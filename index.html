@@ -36,6 +36,16 @@ button,input,select{font:inherit;color:inherit}
 .login-box{background:var(--card);border:1px solid var(--bd);border-radius:18px;padding:24px;width:100%;box-shadow:var(--sh)}
 @media (max-width:820px){.auth-wrap{grid-template-columns:1fr;gap:24px}.pitch h1{font-size:26px}#authForm{order:-1}}
 .mut{color:var(--mut)}.small{font-size:13px}
+.linkbtn{background:none;border:0;color:var(--pri);cursor:pointer;font-weight:500;padding:4px}
+.linkbtn:hover{text-decoration:underline}
+.ok-msg{background:var(--pri-soft);color:var(--pri);padding:10px 12px;border-radius:10px;font-size:14px;margin:0 0 12px}
+.warn-box{background:var(--warn-soft);color:var(--warn);padding:10px 12px;border-radius:10px;font-size:14px;margin:0 0 12px}
+/* Admin */
+.tbl-wrap{overflow-x:auto}
+table.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
+.tbl th{text-align:left;color:var(--mut);font-weight:500;padding:8px 10px;border-bottom:1px solid var(--bd);white-space:nowrap}
+.tbl td{padding:9px 10px;border-bottom:1px solid var(--bd);white-space:nowrap;font-variant-numeric:tabular-nums}
+.tbl tr:last-child td{border-bottom:0}
 
 /* Planos */
 #paywall{min-height:100vh;padding:16px}
@@ -163,16 +173,23 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
       <div class="pitch-price" id="pitchPrice"></div>
     </div>
     <form class="login-box" id="authForm" novalidate>
-      <div class="seg">
+      <div class="seg" id="authSeg">
         <label><input type="radio" name="mode" value="login" checked><span>Entrar</span></label>
         <label><input type="radio" name="mode" value="signup"><span>Criar conta</span></label>
       </div>
+      <h3 id="authTitle" class="hidden" style="margin:0 0 6px"></h3>
+      <p id="authSub" class="small mut hidden" style="margin:0 0 14px"></p>
       <label class="f hidden" id="nameField">Seu nome<input name="name" autocomplete="name"></label>
-      <label class="f">E-mail<input name="email" type="text" inputmode="email" autocomplete="username" autocapitalize="none"></label>
-      <label class="f">Senha<input name="password" type="password" autocomplete="current-password"></label>
+      <label class="f" id="emailField">E-mail<input name="email" type="text" inputmode="email" autocomplete="username" autocapitalize="none"></label>
+      <label class="f" id="passField">Senha<input name="password" type="password" autocomplete="current-password"></label>
+      <label class="f hidden" id="pass2Field">Repita a nova senha<input name="password2" type="password" autocomplete="new-password"></label>
       <p class="err" id="authErr"></p>
+      <p class="ok-msg hidden" id="authOk"></p>
       <button class="btn pri" id="authBtn" style="width:100%">Entrar</button>
-      <p class="small mut" id="authHint" style="margin:12px 0 0">Esqueceu a senha? Peça para o titular da conta redefinir em <b>Conta</b>.</p>
+      <p class="small" style="margin:12px 0 0;text-align:center">
+        <button type="button" class="linkbtn" id="forgotLink" data-act="auth-mode" data-mode="forgot">Esqueci minha senha</button>
+        <button type="button" class="linkbtn hidden" id="backLink" data-act="auth-mode" data-mode="login">← Voltar para entrar</button>
+      </p>
     </form>
   </div>
 </section>
@@ -208,6 +225,7 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
       <button data-act="tab" data-tab="bills">Contas a pagar</button>
       <button data-act="tab" data-tab="investments">Investimentos</button>
       <button data-act="tab" data-tab="conta">Conta</button>
+      <button data-act="tab" data-tab="admin" id="adminTab" class="hidden">Admin</button>
     </nav>
   </header>
   <main id="view"></main>
@@ -289,7 +307,8 @@ const show = id => views.forEach(v => $(v).classList.toggle('hidden', v !== id))
 
 function applyMe(d) {
   S.me = d.user; S.account = d.account; S.members = d.members; S.plans = d.plans;
-  S.user = d.user.name; S.users = d.members.map(m => m.name);
+  S.user = d.user.name; S.users = d.members.map(m => m.name); S.mail = d.mail;
+  $('#adminTab').classList.toggle('hidden', !d.user.admin);
 }
 async function loadMe() { applyMe(await api('/api/auth')); }
 
@@ -338,23 +357,41 @@ function route(pago) {
   if (pago === 'ok') toast('Pagamento aprovado! Acesso liberado ✓');
 }
 
-let authMode = 'login';
-$('#authForm').querySelectorAll('input[name=mode]').forEach(r => r.onchange = () => {
-  authMode = r.value;
-  $('#nameField').classList.toggle('hidden', authMode !== 'signup');
-  $('#authBtn').textContent = authMode === 'signup' ? 'Criar conta e escolher plano' : 'Entrar';
-  $('#authHint').classList.toggle('hidden', authMode === 'signup');
-  $('#authForm [name=password]').autocomplete = authMode === 'signup' ? 'new-password' : 'current-password';
-  $('#authErr').textContent = '';
-});
+let authMode = 'login', resetToken = null;
+function setAuthMode(mode) {
+  authMode = mode;
+  const tog = (id, on) => $(id).classList.toggle('hidden', !on);
+  const special = mode === 'forgot' || mode === 'reset';
+  tog('#authSeg', !special); tog('#authTitle', special); tog('#authSub', special);
+  tog('#nameField', mode === 'signup');
+  tog('#emailField', mode !== 'reset');
+  tog('#passField', mode !== 'forgot');
+  tog('#pass2Field', mode === 'reset');
+  tog('#forgotLink', mode === 'login'); tog('#backLink', special);
+  $('#authTitle').textContent = mode === 'forgot' ? 'Esqueci minha senha' : 'Criar nova senha';
+  $('#authSub').textContent = mode === 'forgot'
+    ? 'Informe o e-mail do cadastro. Vamos enviar um link para você criar uma nova senha.'
+    : 'Escolha uma nova senha com pelo menos 8 caracteres.';
+  $('#authBtn').textContent = { login: 'Entrar', signup: 'Criar conta e escolher plano', forgot: 'Enviar link', reset: 'Salvar nova senha e entrar' }[mode];
+  $('#passField').firstChild.textContent = mode === 'reset' ? 'Nova senha' : 'Senha';
+  $('#authForm [name=password]').autocomplete = mode === 'login' ? 'current-password' : 'new-password';
+  $('#authErr').textContent = ''; tog('#authOk', false);
+  if (mode === 'login' || mode === 'signup') $(`#authForm input[name=mode][value=${mode}]`).checked = true;
+}
+$('#authForm').querySelectorAll('input[name=mode]').forEach(r => r.onchange = () => setAuthMode(r.value));
 $('#authForm').addEventListener('submit', async e => {
   e.preventDefault();
   const f = new FormData(e.target), btn = $('#authBtn');
-  btn.disabled = true;
+  if (authMode === 'reset' && f.get('password') !== f.get('password2')) return ($('#authErr').textContent = 'As senhas não conferem');
+  btn.disabled = true; $('#authErr').textContent = '';
   try {
-    const d = await api(`/api/auth?action=${authMode}`, { method: 'POST', body: {
-      name: f.get('name'), email: f.get('email'), password: f.get('password') } });
-    applyMe(d); e.target.reset(); $('#authForm [value=login]').click(); route();
+    const body = authMode === 'reset' ? { token: resetToken, password: f.get('password') }
+      : { name: f.get('name'), email: f.get('email'), password: f.get('password') };
+    const d = await api(`/api/auth?action=${authMode}`, { method: 'POST', body });
+    if (authMode === 'forgot') { $('#authOk').textContent = d.message; $('#authOk').classList.remove('hidden'); return; }
+    const wasReset = authMode === 'reset';
+    applyMe(d); e.target.reset(); setAuthMode('login'); resetToken = null; route();
+    if (wasReset) toast('Senha alterada ✓');
   } catch (err) { if (err.message !== 'auth') $('#authErr').textContent = err.message; }
   finally { btn.disabled = false; }
 });
@@ -370,7 +407,9 @@ async function start() {
 (async () => {
   const qs = new URLSearchParams(location.search);
   const pago = qs.get('pago'), pid = qs.get('payment_id') || qs.get('collection_id');
-  if (pago) history.replaceState(null, '', location.pathname);
+  const reset = qs.get('reset');
+  if (pago || reset) history.replaceState(null, '', location.pathname);
+  if (reset) { resetToken = reset; showAuth(); setAuthMode('reset'); return; }
   try {
     await loadMe();
     if (pago && pid && pid !== 'null') {
@@ -384,17 +423,67 @@ async function start() {
 function render() {
   $('#monthLbl').textContent = `${MESES[S.m - 1]} ${S.y}`;
   document.querySelectorAll('nav.tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === S.tab));
-  $('#fab').classList.toggle('hidden', S.tab === 'painel' || S.tab === 'conta');
-  $('.month').style.visibility = S.tab === 'conta' ? 'hidden' : '';
+  $('#fab').classList.toggle('hidden', ['painel', 'conta', 'admin'].includes(S.tab));
+  $('.month').style.visibility = ['conta', 'admin'].includes(S.tab) ? 'hidden' : '';
   Object.values(S.charts).forEach(c => c.destroy()); S.charts = {};
-  ({ painel: renderPainel, transactions: renderTx, bills: renderBills, investments: renderInv, conta: renderConta })[S.tab]();
+  ({ painel: renderPainel, transactions: renderTx, bills: renderBills, investments: renderInv, conta: renderConta, admin: renderAdmin })[S.tab]();
+}
+
+async function renderAdmin() {
+  $('#view').innerHTML = '<div class="empty">Carregando…</div>';
+  let d;
+  try { d = S.adm = await api('/api/admin?action=overview'); }
+  catch (e) { if (e.message !== 'auth') $('#view').innerHTML = `<div class="empty">Erro: ${esc(e.message)}</div>`; return; }
+  const s = d.stats, r = d.revenue;
+  const planLbl = p => p === 'vitalicio' ? 'Vitalício' : p ? cap(p) : '—';
+  $('#view').innerHTML = `
+    <div class="bar"><h2>Administração</h2><div class="spacer"></div>
+      <input id="admSearch" placeholder="Buscar conta ou e-mail" style="border:1px solid var(--bd);background:var(--card);border-radius:10px;padding:7px 10px;min-width:220px"></div>
+    <div class="grid kpis">
+      <div class="card kpi"><div class="l">Recebido no mês</div><div class="v in">${fm(r.mes)}</div><div class="s">${r.pagamentos} pagamento(s) no total</div></div>
+      <div class="card kpi"><div class="l">Recebido desde o início</div><div class="v">${fm(r.total)}</div></div>
+      <div class="card kpi"><div class="l">Contas pagantes ativas</div><div class="v">${s.pagantes}</div><div class="s">${s.contas} contas no total · ${s.novas_30d} novas em 30 dias</div></div>
+      <div class="card kpi"><div class="l">Cadastraram e não pagaram</div><div class="v">${s.sem_pagamento}</div></div>
+      <div class="card kpi"><div class="l">Vencidas</div><div class="v ${s.vencidas ? 'out' : ''}">${s.vencidas}</div></div>
+    </div>
+    <div class="section-t">Contas</div>
+    <div class="card tbl-wrap" style="padding:4px 6px"><table class="tbl"><thead><tr>
+      <th>Conta</th><th>Titular</th><th>Plano</th><th>Acesso até</th><th>Pessoas</th><th>Pago</th><th>Criada</th><th></th></tr></thead>
+      <tbody id="admRows"></tbody></table></div>
+    <div class="section-t">Últimos pagamentos</div>
+    <div class="card tbl-wrap" style="padding:4px 6px"><table class="tbl"><thead><tr>
+      <th>Quando</th><th>Conta</th><th>Plano</th><th>Valor</th><th>Status</th><th>ID Mercado Pago</th></tr></thead>
+      <tbody>${d.payments.map(p => `<tr><td>${esc(p.quando)}</td><td>${esc(p.account_name || '—')}</td><td>${esc(planLbl(p.plan))}</td>
+        <td>${fm(p.amount)}</td><td>${p.credited ? '<span class="badge b-ok">Creditado</span>' : `<span class="badge ${p.status === 'approved' ? 'b-late' : 'b-rec'}">${esc(p.status)}</span>`}</td>
+        <td class="mut">${esc(p.id)}</td></tr>`).join('') || '<tr><td colspan="6" class="mut">Nenhum pagamento ainda</td></tr>'}</tbody></table></div>`;
+  const rows = () => {
+    const t = ($('#admSearch').value || '').toLowerCase();
+    $('#admRows').innerHTML = d.accounts.filter(a => !t || `${a.name} ${a.owner_email}`.toLowerCase().includes(t)).map(a => {
+      const st = a.plan === 'vitalicio' ? '<span class="badge b-ok">Vitalício</span>'
+        : a.active ? `${fd(a.paid_until)}` : a.paid_until ? `<span class="badge b-late">Venceu ${fd(a.paid_until)}</span>` : '<span class="badge b-rec">Nunca pagou</span>';
+      return `<tr><td>${esc(a.name)}</td><td class="mut">${esc(a.owner_email || '—')}</td><td>${esc(planLbl(a.plan))}</td><td>${st}</td>
+        <td>${a.members}</td><td>${fm(a.paid_total)}</td><td class="mut">${fd(a.created)}</td>
+        <td>${a.plan === 'vitalicio' ? '' : `<button class="btn sm" data-act="adm-extend" data-id="${a.id}">+ dias</button>`}</td></tr>`;
+    }).join('') || '<tr><td colspan="8" class="mut">Nenhuma conta encontrada</td></tr>';
+  };
+  rows(); $('#admSearch').oninput = rows;
 }
 
 function renderConta() {
   const a = S.account, owner = S.me.role === 'owner';
   const vital = a.plan === 'vitalicio';
+  const semEmail = !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(S.me.email);
   $('#view').innerHTML = `<div class="stack">
     <div class="bar"><h2>Conta</h2></div>
+    <div class="card">
+      <h3>Meus dados</h3>
+      ${semEmail ? `<div class="warn-box">Cadastre seu e-mail para poder entrar com ele e recuperar a senha se esquecer.</div>` : ''}
+      <form id="profileForm"><div class="form-row" style="grid-template-columns:1fr 1fr auto">
+        <label class="f">Nome<input name="name" value="${esc(S.me.name)}" required></label>
+        <label class="f">E-mail de login<input name="email" type="email" autocapitalize="none" value="${semEmail ? '' : esc(S.me.email)}" placeholder="${semEmail ? 'seu@email.com' : ''}" required></label>
+        <button class="btn">Salvar</button>
+      </div><p class="err" id="profileErr"></p></form>
+    </div>
     <div class="card">
       <h3>Assinatura</h3>
       <div class="kpi"><div class="l">${esc(a.name)}</div>
@@ -408,7 +497,7 @@ function renderConta() {
       <div class="list" style="box-shadow:none">${S.members.map(m => `
         <div class="row"><div class="main"><div class="t">${esc(cap(m.name))}${m.role === 'owner' ? '<span class="badge b-ok">Titular</span>' : ''}${m.id === S.me.id ? '<span class="badge b-rec">Você</span>' : ''}</div>
           <div class="m">${esc(m.email)}</div></div>
-          ${owner && m.role !== 'owner' ? `<button class="ghost" data-act="rm-member" data-id="${m.id}" title="Remover acesso">🗑</button>` : ''}
+          ${owner && m.role !== 'owner' ? `<button class="btn sm" data-act="member-pass" data-id="${m.id}">Redefinir senha</button><button class="ghost" data-act="rm-member" data-id="${m.id}" title="Remover acesso">🗑</button>` : ''}
         </div>`).join('')}</div>
       ${owner ? `<form id="memberForm" style="margin-top:14px">
         <p class="small mut" style="margin:0 0 10px">Adicione quem divide as contas com você. Ela entra com o e-mail e a senha que você definir e pode trocar a senha depois.</p>
@@ -435,6 +524,14 @@ function renderConta() {
       applyMe(await api('/api/auth?action=member', { method: 'POST', body: Object.fromEntries(f) }));
       renderConta(); toast('Pessoa adicionada ✓');
     } catch (err) { if (err.message !== 'auth') $('#memberErr').textContent = err.message; }
+  });
+  $('#profileForm').addEventListener('submit', async e => {
+    e.preventDefault(); const f = new FormData(e.target);
+    try {
+      applyMe(await api('/api/auth?action=profile', { method: 'POST', body: Object.fromEntries(f) }));
+      $('#whoLbl').textContent = 'Olá, ' + cap(S.user.split(' ')[0]);
+      await load('transactions'); renderConta(); toast('Dados salvos ✓');
+    } catch (err) { if (err.message !== 'auth') $('#profileErr').textContent = err.message; }
   });
   $('#passForm').addEventListener('submit', async e => {
     e.preventDefault(); const f = new FormData(e.target);
@@ -804,6 +901,21 @@ document.addEventListener('click', async e => {
       b.disabled = true;
       await api(`/api/data?r=bills&action=pay&id=${id}`, { method: 'POST', body: { date: today(), person: S.user } });
       await Promise.all([load('bills'), load('transactions')]); render(); toast('Conta paga ✓');
+    }
+    else if (act === 'auth-mode') setAuthMode(b.dataset.mode);
+    else if (act === 'member-pass') {
+      const m = S.members.find(x => x.id === id);
+      const pw = prompt(`Nova senha para ${cap(m.name)} (mínimo 8 caracteres).\nPasse para a pessoa; ela pode trocar depois em Conta.`);
+      if (pw === null) return;
+      await api('/api/auth?action=member-password', { method: 'POST', body: { id, password: pw } });
+      toast(`Senha de ${cap(m.name)} redefinida ✓`);
+    }
+    else if (act === 'adm-extend') {
+      const a = S.adm.accounts.find(x => x.id === id);
+      const v = prompt(`Quantos dias dar para "${a.name}"?\n(Use número negativo para tirar dias.)`, '30');
+      if (v === null) return;
+      const r = await api('/api/admin?action=extend', { method: 'POST', body: { account_id: id, days: Number(v) } });
+      toast(`Acesso até ${fd(r.paid_until)} ✓`); renderAdmin();
     }
     else if (act === 'logout') { await api('/api/auth', { method: 'DELETE' }).catch(() => {}); S.account = null; showAuth(); }
     else if (act === 'checkout') {

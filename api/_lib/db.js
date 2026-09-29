@@ -69,6 +69,18 @@ const DDL = [
   `CREATE INDEX IF NOT EXISTS transactions_acc_idx ON transactions(account_id, date)`,
   `CREATE INDEX IF NOT EXISTS bills_acc_idx ON bills(account_id)`,
   `CREATE INDEX IF NOT EXISTS investments_acc_idx ON investments(account_id)`,
+  `CREATE TABLE IF NOT EXISTS password_resets (
+    token_hash TEXT PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    expires_at TIMESTAMPTZ NOT NULL,
+    used BOOLEAN NOT NULL DEFAULT false
+  )`,
+  `CREATE TABLE IF NOT EXISTS login_attempts (
+    id SERIAL PRIMARY KEY,
+    key TEXT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  )`,
+  `CREATE INDEX IF NOT EXISTS login_attempts_idx ON login_attempts(key, created_at)`,
 ];
 
 // Usuários antigos da variável USERS ("nome:senha;nome:senha") viram a conta

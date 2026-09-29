@@ -31,6 +31,9 @@ api/_lib/billing.js     # integração Mercado Pago e regra de liberação do ac
 | `PRICE_ANUAL` | não | Preço do plano anual (padrão `179.90`) |
 | `MP_WEBHOOK_SECRET` | não | Assinatura secreta do webhook (camada extra de segurança) |
 | `APP_URL` | não | Domínio próprio, ex. `https://financasdocasal.com.br` |
+| `ADMIN_EMAILS` | não | E-mails com acesso à aba **Admin**, separados por vírgula |
+| `RESEND_API_KEY` | não | Chave do resend.com para o "Esqueci minha senha" por e-mail |
+| `MAIL_FROM` | não | Remetente, ex. `Finanças do Casal <nao-responda@seudominio.com.br>` |
 | `USERS` | não | Só para a migração da conta antiga (`nome:senha;nome:senha`) |
 
 Depois de mudar variáveis, faça **Redeploy**.
@@ -66,7 +69,23 @@ cada um pode trocar a senha na aba **Conta**, e a variável `USERS` pode ser rem
 ## Pessoas por conta
 
 O titular adiciona até 5 pessoas na aba **Conta**, com e-mail e senha inicial.
-Todos veem e editam os mesmos dados. Esqueceu a senha: o titular remove e adiciona de novo.
+Todos veem e editam os mesmos dados. O titular também pode redefinir a senha de quem ele adicionou.
+
+## Esqueci minha senha
+
+Com `RESEND_API_KEY` configurada, a tela de entrada envia um link por e-mail (vale 1 hora, uso único).
+No Resend, verifique seu domínio para enviar para qualquer endereço; sem domínio verificado,
+o remetente de teste `onboarding@resend.dev` só entrega no e-mail da sua própria conta Resend.
+
+## Segurança do login
+
+Depois de 8 senhas erradas para o mesmo e-mail (ou 30 do mesmo IP), o login fica bloqueado por 15 minutos.
+
+## Administração
+
+Quem estiver em `ADMIN_EMAILS` vê a aba **Admin**: receita do mês e total, contas pagantes, vencidas e
+que nunca pagaram, busca por conta ou e-mail, últimos pagamentos e botão **+ dias** para dar
+(ou tirar, com número negativo) dias de acesso manualmente.
 
 ## Como funciona o app
 
