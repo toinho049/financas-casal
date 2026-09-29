@@ -1,5 +1,5 @@
 import { getSession } from './_lib/auth.js';
-import { createCheckout, processPayment, publicPlans, baseUrl } from './_lib/billing.js';
+import { createCheckout, createPix, processPayment, publicPlans, baseUrl } from './_lib/billing.js';
 
 export default async function handler(req, res) {
   const action = req.query.action || '';
@@ -13,6 +13,11 @@ export default async function handler(req, res) {
     if (action === 'checkout') {
       const url = await createCheckout({ accountId: me.account_id, email: me.email, plan: req.body?.plan, base: baseUrl(req) });
       return res.json({ url });
+    }
+
+    if (action === 'pix') {
+      const pix = await createPix({ accountId: me.account_id, email: me.email, plan: req.body?.plan, base: baseUrl(req) });
+      return res.json(pix);
     }
 
     // Retorno do checkout: confere o pagamento na hora, sem esperar o webhook

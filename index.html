@@ -61,6 +61,13 @@ table.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
 .plan .pr small{font-size:14px;font-weight:500;color:var(--mut)}
 .plan .eq{font-size:13px;color:var(--mut);min-height:20px;margin:2px 0 14px}
 .plan .btn{width:100%}
+.pay-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#pixDlg .dlg-b{text-align:center}
+.pix-qr{width:220px;height:220px;margin:6px auto 10px;display:block;background:#fff;border-radius:12px;padding:8px}
+.pix-code{width:100%;font:12px/1.4 ui-monospace,monospace;padding:10px;border:1px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx);resize:none;height:74px}
+.pix-wait{display:flex;align-items:center;justify-content:center;gap:8px;color:var(--mut);font-size:14px;margin:10px 0 4px}
+.spin{width:14px;height:14px;border:2px solid var(--bd);border-top-color:var(--pri);border-radius:50%;animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
 
 /* Conta */
 .stack{display:grid;gap:14px;max-width:720px}
@@ -244,6 +251,19 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
   </form>
 </dialog>
 
+<dialog id="pixDlg">
+  <div class="dlg-h"><h3>Pagar com Pix</h3><button type="button" class="ghost" data-act="pix-close">✕</button></div>
+  <div class="dlg-b">
+    <div id="pixAmount" style="font-size:22px;font-weight:700"></div>
+    <p class="small mut" style="margin:4px 0 8px">Abra o app do seu banco, escolha <b>Pix → Ler QR code</b> ou use o <b>copia e cola</b>.</p>
+    <img class="pix-qr" id="pixImg" alt="QR code do Pix">
+    <textarea class="pix-code" id="pixCode" readonly></textarea>
+    <button class="btn pri" style="width:100%;margin-top:8px" data-act="pix-copy">Copiar código Pix</button>
+    <div class="pix-wait" id="pixWait"><span class="spin"></span>Aguardando pagamento… o acesso libera sozinho.</div>
+    <p class="small mut" style="margin:0 0 14px">O código vale por 30 minutos.</p>
+  </div>
+</dialog>
+
 <datalist id="cats"></datalist>
 
 <script>
@@ -322,7 +342,10 @@ function planCards(plans, highlight = 'anual') {
       <h3>Plano ${esc(p.title)}</h3>
       <div class="pr">${fm(p.price)} <small>/ ${esc(p.period)}</small></div>
       <div class="eq">${per ? `equivale a ${fm(per)} por mês` : 'renove quando quiser'}</div>
-      <button class="btn ${p.id === highlight ? 'pri' : ''}" data-act="checkout" data-plan="${p.id}">Pagar com Pix ou cartão</button>
+      <div class="pay-btns">
+        <button class="btn ${p.id === highlight ? 'pri' : ''}" data-act="pix" data-plan="${p.id}">Pix</button>
+        <button class="btn" data-act="checkout" data-plan="${p.id}">Cartão</button>
+      </div>
     </div>`;
   }).join('');
 }
@@ -871,6 +894,30 @@ function sendWhatsApp(kind) {
   window.open('https://wa.me/?text=' + encodeURIComponent(waText(kind)), '_blank');
 }
 
+/* ---------- Pix ---------- */
+let pixTimer = null;
+function closePix() { clearInterval(pixTimer); pixTimer = null; if ($('#pixDlg').open) $('#pixDlg').close(); }
+function openPix(d) {
+  $('#pixAmount').textContent = fm(d.amount);
+  $('#pixImg').src = 'data:image/png;base64,' + d.qr_base64;
+  $('#pixImg').classList.toggle('hidden', !d.qr_base64);
+  $('#pixCode').value = d.qr_code;
+  $('#pixDlg').showModal();
+  const started = Date.now();
+  clearInterval(pixTimer);
+  pixTimer = setInterval(async () => {
+    if (Date.now() - started > 31 * 60 * 1000) { closePix(); toast('O código Pix expirou. Gere um novo.'); return; }
+    try {
+      const r = await api('/api/billing?action=confirm', { method: 'POST', body: { payment_id: d.id } });
+      if (r.credited || r.status === 'approved') {
+        closePix(); await loadMe();
+        if (S.account.active) { S.tab = S.tab === 'admin' ? 'painel' : S.tab; route('ok'); }
+      }
+    } catch {}
+  }, 4000);
+}
+$('#pixDlg').addEventListener('close', () => { clearInterval(pixTimer); pixTimer = null; });
+
 /* ---------- Ações ---------- */
 const resOfTab = () => (S.tab === 'painel' ? 'transactions' : S.tab);
 const findItem = (res, id) => ({ transactions: S.tx, bills: S.bills, investments: S.inv }[res]).find(x => x.id === id);
@@ -918,6 +965,18 @@ document.addEventListener('click', async e => {
       toast(`Acesso até ${fd(r.paid_until)} ✓`); renderAdmin();
     }
     else if (act === 'logout') { await api('/api/auth', { method: 'DELETE' }).catch(() => {}); S.account = null; showAuth(); }
+    else if (act === 'pix') {
+      b.disabled = true; b.textContent = 'Gerando…';
+      const d = await api('/api/billing?action=pix', { method: 'POST', body: { plan: b.dataset.plan } });
+      b.disabled = false; b.textContent = 'Pix';
+      openPix(d);
+    }
+    else if (act === 'pix-copy') {
+      const t = $('#pixCode'); t.select();
+      try { await navigator.clipboard.writeText(t.value); } catch { document.execCommand('copy'); }
+      toast('Código Pix copiado ✓');
+    }
+    else if (act === 'pix-close') closePix();
     else if (act === 'checkout') {
       b.disabled = true; b.textContent = 'Abrindo Mercado Pago…';
       const d = await api('/api/billing?action=checkout', { method: 'POST', body: { plan: b.dataset.plan } });
@@ -933,7 +992,7 @@ document.addEventListener('click', async e => {
   } catch (err) {
     if (err.message !== 'auth') {
       const box = $('#paywall').classList.contains('hidden') ? $('#contaPayErr') : $('#payErr');
-      if (act === 'checkout' && box) { box.textContent = err.message; b.textContent = 'Pagar com Pix ou cartão'; }
+      if ((act === 'checkout' || act === 'pix') && box) { box.textContent = err.message; b.textContent = act === 'pix' ? 'Pix' : 'Cartão'; }
       else toast(err.message);
     }
     b.disabled = false;

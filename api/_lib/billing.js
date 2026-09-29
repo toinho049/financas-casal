@@ -5,8 +5,8 @@ const num = (v, d) => (Number.isFinite(Number(v)) && Number(v) > 0 ? Number(v) :
 
 // Preços configuráveis pelas variáveis PRICE_MENSAL e PRICE_ANUAL
 export const PLANS = {
-  mensal: { id: 'mensal', title: 'Mensal', period: '1 mês', price: num(process.env.PRICE_MENSAL, 19.9), interval: '1 month' },
-  anual: { id: 'anual', title: 'Anual', period: '12 meses', price: num(process.env.PRICE_ANUAL, 179.9), interval: '1 year' },
+  mensal: { id: 'mensal', title: 'Mensal', period: '1 mês', price: num(process.env.PRICE_MENSAL, 10), interval: '1 month' },
+  anual: { id: 'anual', title: 'Anual', period: '12 meses', price: num(process.env.PRICE_ANUAL, 20), interval: '1 year' },
 };
 
 export const publicPlans = () =>
@@ -52,6 +52,39 @@ export async function createCheckout({ accountId, email, plan, base }) {
     },
   });
   return pref.init_point;
+}
+
+// Pix direto: devolve o QR code e o "copia e cola" para mostrar no próprio site
+export async function createPix({ accountId, email, plan, base }) {
+  const p = PLANS[plan];
+  if (!p) throw new Error('Plano inválido');
+  if (!email || !email.includes('@')) throw new Error('Cadastre seu e-mail em Conta → Meus dados antes de pagar com Pix.');
+  // expira em 30 minutos (horário de Brasília)
+  const exp = new Date(Date.now() + 30 * 60 * 1000 - 3 * 60 * 60 * 1000).toISOString().replace('Z', '-03:00');
+  let pay;
+  try {
+    pay = await mp('/v1/payments', {
+      method: 'POST',
+      idem: crypto.randomUUID(),
+      body: {
+        transaction_amount: p.price,
+        description: `Finanças do Casal — plano ${p.title}`,
+        payment_method_id: 'pix',
+        payer: { email },
+        external_reference: `acc:${accountId}:${p.id}`,
+        notification_url: `${base}/api/mp-webhook`,
+        date_of_expiration: exp,
+      },
+    });
+  } catch (e) {
+    if (/key enabled|without key|pix key/i.test(e.message)) {
+      throw new Error('A conta do Mercado Pago que recebe ainda não tem chave Pix cadastrada. Use o cartão ou tente mais tarde.');
+    }
+    throw e;
+  }
+  const td = pay.point_of_interaction?.transaction_data || {};
+  if (!td.qr_code) throw new Error('O Mercado Pago não devolveu o QR code do Pix. Tente de novo ou pague com cartão.');
+  return { id: String(pay.id), qr_code: td.qr_code, qr_base64: td.qr_code_base64, amount: p.price, expires: exp };
 }
 
 // Busca o pagamento direto no Mercado Pago (fonte da verdade) e libera o acesso.
