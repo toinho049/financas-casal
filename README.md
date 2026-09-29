@@ -1,50 +1,79 @@
-# Finanças do Casal
+# Finanças do Casal (SaaS)
 
-Sistema simples para controlar entradas, saídas, contas a pagar e investimentos, com gráficos.
-Front-end em HTML/JS puro + funções serverless da Vercel + Postgres (Neon, plano grátis).
+Controle financeiro para casais e famílias: entradas, saídas, contas a pagar, investimentos,
+gráficos e resumo para o WhatsApp. Cada conta tem seus dados isolados, cadastro com e-mail e
+senha, e acesso liberado por pagamento no Mercado Pago (Pix ou cartão).
+
+Front-end em HTML/JS puro + funções serverless da Vercel + Postgres (Neon).
 
 ## Estrutura
 
 ```
-index.html          # interface (painel, lançamentos, contas, investimentos)
-api/login.js        # login/logout (cookie assinado, 30 dias)
-api/data.js         # CRUD de transactions, bills, investments + "pagar conta"
-api/_lib/db.js      # conexão Neon; cria as tabelas sozinho na 1ª chamada
-api/_lib/auth.js    # usuários vindos da variável USERS
+index.html              # tela de entrada/cadastro, planos, app e aba Conta
+api/auth.js             # sessão, login, cadastro, pessoas da conta, troca de senha
+api/data.js             # lançamentos, contas a pagar, investimentos (sempre filtrado pela conta)
+api/billing.js          # planos, criação do checkout e confirmação no retorno
+api/mp-webhook.js       # notificações do Mercado Pago
+api/_lib/db.js          # conexão Neon; cria/migra as tabelas sozinho
+api/_lib/auth.js        # cookie de sessão assinado
+api/_lib/password.js    # hash de senha (scrypt)
+api/_lib/billing.js     # integração Mercado Pago e regra de liberação do acesso
 ```
 
-## Deploy na Vercel (≈10 min)
+## Variáveis de ambiente (Vercel → Settings → Environment Variables)
 
-1. Suba esta pasta para um repositório no GitHub (pode ser privado).
-2. Na Vercel: **Add New → Project** → importe o repositório. Framework: **Other**. Não precisa de build command.
-3. No projeto, aba **Storage → Create Database → Neon (Postgres)** → conecte ao projeto.
-   Isso cria a variável `DATABASE_URL` automaticamente.
-4. Em **Settings → Environment Variables**, adicione:
-   - `USERS` = `mateus:SuaSenha;esposa:SenhaDela`  (usuário:senha, separados por `;`)
-   - `SESSION_SECRET` = um texto longo e aleatório (ex.: saída de `openssl rand -base64 32`)
-5. **Redeploy**. Pronto — as tabelas são criadas no primeiro acesso.
+| Variável | Obrigatória | O que é |
+|---|---|---|
+| `DATABASE_URL` | sim | Criada sozinha ao conectar o Neon em Storage |
+| `SESSION_SECRET` | sim | Texto longo e aleatório. Trocar desloga todo mundo |
+| `MP_ACCESS_TOKEN` | sim, para cobrar | Access Token de **produção** do Mercado Pago |
+| `PRICE_MENSAL` | não | Preço do plano mensal (padrão `19.90`) |
+| `PRICE_ANUAL` | não | Preço do plano anual (padrão `179.90`) |
+| `MP_WEBHOOK_SECRET` | não | Assinatura secreta do webhook (camada extra de segurança) |
+| `APP_URL` | não | Domínio próprio, ex. `https://financasdocasal.com.br` |
+| `USERS` | não | Só para a migração da conta antiga (`nome:senha;nome:senha`) |
 
-> Para trocar senha ou tirar alguém, edite `USERS` e faça redeploy. Mudar o `SESSION_SECRET` desloga todo mundo.
-> O nome antes do `:` é o que aparece no campo "Quem" dos lançamentos.
+Depois de mudar variáveis, faça **Redeploy**.
 
-## Rodar local
+## Mercado Pago
 
-```bash
-npm i
-npm i -g vercel
-vercel link
-vercel env pull .env.local   # traz DATABASE_URL, USERS e SESSION_SECRET
-vercel dev
-```
+1. Em mercadopago.com.br/developers → **Suas integrações → Criar aplicação**
+   (tipo: pagamentos online / Checkout Pro).
+2. Em **Credenciais de produção**, copie o **Access Token** para `MP_ACCESS_TOKEN`.
+3. (Opcional) Em **Webhooks**, cadastre `https://SEU-DOMINIO/api/mp-webhook` com o evento
+   **Pagamentos** e copie a assinatura secreta para `MP_WEBHOOK_SECRET`.
+   O sistema já envia o endereço do webhook em cada checkout, então funciona mesmo sem este passo.
 
-## Como funciona
+Para testar sem cobrar de verdade, use as credenciais de **teste** e os cartões de teste
+do Mercado Pago num deploy de preview.
+
+## Como a cobrança funciona
+
+- A pessoa cria a conta e vai para a tela de planos. Sem pagamento aprovado, os dados ficam bloqueados.
+- Pagamento aprovado soma o período (1 mês ou 12 meses) à data atual de vencimento.
+  Renovar antes do fim não perde dias.
+- O sistema nunca confia só na notificação: busca o pagamento na API do Mercado Pago,
+  confere o valor e a moeda e credita uma única vez por pagamento.
+- Pix pendente: o acesso libera quando o Mercado Pago confirma (webhook ou botão "Já paguei").
+- Venceu: a conta volta para a tela de planos. Os dados continuam guardados.
+
+## Conta principal (migração)
+
+Os dados que existiam antes da versão SaaS e os logins da variável `USERS` viram
+automaticamente a "Conta principal", com acesso vitalício. Depois do primeiro acesso,
+cada um pode trocar a senha na aba **Conta**, e a variável `USERS` pode ser removida.
+
+## Pessoas por conta
+
+O titular adiciona até 5 pessoas na aba **Conta**, com e-mail e senha inicial.
+Todos veem e editam os mesmos dados. Esqueceu a senha: o titular remove e adiciona de novo.
+
+## Como funciona o app
 
 - **Entradas e saídas**: lançamentos por mês, com categoria e quem lançou.
-- **Contas a pagar**: ao clicar em *Pagar*, a conta é marcada como paga e vira uma saída automaticamente.
-  Se estiver marcada como *mensal*, a conta do mês seguinte é criada sozinha.
-- **Investimentos**: cadastre o total aplicado e atualize o *valor atual* de vez em quando para ver o rendimento.
-- **WhatsApp**: botão "Enviar no WhatsApp" no Painel (resumo do mês) e em Contas a pagar (só as contas). Abre o WhatsApp com o texto pronto; é só escolher o grupo.
-- **Painel**: resumo do mês, saldo em caixa, entradas × saídas dos últimos 6 meses, gastos por categoria,
-  evolução do saldo e próximas contas.
+- **Contas a pagar**: ao clicar em *Pagar*, a conta vira uma saída. Contas mensais geram a do mês seguinte.
+- **Investimentos**: total aplicado e valor atual para ver o rendimento.
+- **WhatsApp**: botão que abre o WhatsApp com o resumo do mês pronto.
+- **Painel**: resumo do mês, saldo, entradas × saídas dos últimos 6 meses, gastos por categoria.
 
-Dica: no celular, abra o site e use "Adicionar à tela inicial" para usar como app.
+Dica: no celular, "Adicionar à tela inicial" deixa o site com cara de app.

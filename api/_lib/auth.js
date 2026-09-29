@@ -1,47 +1,53 @@
 import crypto from 'node:crypto';
+import { q } from './db.js';
 
 const SECRET = process.env.SESSION_SECRET || '';
-const MAX_AGE = 30 * 24 * 60 * 60; // 30 dias
-
-// USERS="mateus:senha1;esposa:senha2"
-export function users() {
-  return Object.fromEntries(
-    (process.env.USERS || '')
-      .split(';')
-      .map((s) => s.trim())
-      .filter((s) => s.includes(':'))
-      .map((s) => {
-        const i = s.indexOf(':');
-        return [s.slice(0, i).trim().toLowerCase(), s.slice(i + 1)];
-      })
-  );
-}
+export const MAX_AGE = 30 * 24 * 60 * 60; // 30 dias
 
 const sign = (v) => crypto.createHmac('sha256', SECRET).update(v).digest('base64url');
 
-export function safeEq(a, b) {
+function safeEq(a, b) {
   const x = crypto.createHash('sha256').update(String(a)).digest();
   const y = crypto.createHash('sha256').update(String(b)).digest();
   return crypto.timingSafeEqual(x, y);
 }
 
+// O token carrega um pedaço do hash da senha: trocar a senha derruba sessões antigas.
+const tag = (user) => user.pass_hash.slice(-12);
+
 export function makeToken(user) {
-  const payload = Buffer.from(`${user}|${Date.now() + MAX_AGE * 1000}`).toString('base64url');
+  const payload = Buffer.from(`${user.id}|${Date.now() + MAX_AGE * 1000}|${tag(user)}`).toString('base64url');
   return `${payload}.${sign(payload)}`;
 }
 
-export function readUser(req) {
+export function setCookie(res, token, maxAge = MAX_AGE) {
+  res.setHeader('Set-Cookie', `sess=${token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${maxAge}`);
+}
+
+export const SESSION_SELECT = `
+  SELECT u.id, u.name, u.email, u.role, u.pass_hash, u.account_id,
+         a.name AS account_name, a.plan,
+         (a.paid_until AT TIME ZONE 'America/Sao_Paulo')::date::text AS paid_until,
+         (a.paid_until IS NOT NULL AND a.paid_until > now()) AS active
+  FROM users u JOIN accounts a ON a.id = u.account_id`;
+
+export async function getSession(req) {
   if (!SECRET) return null;
   const token = req.cookies?.sess;
   if (!token) return null;
   const [payload, sig] = token.split('.');
   if (!payload || !sig || !safeEq(sig, sign(payload))) return null;
-  const [user, exp] = Buffer.from(payload, 'base64url').toString().split('|');
-  if (Date.now() > Number(exp)) return null;
-  if (!(user in users())) return null; // remover do USERS revoga o acesso
-  return user;
+  const [uid, exp, t] = Buffer.from(payload, 'base64url').toString().split('|');
+  if (!Number(uid) || Date.now() > Number(exp)) return null;
+  const [u] = await q(`${SESSION_SELECT} WHERE u.id = $1`, [Number(uid)]);
+  if (!u || tag(u) !== t) return null;
+  return u;
 }
 
-export function setCookie(res, token, maxAge = MAX_AGE) {
-  res.setHeader('Set-Cookie', `sess=${token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${maxAge}`);
+export function requireSecret(res) {
+  if (!SECRET) {
+    res.status(500).json({ error: 'Configure SESSION_SECRET nas variáveis de ambiente da Vercel.' });
+    return false;
+  }
+  return true;
 }

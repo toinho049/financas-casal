@@ -24,11 +24,39 @@ body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 Inter,system-u
 button,input,select{font:inherit;color:inherit}
 .hidden{display:none!important}
 
-/* Login */
-#login{min-height:100vh;display:grid;place-items:center;padding:16px}
-.login-box{background:var(--card);border:1px solid var(--bd);border-radius:18px;padding:28px;width:100%;max-width:360px;box-shadow:var(--sh)}
-.login-box h1{margin:0 0 4px;font-size:22px}
-.login-box p{margin:0 0 20px;color:var(--mut)}
+/* Entrada / cadastro */
+#auth{min-height:100vh;display:grid;place-items:center;padding:24px 16px}
+.auth-wrap{display:grid;grid-template-columns:1.1fr 380px;gap:48px;align-items:center;max-width:980px;width:100%}
+.pitch h1{font-size:34px;line-height:1.15;margin:18px 0 18px;letter-spacing:-.02em}
+.feat{list-style:none;padding:0;margin:0 0 22px}
+.feat li{padding:7px 0 7px 28px;position:relative;color:var(--tx)}
+.feat li::before{content:"✓";position:absolute;left:0;top:6px;width:20px;height:20px;border-radius:50%;background:var(--pri-soft);color:var(--pri);font-size:12px;font-weight:700;display:grid;place-items:center}
+.pitch-price{font-size:15px;color:var(--mut)}
+.pitch-price b{color:var(--tx);font-size:22px}
+.login-box{background:var(--card);border:1px solid var(--bd);border-radius:18px;padding:24px;width:100%;box-shadow:var(--sh)}
+@media (max-width:820px){.auth-wrap{grid-template-columns:1fr;gap:24px}.pitch h1{font-size:26px}#authForm{order:-1}}
+.mut{color:var(--mut)}.small{font-size:13px}
+
+/* Planos */
+#paywall{min-height:100vh;padding:16px}
+.pay-box{max-width:720px;margin:0 auto}
+.top-mini{display:flex;align-items:center;padding:4px 0 24px}
+.pay-box h1{font-size:26px;margin:0 0 6px}
+.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:20px 0 14px}
+.plan{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:20px;box-shadow:var(--sh);position:relative}
+.plan.best{border:2px solid var(--pri)}
+.plan .tag{position:absolute;top:-11px;left:16px;background:var(--pri);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px}
+.plan h3{margin:0 0 6px;font-size:16px}
+.plan .pr{font-size:28px;font-weight:700;font-variant-numeric:tabular-nums}
+.plan .pr small{font-size:14px;font-weight:500;color:var(--mut)}
+.plan .eq{font-size:13px;color:var(--mut);min-height:20px;margin:2px 0 14px}
+.plan .btn{width:100%}
+
+/* Conta */
+.stack{display:grid;gap:14px;max-width:720px}
+.form-row{display:grid;grid-template-columns:repeat(3,1fr) auto;gap:8px;align-items:end}
+.form-row label.f{margin:0}
+@media (max-width:640px){.form-row{grid-template-columns:1fr}}
 
 /* Layout */
 header{position:sticky;top:0;z-index:5;background:var(--card);border-bottom:1px solid var(--bd)}
@@ -120,15 +148,45 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 </head>
 <body>
 
-<section id="login" class="hidden">
-  <form class="login-box" id="loginForm">
-    <h1>Finanças do Casal</h1>
-    <p>Entre para ver as contas de vocês.</p>
-    <label class="f">Usuário<input name="user" autocomplete="username" autocapitalize="none" required></label>
-    <label class="f">Senha<input name="pass" type="password" autocomplete="current-password" required></label>
-    <p class="err" id="loginErr"></p>
-    <button class="btn pri" style="width:100%">Entrar</button>
-  </form>
+<section id="auth" class="hidden">
+  <div class="auth-wrap">
+    <div class="pitch">
+      <div class="brand"><i>R$</i>Finanças do Casal</div>
+      <h1>O dinheiro de vocês dois, organizado num lugar só.</h1>
+      <ul class="feat">
+        <li>Entradas, saídas e contas a pagar com aviso de vencimento</li>
+        <li>Gráficos do mês, gastos por categoria e evolução do saldo</li>
+        <li>Investimentos com rendimento acompanhado</li>
+        <li>Resumo pronto para mandar no grupo do WhatsApp</li>
+        <li>Um login para cada um, os mesmos dados</li>
+      </ul>
+      <div class="pitch-price" id="pitchPrice"></div>
+    </div>
+    <form class="login-box" id="authForm" novalidate>
+      <div class="seg">
+        <label><input type="radio" name="mode" value="login" checked><span>Entrar</span></label>
+        <label><input type="radio" name="mode" value="signup"><span>Criar conta</span></label>
+      </div>
+      <label class="f hidden" id="nameField">Seu nome<input name="name" autocomplete="name"></label>
+      <label class="f">E-mail<input name="email" type="text" inputmode="email" autocomplete="username" autocapitalize="none"></label>
+      <label class="f">Senha<input name="password" type="password" autocomplete="current-password"></label>
+      <p class="err" id="authErr"></p>
+      <button class="btn pri" id="authBtn" style="width:100%">Entrar</button>
+      <p class="small mut" id="authHint" style="margin:12px 0 0">Esqueceu a senha? Peça para o titular da conta redefinir em <b>Conta</b>.</p>
+    </form>
+  </div>
+</section>
+
+<section id="paywall" class="hidden">
+  <div class="pay-box">
+    <div class="top-mini"><div class="brand"><i>R$</i>Finanças do Casal</div><div class="spacer"></div><button class="ghost" data-act="logout">Sair</button></div>
+    <h1 id="payTitle"></h1>
+    <p class="mut" id="payMsg"></p>
+    <div class="plans" id="payPlans"></div>
+    <p class="err" id="payErr"></p>
+    <p class="small mut">Pagamento seguro pelo Mercado Pago, com Pix ou cartão. O acesso é liberado assim que o pagamento é aprovado. Pix costuma liberar na hora.</p>
+    <button class="btn" data-act="recheck" id="recheckBtn">Já paguei, verificar de novo</button>
+  </div>
 </section>
 
 <div id="app" class="hidden">
@@ -149,6 +207,7 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
       <button data-act="tab" data-tab="transactions">Entradas e saídas</button>
       <button data-act="tab" data-tab="bills">Contas a pagar</button>
       <button data-act="tab" data-tab="investments">Investimentos</button>
+      <button data-act="tab" data-tab="conta">Conta</button>
     </nav>
   </header>
   <main id="view"></main>
@@ -206,7 +265,8 @@ async function api(path, opt = {}) {
     credentials: 'same-origin',
     body: opt.body ? JSON.stringify(opt.body) : undefined,
   });
-  if (r.status === 401) { showLogin(); throw new Error('auth'); }
+  if (r.status === 401) { showAuth(); throw new Error('auth'); }
+  if (r.status === 402) { showPaywall(); throw new Error('auth'); }
   const d = await r.json().catch(() => ({}));
   if (!r.ok) throw new Error(d.error || 'Erro ao comunicar com o servidor');
   return d;
@@ -218,42 +278,171 @@ async function load(res) {
 const loadAll = () => Promise.all(['transactions', 'bills', 'investments'].map(load));
 
 function toast(msg) {
+  document.querySelectorAll('.toast').forEach(x => x.remove());
   const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
   document.body.appendChild(t); setTimeout(() => t.remove(), 2600);
 }
 
-/* ---------- Auth ---------- */
-function showLogin(msg) {
-  $('#app').classList.add('hidden'); $('#login').classList.remove('hidden');
-  $('#loginErr').textContent = msg || '';
+/* ---------- Sessão, cadastro e planos ---------- */
+const views = ['#auth', '#paywall', '#app'];
+const show = id => views.forEach(v => $(v).classList.toggle('hidden', v !== id));
+
+function applyMe(d) {
+  S.me = d.user; S.account = d.account; S.members = d.members; S.plans = d.plans;
+  S.user = d.user.name; S.users = d.members.map(m => m.name);
 }
-$('#loginForm').addEventListener('submit', async e => {
-  e.preventDefault();
-  const fd = new FormData(e.target);
-  try {
-    const d = await api('/api/login', { method: 'POST', body: { user: fd.get('user'), pass: fd.get('pass') } });
-    S.user = d.user; S.users = d.users; e.target.reset(); await start();
-  } catch (err) { if (err.message !== 'auth') $('#loginErr').textContent = err.message; }
+async function loadMe() { applyMe(await api('/api/auth')); }
+
+function planCards(plans, highlight = 'anual') {
+  const mensal = plans.find(p => p.id === 'mensal');
+  return plans.map(p => {
+    const per = p.id === 'anual' ? p.price / 12 : null;
+    const econ = per && mensal ? Math.round((1 - per / mensal.price) * 100) : 0;
+    return `<div class="plan ${p.id === highlight ? 'best' : ''}">
+      ${p.id === highlight && econ > 0 ? `<span class="tag">Economize ${econ}%</span>` : ''}
+      <h3>Plano ${esc(p.title)}</h3>
+      <div class="pr">${fm(p.price)} <small>/ ${esc(p.period)}</small></div>
+      <div class="eq">${per ? `equivale a ${fm(per)} por mês` : 'renove quando quiser'}</div>
+      <button class="btn ${p.id === highlight ? 'pri' : ''}" data-act="checkout" data-plan="${p.id}">Pagar com Pix ou cartão</button>
+    </div>`;
+  }).join('');
+}
+
+function showAuth(msg) {
+  show('#auth');
+  $('#authErr').textContent = msg || '';
+  fetch('/api/billing?action=plans').then(r => r.json()).then(pl => {
+    const m = pl.find(p => p.id === 'mensal'), a = pl.find(p => p.id === 'anual');
+    if (m) $('#pitchPrice').innerHTML = `A partir de <b>${fm(a ? a.price / 12 : m.price)}</b>/mês${a ? ` no plano anual · ou ${fm(m.price)} no mensal` : ''}`;
+  }).catch(() => {});
+}
+
+function showPaywall(pago) {
+  show('#paywall');
+  const a = S.account || {};
+  const venceu = a.paid_until && !a.active;
+  $('#payTitle').textContent = venceu ? 'Seu acesso venceu' : `Falta pouco${S.me ? ', ' + cap(S.me.name.split(' ')[0]) : ''}!`;
+  $('#payMsg').textContent = venceu
+    ? `O acesso terminou em ${fd(a.paid_until)}. Renove para continuar usando. Seus dados continuam guardados.`
+    : 'Escolha um plano para liberar o acesso da sua conta.';
+  $('#payErr').textContent =
+    pago === 'pendente' ? 'Pagamento em processamento. Se foi Pix, assim que for confirmado o acesso é liberado. Toque em "Já paguei" em instantes.' :
+    pago === 'falhou' ? 'O pagamento não foi concluído. Tente de novo ou use outra forma de pagamento.' : '';
+  $('#recheckBtn').classList.toggle('hidden', pago !== 'pendente' && pago !== 'ok');
+  if (S.plans) $('#payPlans').innerHTML = planCards(S.plans);
+}
+
+function route(pago) {
+  if (!S.account.active) return showPaywall(pago);
+  start();
+  if (pago === 'ok') toast('Pagamento aprovado! Acesso liberado ✓');
+}
+
+let authMode = 'login';
+$('#authForm').querySelectorAll('input[name=mode]').forEach(r => r.onchange = () => {
+  authMode = r.value;
+  $('#nameField').classList.toggle('hidden', authMode !== 'signup');
+  $('#authBtn').textContent = authMode === 'signup' ? 'Criar conta e escolher plano' : 'Entrar';
+  $('#authHint').classList.toggle('hidden', authMode === 'signup');
+  $('#authForm [name=password]').autocomplete = authMode === 'signup' ? 'new-password' : 'current-password';
+  $('#authErr').textContent = '';
 });
+$('#authForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const f = new FormData(e.target), btn = $('#authBtn');
+  btn.disabled = true;
+  try {
+    const d = await api(`/api/auth?action=${authMode}`, { method: 'POST', body: {
+      name: f.get('name'), email: f.get('email'), password: f.get('password') } });
+    applyMe(d); e.target.reset(); $('#authForm [value=login]').click(); route();
+  } catch (err) { if (err.message !== 'auth') $('#authErr').textContent = err.message; }
+  finally { btn.disabled = false; }
+});
+
 async function start() {
-  $('#login').classList.add('hidden'); $('#app').classList.remove('hidden');
-  $('#whoLbl').textContent = 'Olá, ' + cap(S.user);
+  show('#app');
+  $('#whoLbl').textContent = 'Olá, ' + cap(S.user.split(' ')[0]);
   $('#view').innerHTML = '<div class="empty">Carregando…</div>';
   try { await loadAll(); render(); }
   catch (e) { if (e.message !== 'auth') $('#view').innerHTML = `<div class="empty">Erro: ${esc(e.message)}</div>`; }
 }
+
 (async () => {
-  try { const d = await api('/api/login'); S.user = d.user; S.users = d.users; await start(); }
-  catch (e) { if (e.message !== 'auth') showLogin(e.message); }
+  const qs = new URLSearchParams(location.search);
+  const pago = qs.get('pago'), pid = qs.get('payment_id') || qs.get('collection_id');
+  if (pago) history.replaceState(null, '', location.pathname);
+  try {
+    await loadMe();
+    if (pago && pid && pid !== 'null') {
+      try { await api('/api/billing?action=confirm', { method: 'POST', body: { payment_id: pid } }); await loadMe(); } catch {}
+    }
+    route(pago);
+  } catch (e) { if (e.message !== 'auth') showAuth(e.message); }
 })();
 
 /* ---------- Render ---------- */
 function render() {
   $('#monthLbl').textContent = `${MESES[S.m - 1]} ${S.y}`;
   document.querySelectorAll('nav.tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === S.tab));
-  $('#fab').classList.toggle('hidden', S.tab === 'painel');
+  $('#fab').classList.toggle('hidden', S.tab === 'painel' || S.tab === 'conta');
+  $('.month').style.visibility = S.tab === 'conta' ? 'hidden' : '';
   Object.values(S.charts).forEach(c => c.destroy()); S.charts = {};
-  ({ painel: renderPainel, transactions: renderTx, bills: renderBills, investments: renderInv })[S.tab]();
+  ({ painel: renderPainel, transactions: renderTx, bills: renderBills, investments: renderInv, conta: renderConta })[S.tab]();
+}
+
+function renderConta() {
+  const a = S.account, owner = S.me.role === 'owner';
+  const vital = a.plan === 'vitalicio';
+  $('#view').innerHTML = `<div class="stack">
+    <div class="bar"><h2>Conta</h2></div>
+    <div class="card">
+      <h3>Assinatura</h3>
+      <div class="kpi"><div class="l">${esc(a.name)}</div>
+        <div class="v">${vital ? 'Acesso vitalício' : a.active ? `Ativa até ${fd(a.paid_until)}` : 'Vencida'}</div>
+        <div class="s">${vital ? '' : a.plan ? 'Último plano: ' + esc(cap(a.plan)) : ''}</div></div>
+      ${vital ? '' : `<p class="small mut" style="margin:14px 0 0">Pagar agora soma o período ao que você já tem. Nenhum dia é perdido.</p>
+        <div class="plans">${planCards(S.plans)}</div><p class="err" id="contaPayErr"></p>`}
+    </div>
+    <div class="card">
+      <h3>Pessoas com acesso</h3>
+      <div class="list" style="box-shadow:none">${S.members.map(m => `
+        <div class="row"><div class="main"><div class="t">${esc(cap(m.name))}${m.role === 'owner' ? '<span class="badge b-ok">Titular</span>' : ''}${m.id === S.me.id ? '<span class="badge b-rec">Você</span>' : ''}</div>
+          <div class="m">${esc(m.email)}</div></div>
+          ${owner && m.role !== 'owner' ? `<button class="ghost" data-act="rm-member" data-id="${m.id}" title="Remover acesso">🗑</button>` : ''}
+        </div>`).join('')}</div>
+      ${owner ? `<form id="memberForm" style="margin-top:14px">
+        <p class="small mut" style="margin:0 0 10px">Adicione quem divide as contas com você. Ela entra com o e-mail e a senha que você definir e pode trocar a senha depois.</p>
+        <div class="form-row">
+          <label class="f">Nome<input name="name" required></label>
+          <label class="f">E-mail<input name="email" type="email" autocapitalize="none" required></label>
+          <label class="f">Senha inicial<input name="password" type="text" minlength="8" required></label>
+          <button class="btn pri">Adicionar</button>
+        </div><p class="err" id="memberErr"></p></form>` : ''}
+    </div>
+    <div class="card">
+      <h3>Trocar minha senha</h3>
+      <form id="passForm"><div class="form-row" style="grid-template-columns:1fr 1fr auto">
+        <label class="f">Senha atual<input name="password" type="password" autocomplete="current-password" required></label>
+        <label class="f">Nova senha<input name="new_password" type="password" autocomplete="new-password" minlength="8" required></label>
+        <button class="btn">Salvar</button>
+      </div><p class="err" id="passErr"></p></form>
+    </div>
+  </div>`;
+
+  $('#memberForm')?.addEventListener('submit', async e => {
+    e.preventDefault(); const f = new FormData(e.target);
+    try {
+      applyMe(await api('/api/auth?action=member', { method: 'POST', body: Object.fromEntries(f) }));
+      renderConta(); toast('Pessoa adicionada ✓');
+    } catch (err) { if (err.message !== 'auth') $('#memberErr').textContent = err.message; }
+  });
+  $('#passForm').addEventListener('submit', async e => {
+    e.preventDefault(); const f = new FormData(e.target);
+    try {
+      await api('/api/auth?action=password', { method: 'POST', body: Object.fromEntries(f) });
+      e.target.reset(); $('#passErr').textContent = ''; toast('Senha alterada ✓');
+    } catch (err) { if (err.message !== 'auth') $('#passErr').textContent = err.message; }
+  });
 }
 
 function billStatus(b) {
@@ -616,8 +805,27 @@ document.addEventListener('click', async e => {
       await api(`/api/data?r=bills&action=pay&id=${id}`, { method: 'POST', body: { date: today(), person: S.user } });
       await Promise.all([load('bills'), load('transactions')]); render(); toast('Conta paga ✓');
     }
-    else if (act === 'logout') { await api('/api/login', { method: 'DELETE' }); showLogin(); }
-  } catch (err) { if (err.message !== 'auth') toast(err.message); b.disabled = false; }
+    else if (act === 'logout') { await api('/api/auth', { method: 'DELETE' }).catch(() => {}); S.account = null; showAuth(); }
+    else if (act === 'checkout') {
+      b.disabled = true; b.textContent = 'Abrindo Mercado Pago…';
+      const d = await api('/api/billing?action=checkout', { method: 'POST', body: { plan: b.dataset.plan } });
+      location.href = d.url;
+    }
+    else if (act === 'recheck') { await loadMe(); if (S.account.active) route('ok'); else toast('Ainda não confirmado. Tente em alguns instantes.'); }
+    else if (act === 'rm-member') {
+      const m = S.members.find(x => x.id === id);
+      if (!confirm(`Remover o acesso de ${cap(m.name)}? Os lançamentos continuam na conta.`)) return;
+      applyMe(await api('/api/auth?action=remove-member', { method: 'POST', body: { id } }));
+      renderConta(); toast('Acesso removido');
+    }
+  } catch (err) {
+    if (err.message !== 'auth') {
+      const box = $('#paywall').classList.contains('hidden') ? $('#contaPayErr') : $('#payErr');
+      if (act === 'checkout' && box) { box.textContent = err.message; b.textContent = 'Pagar com Pix ou cartão'; }
+      else toast(err.message);
+    }
+    b.disabled = false;
+  }
 });
 </script>
 </body>
