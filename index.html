@@ -264,6 +264,12 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
   </div>
 </dialog>
 
+<dialog id="admDlg">
+  <div class="dlg-h"><h3 id="admDlgTitle"></h3><button type="button" class="ghost" data-act="adm-close">✕</button></div>
+  <div class="dlg-b"><div class="list" style="box-shadow:none" id="admDlgList"></div>
+    <p class="small mut" style="margin:10px 0 14px">O titular não pode ser removido sozinho. Para tirá-lo, exclua a conta inteira.</p></div>
+</dialog>
+
 <datalist id="cats"></datalist>
 
 <script>
@@ -485,8 +491,9 @@ async function renderAdmin() {
       const st = a.plan === 'vitalicio' ? '<span class="badge b-ok">Vitalício</span>'
         : a.active ? `${fd(a.paid_until)}` : a.paid_until ? `<span class="badge b-late">Venceu ${fd(a.paid_until)}</span>` : '<span class="badge b-rec">Nunca pagou</span>';
       return `<tr><td>${esc(a.name)}</td><td class="mut">${esc(a.owner_email || '—')}</td><td>${esc(planLbl(a.plan))}</td><td>${st}</td>
-        <td>${a.members}</td><td>${fm(a.paid_total)}</td><td class="mut">${fd(a.created)}</td>
-        <td>${a.plan === 'vitalicio' ? '' : `<button class="btn sm" data-act="adm-extend" data-id="${a.id}">+ dias</button>`}</td></tr>`;
+        <td><button class="linkbtn" data-act="adm-members" data-id="${a.id}" title="Ver pessoas">${a.members} ▸</button></td><td>${fm(a.paid_total)}</td><td class="mut">${fd(a.created)}</td>
+        <td>${a.plan === 'vitalicio' ? '' : `<button class="btn sm" data-act="adm-extend" data-id="${a.id}">+ dias</button>
+          <button class="ghost" data-act="adm-delete" data-id="${a.id}" title="Excluir conta">🗑</button>`}</td></tr>`;
     }).join('') || '<tr><td colspan="8" class="mut">Nenhuma conta encontrada</td></tr>';
   };
   rows(); $('#admSearch').oninput = rows;
@@ -918,6 +925,18 @@ function openPix(d) {
 }
 $('#pixDlg').addEventListener('close', () => { clearInterval(pixTimer); pixTimer = null; });
 
+async function showAdmMembers() {
+  const a = S.admAcc;
+  S.admUsers = await api(`/api/admin?action=members&account_id=${a.id}`);
+  $('#admDlgTitle').textContent = `Pessoas — ${a.name}`;
+  $('#admDlgList').innerHTML = S.admUsers.map(u => `
+    <div class="row"><div class="main"><div class="t">${esc(cap(u.name))}${u.role === 'owner' ? '<span class="badge b-ok">Titular</span>' : ''}${u.id === S.me.id ? '<span class="badge b-rec">Você</span>' : ''}</div>
+      <div class="m">${esc(u.email)} · desde ${fd(u.created)}</div></div>
+      ${u.role !== 'owner' && u.id !== S.me.id ? `<button class="btn sm" data-act="adm-rm-user" data-id="${u.id}">Remover</button>` : ''}
+    </div>`).join('') || '<div class="empty">Nenhuma pessoa nesta conta.</div>';
+  if (!$('#admDlg').open) $('#admDlg').showModal();
+}
+
 /* ---------- Ações ---------- */
 const resOfTab = () => (S.tab === 'painel' ? 'transactions' : S.tab);
 const findItem = (res, id) => ({ transactions: S.tx, bills: S.bills, investments: S.inv }[res]).find(x => x.id === id);
@@ -963,6 +982,25 @@ document.addEventListener('click', async e => {
       if (v === null) return;
       const r = await api('/api/admin?action=extend', { method: 'POST', body: { account_id: id, days: Number(v) } });
       toast(`Acesso até ${fd(r.paid_until)} ✓`); renderAdmin();
+    }
+    else if (act === 'adm-members') {
+      const a = S.adm.accounts.find(x => x.id === id);
+      S.admAcc = a; await showAdmMembers();
+    }
+    else if (act === 'adm-close') $('#admDlg').close();
+    else if (act === 'adm-rm-user') {
+      const u = S.admUsers.find(x => x.id === id);
+      if (!confirm(`Remover ${u.name} (${u.email}) da conta "${S.admAcc.name}"?\nEla perde o acesso na hora. Os lançamentos da conta continuam.`)) return;
+      await api('/api/admin?action=remove-user', { method: 'POST', body: { user_id: id } });
+      toast('Pessoa removida ✓'); await showAdmMembers(); renderAdmin();
+    }
+    else if (act === 'adm-delete') {
+      const a = S.adm.accounts.find(x => x.id === id);
+      const v = prompt(`Excluir a conta "${a.name}" (${a.owner_email || 'sem titular'})?\n\nIsso apaga PARA SEMPRE todas as pessoas, lançamentos, contas a pagar e investimentos dela. Os pagamentos continuam no histórico.\n\nPara confirmar, digite EXCLUIR:`);
+      if (v === null) return;
+      if (v.trim().toUpperCase() !== 'EXCLUIR') { toast('Exclusão cancelada'); return; }
+      await api('/api/admin?action=delete-account', { method: 'POST', body: { account_id: id } });
+      toast('Conta excluída ✓'); renderAdmin();
     }
     else if (act === 'logout') { await api('/api/auth', { method: 'DELETE' }).catch(() => {}); S.account = null; showAuth(); }
     else if (act === 'pix') {

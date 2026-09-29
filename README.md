@@ -84,8 +84,8 @@ Depois de 8 senhas erradas para o mesmo e-mail (ou 30 do mesmo IP), o login fica
 ## Administração
 
 Quem estiver em `ADMIN_EMAILS` vê a aba **Admin**: receita do mês e total, contas pagantes, vencidas e
-que nunca pagaram, busca por conta ou e-mail, últimos pagamentos e botão **+ dias** para dar
-(ou tirar, com número negativo) dias de acesso manualmente.
+que nunca pagaram, busca por conta ou e-mail, últimos pagamentos, botão **+ dias** para dar
+(ou tirar, com número negativo) dias de acesso manualmente. Clicando no número de pessoas, dá para remover alguém de uma conta; o 🗑 exclui a conta inteira com todos os dados (pede para digitar EXCLUIR). A conta vitalícia não pode ser excluída.
 
 ## Como funciona o app
 

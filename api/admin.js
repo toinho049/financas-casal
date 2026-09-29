@@ -54,6 +54,43 @@ export default async function handler(req, res) {
       return res.json(rows[0]);
     }
 
+    // Pessoas de uma conta
+    if (req.method === 'GET' && action === 'members') {
+      const rows = await q(
+        `SELECT id, name, email, role, (created_at AT TIME ZONE 'America/Sao_Paulo')::date::text AS created
+         FROM users WHERE account_id = $1 ORDER BY role = 'owner' DESC, id`,
+        [Number(req.query.account_id)]
+      );
+      return res.json(rows);
+    }
+
+    // Remove uma pessoa (o titular só sai excluindo a conta inteira)
+    if (req.method === 'POST' && action === 'remove-user') {
+      const rows = await q(
+        `DELETE FROM users WHERE id = $1 AND role <> 'owner' AND id <> $2 RETURNING id`,
+        [Number(req.body?.user_id), me.id]
+      );
+      if (!rows.length) return res.status(400).json({ error: 'Não é possível remover: é o titular da conta (exclua a conta inteira) ou é você.' });
+      return res.json({ ok: true });
+    }
+
+    // Exclui a conta com todos os dados. Pagamentos ficam no histórico (sem vínculo).
+    // Tudo num único comando: ou apaga tudo, ou nada.
+    if (req.method === 'POST' && action === 'delete-account') {
+      const rows = await q(
+        `WITH a AS (
+           SELECT id FROM accounts WHERE id = $1 AND plan IS DISTINCT FROM 'vitalicio' AND id <> $2
+         ),
+         t AS (DELETE FROM transactions WHERE account_id IN (SELECT id FROM a)),
+         b AS (DELETE FROM bills WHERE account_id IN (SELECT id FROM a)),
+         i AS (DELETE FROM investments WHERE account_id IN (SELECT id FROM a))
+         DELETE FROM accounts WHERE id IN (SELECT id FROM a) RETURNING id`,
+        [Number(req.body?.account_id), me.account_id]
+      );
+      if (!rows.length) return res.status(400).json({ error: 'Não é possível excluir esta conta (vitalícia ou a sua).' });
+      return res.json({ ok: true });
+    }
+
     res.status(400).json({ error: 'Ação inválida' });
   } catch (e) {
     console.error(e);
