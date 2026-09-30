@@ -8,7 +8,8 @@ Front-end em HTML/JS puro + funções serverless da Vercel + Postgres (Neon).
 
 ## Novidades (setembro/2026)
 
-- **Página de vendas** para quem não está logado (recursos, planos, dúvidas) e imagem de prévia do link (`og.png`).
+- **Tema claro, escuro ou automático** (botão no topo e em Mais, no celular); a escolha fica salva no aparelho.
+- **Página de vendas** (visual escuro, com prévia animada do app) para quem não está logado (recursos, planos, dúvidas) e imagem de prévia do link (`og.png`).
 - **Teste grátis**: padrão para todo cadastro (Admin → Teste grátis) e **links de campanha** `/?convite=CODIGO` com dias próprios.
 - **Avisos no sistema**: sininho com contas vencidas/vencendo, orçamento estourando e fim do plano; faixa quando o plano/teste está acabando.
 - **Avisos no celular** (Web Push): o cliente ativa em Conta; rotina diária às 8h (`/api/cron`, em `vercel.json`). As chaves são geradas e guardadas no banco sozinhas. Opcional: `CRON_SECRET` na Vercel para proteger a rotina.

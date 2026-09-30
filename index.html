@@ -24,20 +24,27 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Finanças">
 <title>Finanças do Casal</title>
+<script>try{var t=localStorage.getItem('fc-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
 :root{
   --bg:#f3f5f4;--card:#fff;--tx:#16201b;--mut:#6a766f;--bd:#e2e8e4;
   --pri:#0f8a5f;--pri-soft:#e4f4ec;--in:#0f8a5f;--out:#d14343;--warn:#b7791f;--warn-soft:#fdf3e1;--out-soft:#fdecec;
   --r:14px;--sh:0 1px 2px rgba(0,0,0,.04),0 4px 14px rgba(0,0,0,.04);
+  --pri2:#0d9488;--glow1:rgba(15,138,95,.07);--glow2:rgba(13,148,136,.05);--hdr:rgba(255,255,255,.8);
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#0f1512;--card:#18201c;--tx:#e8eeea;--mut:#93a09a;--bd:#27322c;
-  --pri:#34c38f;--pri-soft:#173027;--in:#34c38f;--out:#f07070;--warn:#e0a84a;--warn-soft:#2e2515;--out-soft:#331c1c;
-  --sh:none;
+  --bg:#0b110e;--card:#131c18;--tx:#e8eeea;--mut:#93a09a;--bd:#243029;
+  --pri:#34c38f;--pri2:#2dd4bf;--pri-soft:#15302a;--in:#34c38f;--out:#f07070;--warn:#e0a84a;--warn-soft:#2e2515;--out-soft:#331c1c;
+  --sh:none;--glow1:rgba(52,195,143,.11);--glow2:rgba(45,212,191,.07);--hdr:rgba(15,22,19,.78);color-scheme:dark;
 }}
+:root[data-theme="dark"]{
+  --bg:#0b110e;--card:#131c18;--tx:#e8eeea;--mut:#93a09a;--bd:#243029;
+  --pri:#34c38f;--pri2:#2dd4bf;--pri-soft:#15302a;--in:#34c38f;--out:#f07070;--warn:#e0a84a;--warn-soft:#2e2515;--out-soft:#331c1c;
+  --sh:none;--glow1:rgba(52,195,143,.11);--glow2:rgba(45,212,191,.07);--hdr:rgba(15,22,19,.78);color-scheme:dark;
+}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
 button,input,select{font:inherit;color:inherit}
@@ -86,6 +93,95 @@ button,input,select{font:inherit;color:inherit}
 .lp-foot a{color:inherit}
 @media (max-width:900px){.lp-grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:640px){.lp-in .brand{font-size:15px;gap:8px;white-space:nowrap}.lp-in .brand i{width:26px;height:26px;font-size:12px}.lp-in .btn{white-space:nowrap}.lp-in{gap:6px}.lp-steps,.lp-grid{grid-template-columns:1fr}.lp-hide-sm{display:none}.lp-h{font-size:23px}.lp-sub{font-size:16px}}
+/* ===== Página de entrada: visual escuro e futurista ===== */
+#auth.lp-dark{--bg:#060b09;--card:rgba(255,255,255,.045);--tx:#eef5f1;--mut:#9aaba3;--bd:rgba(255,255,255,.09);
+  --pri:#34d399;--pri2:#22d3ee;--pri-soft:rgba(52,211,153,.12);--in:#34d399;--out:#f87171;--warn:#fbbf24;--warn-soft:rgba(251,191,36,.12);--out-soft:rgba(248,113,113,.12);--sh:none;
+  background:var(--bg);color:var(--tx);position:relative;overflow:hidden;isolation:isolate}
+#auth.lp-dark .aurora{position:absolute;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+#auth.lp-dark .aurora span{position:absolute;border-radius:50%;filter:blur(90px);opacity:.55;animation:drift 18s ease-in-out infinite alternate}
+#auth.lp-dark .a1{width:620px;height:620px;left:-160px;top:-180px;background:#10b981}
+#auth.lp-dark .a2{width:520px;height:520px;right:-140px;top:60px;background:#0891b2;animation-delay:-6s!important;opacity:.4!important}
+#auth.lp-dark .a3{width:420px;height:420px;left:35%;top:620px;background:#a3e635;opacity:.16!important;animation-delay:-12s!important}
+#auth.lp-dark .gridbg{position:absolute;inset:0;height:1100px;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:56px 56px;-webkit-mask-image:radial-gradient(ellipse 70% 60% at 50% 20%,#000 30%,transparent 75%);mask-image:radial-gradient(ellipse 70% 60% at 50% 20%,#000 30%,transparent 75%)}
+@keyframes drift{0%{transform:translate(0,0) scale(1)}50%{transform:translate(60px,40px) scale(1.1)}100%{transform:translate(-40px,80px) scale(.95)}}
+#auth.lp-dark .lp-top{background:rgba(6,11,9,.55);backdrop-filter:blur(14px) saturate(140%);-webkit-backdrop-filter:blur(14px) saturate(140%);border-bottom:1px solid var(--bd)}
+#auth.lp-dark .brand{font-family:Sora,Inter,sans-serif;letter-spacing:-.01em}
+#auth.lp-dark .brand i{box-shadow:0 0 0 1px rgba(255,255,255,.12),0 6px 24px rgba(16,185,129,.45)}
+#auth.lp-dark .lp-in .linkbtn{color:var(--mut)}#auth.lp-dark .lp-in .linkbtn:hover{color:var(--tx);text-decoration:none}
+#auth.lp-dark .btn{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.14);color:var(--tx);transition:transform .15s,box-shadow .2s,border-color .2s}
+#auth.lp-dark .btn:hover{border-color:rgba(255,255,255,.3)}
+#auth.lp-dark .btn.pri{background:linear-gradient(135deg,#34d399,#22d3ee);border:0;color:#04130d;font-weight:700;box-shadow:0 8px 30px rgba(34,211,238,.25),0 2px 10px rgba(52,211,153,.35)}
+#auth.lp-dark .btn.pri:hover{transform:translateY(-1px);box-shadow:0 12px 40px rgba(34,211,238,.35),0 2px 14px rgba(52,211,153,.5)}
+#auth.lp-dark .auth-wrap{padding-top:72px;padding-bottom:40px;gap:56px}
+#auth.lp-dark .pitch h1{font-family:Sora,Inter,sans-serif;font-weight:800;font-size:clamp(34px,5.2vw,58px);line-height:1.04;letter-spacing:-.035em;margin:10px 0 18px}
+#auth.lp-dark .grad{background:linear-gradient(100deg,#34d399 0%,#22d3ee 55%,#a3e635 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+#auth.lp-dark .lp-sub{color:#b6c4bd;font-size:18.5px}
+#auth.lp-dark .feat li{color:#dbe7e1}
+#auth.lp-dark .feat li::before{background:linear-gradient(135deg,#34d399,#22d3ee);color:#04130d;box-shadow:0 0 14px rgba(52,211,153,.5)}
+#auth.lp-dark .pitch-price{color:var(--mut)}#auth.lp-dark .pitch-price b{color:#fff}
+#auth.lp-dark .trial-badge{background:rgba(242,193,78,.12);color:#fcd978;border:1px solid rgba(242,193,78,.35);box-shadow:0 0 24px rgba(242,193,78,.18)}
+#auth.lp-dark .glass-wrap{position:relative;border-radius:22px;padding:1px;background:linear-gradient(140deg,rgba(52,211,153,.7),rgba(255,255,255,.08) 40%,rgba(34,211,238,.6));box-shadow:0 30px 80px rgba(0,0,0,.45),0 0 60px rgba(16,185,129,.18)}
+#auth.lp-dark .login-box{background:rgba(10,18,15,.82);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:0;border-radius:21px}
+#auth.lp-dark label.f input{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.12);color:var(--tx)}
+#auth.lp-dark label.f input:focus{outline:2px solid #34d399;box-shadow:0 0 0 4px rgba(52,211,153,.15)}
+#auth.lp-dark .seg{background:rgba(255,255,255,.05)}
+#auth.lp-dark .seg input:checked+span{background:rgba(255,255,255,.1);color:#fff}
+#auth.lp-dark .linkbtn{color:#5eead4}
+#auth.lp-dark .lp-sec{border-top:0;padding:56px 0}
+#auth.lp-dark .kicker{text-align:center;font:600 12.5px/1 Inter,sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#5eead4;margin-bottom:12px}
+#auth.lp-dark .lp-h{font-family:Sora,Inter,sans-serif;font-weight:800;font-size:clamp(26px,3.6vw,38px);letter-spacing:-.03em}
+#auth.lp-dark .lp-step,#auth.lp-dark .lp-card,#auth.lp-dark .faq details,#auth.lp-dark .plan{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));border:1px solid var(--bd);border-radius:18px;transition:transform .25s,border-color .25s,box-shadow .25s}
+#auth.lp-dark .lp-card:hover,#auth.lp-dark .lp-step:hover{transform:translateY(-4px);border-color:rgba(52,211,153,.45);box-shadow:0 18px 50px rgba(16,185,129,.14)}
+#auth.lp-dark .lp-step b{background:linear-gradient(135deg,#34d399,#22d3ee);color:#04130d;box-shadow:0 0 20px rgba(52,211,153,.45)}
+#auth.lp-dark .lp-ic{background:linear-gradient(135deg,rgba(52,211,153,.18),rgba(34,211,238,.14));border:1px solid rgba(52,211,153,.3)}
+#auth.lp-dark .lp-ic svg{stroke:#5eead4}
+#auth.lp-dark .plan.best{border:1px solid transparent;background:linear-gradient(#0b1512,#0b1512) padding-box,linear-gradient(140deg,#34d399,#22d3ee) border-box;box-shadow:0 20px 60px rgba(16,185,129,.2)}
+#auth.lp-dark .plan .tag{background:linear-gradient(135deg,#fbbf24,#f2c14e);color:#1a1405}
+#auth.lp-dark .plan .pr{font-family:Sora,Inter,sans-serif;font-weight:800}
+#auth.lp-dark .faq summary::after{color:#5eead4}
+#auth.lp-dark .cta-box{position:relative;border-radius:28px;padding:56px 24px;background:radial-gradient(80% 120% at 50% 0%,rgba(16,185,129,.28),rgba(8,145,178,.08) 55%,transparent 80%),rgba(255,255,255,.03);border:1px solid rgba(52,211,153,.25);overflow:hidden}
+#auth.lp-dark .lp-foot{border-top:1px solid var(--bd)}
+#auth.lp-dark .lp-foot a{color:var(--mut)}
+#auth.lp-dark .err{color:#fca5a5}
+#auth.lp-dark .ok-msg{background:rgba(52,211,153,.12);color:#6ee7b7}
+/* Prévia do app */
+.showcase{position:relative;max-width:900px;margin:10px auto 34px;perspective:1600px}
+.sc-dev{border-radius:22px;background:linear-gradient(180deg,#101a16,#0a120f);border:1px solid rgba(255,255,255,.1);box-shadow:0 50px 120px rgba(0,0,0,.6),0 0 0 1px rgba(52,211,153,.12),0 0 90px rgba(16,185,129,.18);transform:rotateX(10deg);transform-origin:50% 0;overflow:hidden}
+.sc-top{display:flex;align-items:center;gap:7px;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.07);font-size:12.5px;color:#7d8f86}
+.sc-top i{width:10px;height:10px;border-radius:50%;background:#2b3833}.sc-top span{margin-left:10px;padding:4px 12px;border-radius:99px;background:rgba(255,255,255,.05)}
+.sc-body{padding:20px;display:grid;gap:14px}
+.sc-hero{display:grid;grid-template-columns:1.4fr 1fr;gap:16px;align-items:center;padding:18px 20px;border-radius:16px;background:radial-gradient(120% 140% at 0 0,rgba(52,211,153,.16),rgba(255,255,255,.03) 60%);border:1px solid rgba(255,255,255,.08)}
+.sc-l{font-size:12.5px;color:#93a39b;font-weight:600}
+.sc-v{font:800 34px/1.1 Sora,Inter,sans-serif;letter-spacing:-.03em;color:#34d399;margin:4px 0 8px}
+.sc-bar{height:8px;border-radius:9px;background:rgba(255,255,255,.07);overflow:hidden}.sc-bar b{display:block;height:100%;width:59%;border-radius:9px;background:linear-gradient(90deg,#34d399,#22d3ee)}
+.sc-s{font-size:12.5px;color:#93a39b;margin-top:6px}
+.sc-alert{display:flex;gap:10px;align-items:center;padding:12px 14px;border-radius:14px;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25);font-size:20px}
+.sc-alert b{display:block;font-size:14px;color:#fde68a}.sc-alert span{font-size:12px;color:#b9a77a}
+.sc-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.sc-card{padding:16px;border-radius:16px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07)}
+.sc-chart{display:flex;align-items:flex-end;gap:10px;height:120px;margin-top:12px}
+.sc-chart div{flex:1;display:flex;align-items:flex-end;gap:3px;height:100%}
+.sc-chart b,.sc-chart i{flex:1;border-radius:5px 5px 0 0}
+.sc-chart b{background:linear-gradient(180deg,#34d399,#0f8a5f)}.sc-chart i{background:linear-gradient(180deg,#f87171,#9b2c2c)}
+.sc-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid rgba(255,255,255,.06);font-size:14px;color:#e6efe9}
+.sc-row:nth-child(2){border-top:0;margin-top:6px}
+.sc-row div{flex:1}.sc-row small{display:block;font-size:11.5px;color:#8b9c94}
+.sc-row em{font-style:normal;font-weight:700;color:#fca5a5}.sc-row em.p{color:#6ee7b7}
+.sc-ic{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 22%,transparent);font-size:16px}
+.chip{position:absolute;display:flex;gap:10px;align-items:center;padding:11px 14px;border-radius:14px;background:rgba(14,24,20,.8);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.12);box-shadow:0 20px 50px rgba(0,0,0,.5);font-size:20px;animation:float 6s ease-in-out infinite}
+.chip b{display:block;font-size:13.5px;color:#fff}.chip span{font-size:12px;color:#9aaba3}
+.chip.c1{left:-44px;bottom:-22px}.chip.c2{right:-36px;top:-26px;animation-delay:-3s}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.stats-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;border-radius:18px;overflow:hidden;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.08);margin-bottom:10px}
+.stats-strip div{background:#08110d;padding:20px 16px;text-align:center}
+.stats-strip b{display:block;font:800 26px/1.1 Sora,Inter,sans-serif;letter-spacing:-.02em;background:linear-gradient(100deg,#34d399,#22d3ee);-webkit-background-clip:text;background-clip:text;color:transparent}
+.stats-strip span{font-size:13px;color:#9aaba3}
+/* Aparecer ao rolar */
+.js-rv .rv{opacity:0;transform:translateY(28px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.7,.2,1)}
+.js-rv .rv.rv-on{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){#auth.lp-dark .aurora span,.chip{animation:none}.js-rv .rv{opacity:1;transform:none;transition:none}}
+@media (max-width:820px){#auth.lp-dark .auth-wrap{padding-top:36px;gap:28px}.sc-hero,.sc-grid{grid-template-columns:1fr}.sc-dev{transform:none}.chip{display:none}.stats-strip{grid-template-columns:repeat(2,1fr)}.showcase{margin-top:0}}
+@media (max-width:640px){#auth.lp-dark .lp-sub{font-size:16.5px}.sc-body{padding:14px}.sc-v{font-size:28px}.stats-strip b{font-size:22px}#auth.lp-dark .lp-sec{padding:40px 0}#auth.lp-dark .cta-box{padding:40px 18px}}
 .mut{color:var(--mut)}.small{font-size:13px}
 .linkbtn{background:none;border:0;color:var(--pri);cursor:pointer;font-weight:500;padding:4px}
 .linkbtn:hover{text-decoration:underline}
@@ -140,6 +236,17 @@ nav.tabs{max-width:1100px;margin:0 auto;padding:0 12px;display:flex;gap:4px;over
 nav.tabs button{background:none;border:0;padding:10px 12px;border-bottom:2px solid transparent;color:var(--mut);font-weight:500;cursor:pointer;white-space:nowrap}
 nav.tabs button.on{color:var(--pri);border-color:var(--pri)}
 main{max-width:1100px;margin:0 auto;padding:18px 16px 80px}
+/* Acabamento moderno do app */
+#app{min-height:100vh;background:radial-gradient(900px 520px at 8% -8%,var(--glow1),transparent 70%),radial-gradient(760px 460px at 100% 0,var(--glow2),transparent 70%)}
+header{background:var(--hdr)!important;backdrop-filter:blur(14px) saturate(150%);-webkit-backdrop-filter:blur(14px) saturate(150%)}
+.btn.pri{background:linear-gradient(135deg,var(--pri),var(--pri2));border-color:transparent}
+.btn.pri:hover{filter:brightness(1.06);box-shadow:0 6px 20px color-mix(in srgb,var(--pri) 35%,transparent)}
+nav.tabs button.on{border-image:linear-gradient(90deg,var(--pri),var(--pri2)) 1}
+.card.hero{background:radial-gradient(130% 150% at 0 0,color-mix(in srgb,var(--pri) 13%,var(--card)) 0%,var(--card) 62%);border-color:color-mix(in srgb,var(--pri) 22%,var(--bd))}
+.hbar i{background:linear-gradient(90deg,var(--pri),var(--pri2))}
+.fab{background:linear-gradient(135deg,var(--pri),var(--pri2));box-shadow:0 8px 26px color-mix(in srgb,var(--pri) 45%,transparent)}
+.theme-btn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:block}
+.theme-btn{width:40px;height:40px;display:grid;place-items:center}
 
 .btn{border:1px solid var(--bd);background:var(--card);border-radius:10px;padding:8px 14px;cursor:pointer;font-weight:500}
 .btn:hover{border-color:var(--mut)}
@@ -300,7 +407,7 @@ dialog.wide{width:min(900px,calc(100vw - 24px))}
   .top .brand{font-size:0;gap:0}.top .brand i{width:32px;height:32px}
   .month{flex:1;justify-content:center;min-width:0}.month span{min-width:0;font-size:16px;white-space:nowrap}
   .month .ghost{width:40px;height:40px;font-size:22px}
-  .bnav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:15;background:var(--card);border-top:1px solid var(--bd);padding:4px 4px env(safe-area-inset-bottom);box-shadow:0 -4px 20px rgba(0,0,0,.05)}
+  .bnav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:15;background:var(--hdr);backdrop-filter:blur(14px) saturate(150%);-webkit-backdrop-filter:blur(14px) saturate(150%);border-top:1px solid var(--bd);padding:4px 4px env(safe-area-inset-bottom);box-shadow:0 -4px 20px rgba(0,0,0,.05)}
   .bnav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:0;padding:7px 2px 6px;font:inherit;font-size:11px;font-weight:600;color:var(--mut);cursor:pointer;position:relative;min-height:54px;border-radius:12px}
   .bnav svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
   .bnav button.on{color:var(--pri)}
@@ -357,7 +464,8 @@ dialog.wide{width:min(900px,calc(100vw - 24px))}
 </head>
 <body>
 
-<section id="auth" class="hidden">
+<section id="auth" class="hidden lp-dark">
+  <div class="aurora" aria-hidden="true"><span class="a1"></span><span class="a2"></span><span class="a3"></span><div class="gridbg"></div></div>
   <div class="lp-top">
     <div class="lp-in"><div class="brand"><i><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M14 48 L50 18 L86 48" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><path d="M24 42 L24 80 L76 80 L76 42" fill="none" stroke="#fff" stroke-width="8" stroke-linejoin="round"/><rect x="35" y="61" width="8" height="12" rx="2" fill="#f2c14e"/><rect x="46" y="53" width="8" height="20" rx="2" fill="#f2c14e"/><rect x="57" y="45" width="8" height="28" rx="2" fill="#f2c14e"/></svg></i>Finanças do Casal</div><div class="spacer"></div>
       <a class="linkbtn lp-hide-sm" href="#recursos">Recursos</a><a class="linkbtn lp-hide-sm" href="#planos">Planos</a><a class="linkbtn lp-hide-sm" href="#duvidas">Dúvidas</a>
@@ -367,16 +475,17 @@ dialog.wide{width:min(900px,calc(100vw - 24px))}
   <div class="auth-wrap">
     <div class="pitch">
       <div class="trial-badge hidden" id="trialBadge"></div>
-      <h1>O dinheiro de vocês dois, organizado num lugar só.</h1>
-      <p class="lp-sub">Contas a pagar, gastos do mês, orçamento e investimentos do casal, com avisos no celular antes de vencer. Cada um com seu login, os mesmos números.</p>
+      <h1>O dinheiro de vocês dois, <span class="grad">num lugar só.</span></h1>
+      <p class="lp-sub">Contas a pagar, gastos do mês, orçamento e investimentos do casal, com aviso no celular antes de vencer. Cada um com seu login, os mesmos números.</p>
       <ul class="feat">
-        <li>Contas a pagar com aviso no celular antes de vencer</li>
-        <li>Orçamento por categoria que avisa quando está estourando</li>
-        <li>Compras parceladas e importação do extrato do banco</li>
-        <li>Gráficos do mês e resumo pronto para o WhatsApp</li>
+        <li>Aviso no celular antes de cada conta vencer</li>
+        <li>Orçamento que avisa quando está estourando</li>
+        <li>Parcelas e extrato do banco no automático</li>
+        <li>Gráficos do mês e resumo para o WhatsApp</li>
       </ul>
       <div class="pitch-price" id="pitchPrice"></div>
     </div>
+    <div class="glass-wrap">
     <form class="login-box" id="authForm" novalidate>
       <div class="seg" id="authSeg">
         <label><input type="radio" name="mode" value="login" checked><span>Entrar</span></label>
@@ -399,11 +508,44 @@ dialog.wide{width:min(900px,calc(100vw - 24px))}
       </p>
       <p class="small mut" style="margin:14px 0 0;text-align:center"><a href="/termos.html" style="color:inherit">Termos</a> · <a href="/privacidade.html" style="color:inherit">Privacidade</a></p>
     </form>
+    </div>
   </div>
 
   <div class="lp">
-    <section class="lp-sec">
-      <h2 class="lp-h">Como funciona</h2>
+    <div class="showcase rv" aria-hidden="true">
+      <div class="sc-dev">
+        <div class="sc-top"><i></i><i></i><i></i><span>financasdocasal.sbs</span></div>
+        <div class="sc-body">
+          <div class="sc-hero">
+            <div><div class="sc-l">Sobrou em setembro</div><div class="sc-v">R$ 2.696,00</div>
+              <div class="sc-bar"><b></b></div><div class="sc-s">Entrou R$ 6.500 · saiu R$ 3.804</div></div>
+            <div class="sc-alert">⏰ <div><b>Luz vence hoje</b><span>R$ 280,40 · toque para pagar</span></div></div>
+          </div>
+          <div class="sc-grid">
+            <div class="sc-card"><div class="sc-l">Entradas × saídas</div>
+              <div class="sc-chart"><div><b style="height:78%"></b><i style="height:46%"></i></div><div><b style="height:82%"></b><i style="height:52%"></i></div><div><b style="height:76%"></b><i style="height:40%"></i></div><div><b style="height:84%"></b><i style="height:48%"></i></div><div><b style="height:80%"></b><i style="height:44%"></i></div><div><b style="height:86%"></b><i style="height:50%"></i></div></div></div>
+            <div class="sc-card"><div class="sc-l">Últimos lançamentos</div>
+              <div class="sc-row"><span class="sc-ic" style="--c:#1f9d6b">🛒</span><div>Mercado<small>Débito · Ana</small></div><em>− R$ 821</em></div>
+              <div class="sc-row"><span class="sc-ic" style="--c:#e0782b">⛽</span><div>Gasolina<small>Pix · Mateus</small></div><em>− R$ 389</em></div>
+              <div class="sc-row"><span class="sc-ic" style="--c:#1f9d6b">💰</span><div>Salário<small>Pix</small></div><em class="p">+ R$ 6.500</em></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="chip c1">🔔 <div><b>Conta vence amanhã</b><span>Internet · R$ 120</span></div></div>
+      <div class="chip c2">📊 <div><b>Mercado: 87% do limite</b><span>Faltam R$ 79 no mês</span></div></div>
+    </div>
+
+    <div class="stats-strip rv">
+      <div><b>2 logins</b><span>ou até 5 pessoas</span></div>
+      <div><b>8h</b><span>aviso diário no celular</span></div>
+      <div><b>Pix</b><span>ou cartão, sem burocracia</span></div>
+      <div><b>0</b><span>planilhas</span></div>
+    </div>
+
+    <section class="lp-sec rv">
+      <div class="kicker">Como funciona</div>
+      <h2 class="lp-h">Em 3 passos, vocês no controle</h2>
       <div class="lp-steps">
         <div class="lp-step"><b>1</b><h3>Crie a conta</h3><p>Em 1 minuto, só com nome, e-mail e senha. Sem cartão para testar.</p></div>
         <div class="lp-step"><b>2</b><h3>Chame quem divide as contas</h3><p>Cada um entra com o próprio e-mail e senha e vê os mesmos dados, em tempo real.</p></div>
@@ -411,29 +553,32 @@ dialog.wide{width:min(900px,calc(100vw - 24px))}
       </div>
     </section>
 
-    <section class="lp-sec" id="recursos">
-      <h2 class="lp-h">Tudo que o casal precisa, sem planilha</h2>
+    <section class="lp-sec rv" id="recursos">
+      <div class="kicker">Recursos</div>
+      <h2 class="lp-h">Tudo que o casal precisa, <span class="grad">sem planilha</span></h2>
       <div class="lp-grid">
         <div class="lp-card"><div class="lp-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></div><h3>Avisos antes de vencer</h3><p>Lembrete no celular às 8h quando uma conta vence hoje ou amanhã. Nada de juros por esquecimento.</p></div>
         <div class="lp-card"><div class="lp-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 6-6"/></svg></div><h3>Gráficos do mês</h3><p>Entradas × saídas, gastos por categoria e evolução do saldo, prontos, sem fórmula nenhuma.</p></div>
         <div class="lp-card"><div class="lp-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><h3>Orçamento por categoria</h3><p>Defina quanto pode gastar em mercado, lazer, combustível… O sistema avisa em 80% e quando estourar.</p></div>
-        <div class="lp-card"><div class="lp-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></div><h3>Parcelas no automático</h3><p>Comprou em 10x? Lance uma vez e as parcelas aparecem sozinhas nos próximos meses.</p></div>
+        <div class="lp-card"><div class="lp-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></div><h3>Pix, débito ou crédito</h3><p>Cada gasto com a forma de pagamento. Comprou em 10x? As parcelas aparecem sozinhas nos próximos meses.</p></div>
         <div class="lp-card"><div class="lp-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg></div><h3>Importa o extrato do banco</h3><p>Arquivo OFX ou CSV do seu banco ou do Nubank: o sistema lê, categoriza e não duplica.</p></div>
         <div class="lp-card"><div class="lp-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 21l2.1-5.6A8.4 8.4 0 1 1 21 11.5z"/></svg></div><h3>Resumo no WhatsApp</h3><p>Um toque e o resumo do mês vai para o grupo da família, com o que vence e onde mais gastaram.</p></div>
         <div class="lp-card"><div class="lp-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg></div><h3>Investimentos</h3><p>Acompanhe quanto aplicaram e quanto rendeu, junto com o resto das finanças.</p></div>
-        <div class="lp-card"><div class="lp-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg></div><h3>App no celular</h3><p>Instale na tela inicial do celular e use como um aplicativo. Funciona no computador também.</p></div>
+        <div class="lp-card"><div class="lp-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg></div><h3>Tema claro ou escuro</h3><p>Instale na tela inicial e use como aplicativo, no visual que preferir. Funciona no computador também.</p></div>
       </div>
     </section>
 
-    <section class="lp-sec" id="planos">
-      <h2 class="lp-h">Planos</h2>
+    <section class="lp-sec rv" id="planos">
+      <div class="kicker">Planos</div>
+      <h2 class="lp-h">Menos que um lanche por mês</h2>
       <p class="lp-lead" id="lpTrial"></p>
       <div class="plans lp-plans" id="lpPlans"></div>
       <p class="small mut" style="text-align:center">Pagamento pelo Mercado Pago, com Pix ou cartão. Renovação automática opcional, que você cancela quando quiser.</p>
     </section>
 
-    <section class="lp-sec" id="duvidas">
-      <h2 class="lp-h">Dúvidas frequentes</h2>
+    <section class="lp-sec rv" id="duvidas">
+      <div class="kicker">Dúvidas</div>
+      <h2 class="lp-h">Perguntas frequentes</h2>
       <div class="faq">
         <details><summary>Preciso conectar minha conta do banco?</summary><p>Não. O sistema não pede senha de banco e não se conecta a ele. Você lança os gastos ou importa o arquivo de extrato que o próprio banco gera.</p></details>
         <details><summary>Meus dados ficam seguros?</summary><p>Sim. A conexão é criptografada (cadeado HTTPS), as senhas são guardadas de forma protegida e os dados de cada conta ficam separados dos outros. Não vendemos nem compartilhamos seus dados. Veja a <a href="/privacidade.html">Política de Privacidade</a>.</p></details>
@@ -444,10 +589,12 @@ dialog.wide{width:min(900px,calc(100vw - 24px))}
       </div>
     </section>
 
-    <section class="lp-sec lp-cta">
-      <h2 class="lp-h" style="margin-bottom:10px">Comece hoje e pare de brigar por dinheiro 💚</h2>
-      <p class="lp-lead" id="lpCtaTxt">Leva 1 minuto para criar a conta.</p>
-      <button class="btn pri lp-big" data-act="lp-go" data-mode="signup">Criar minha conta</button>
+    <section class="lp-sec lp-cta rv">
+      <div class="cta-box">
+        <h2 class="lp-h" style="margin-bottom:10px">Comece hoje e <span class="grad">pare de brigar por dinheiro</span></h2>
+        <p class="lp-lead" id="lpCtaTxt">Leva 1 minuto para criar a conta.</p>
+        <button class="btn pri lp-big" data-act="lp-go" data-mode="signup">Criar minha conta →</button>
+      </div>
     </section>
 
     <footer class="lp-foot">
@@ -480,6 +627,7 @@ dialog.wide{width:min(900px,calc(100vw - 24px))}
       </div>
       <div class="spacer"></div>
       <span class="who" id="whoLbl"></span>
+      <button class="ghost theme-btn" data-act="theme" id="themeBtn" aria-label="Tema"></button>
       <div class="bell-wrap">
         <button class="ghost bell" id="bellBtn" data-act="bell" aria-label="Avisos" aria-expanded="false">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
@@ -522,6 +670,7 @@ dialog.wide{width:min(900px,calc(100vw - 24px))}
     <button class="ms-item" data-act="tab" data-tab="investments"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>Investimentos</button>
     <button class="ms-item" data-act="tab" data-tab="conta"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Conta, plano e avisos</button>
     <button class="ms-item hidden" id="moreAdmin" data-act="tab" data-tab="admin"><svg viewBox="0 0 24 24"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/></svg>Administração</button>
+    <button class="ms-item" data-act="theme"><svg viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg><span id="moreTheme">Tema: automático</span></button>
     <button class="ms-item" data-act="sound-toggle"><svg viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg><span id="moreSound">Som dos avisos: ligado</span></button>
     <button class="ms-item out" data-act="logout"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg>Sair</button>
   </div>
@@ -703,8 +852,38 @@ if (S.convite) store.set('fc-convite', S.convite);
 
 const diasTxt = d => d % 30 === 0 && d >= 60 ? `${d / 30} meses` : d === 30 ? '1 mês' : `${d} dias`;
 
+/* ---------- Tema claro / escuro / automático ---------- */
+const THEME_IC = {
+  auto: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg>',
+  light: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
+  dark: '<svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>',
+};
+const THEME_TXT = { auto: 'automático', light: 'claro', dark: 'escuro' };
+const getTheme = () => { try { const t = localStorage.getItem('fc-theme'); return t === 'light' || t === 'dark' ? t : 'auto'; } catch { return 'auto'; } };
+function isDark() { const t = getTheme(); return t === 'dark' || (t === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches); }
+function paintThemeUI() {
+  const t = getTheme();
+  const b = $('#themeBtn'); if (b) { b.innerHTML = THEME_IC[t]; b.title = `Tema: ${THEME_TXT[t]} (toque para trocar)`; b.setAttribute('aria-label', b.title); }
+  const m = $('#moreTheme'); if (m) m.textContent = `Tema: ${THEME_TXT[t]}`;
+  document.querySelector('meta[name=theme-color]')?.setAttribute('content', isDark() ? '#0b110e' : '#0f8a5f');
+}
+function setTheme(t) {
+  try { t === 'auto' ? localStorage.removeItem('fc-theme') : localStorage.setItem('fc-theme', t); } catch {}
+  if (t === 'auto') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = t;
+  paintThemeUI();
+  if (!$('#app').classList.contains('hidden')) render();   // gráficos pegam as cores novas
+}
+matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', () => { if (getTheme() === 'auto') { paintThemeUI(); if (!$('#app').classList.contains('hidden')) render(); } });
+
+function revealOnScroll() {
+  const root = $('#auth');
+  if (root.dataset.rv || matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
+  root.dataset.rv = '1'; root.classList.add('js-rv');
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('rv-on'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -8% 0px' });
+  root.querySelectorAll('.rv').forEach(el => io.observe(el));
+}
 function showAuth(msg) {
-  show('#auth');
+  show('#auth'); revealOnScroll();
   $('#authErr').textContent = msg || '';
   fetch('/api/billing?action=offer&convite=' + encodeURIComponent(S.convite)).then(r => r.json()).then(o => {
     S.offer = o;
@@ -815,6 +994,7 @@ async function start() {
   catch (e) { if (e.message !== 'auth') $('#view').innerHTML = `<div class="empty">Erro: ${esc(e.message)}</div>`; }
 }
 
+paintThemeUI();
 (async () => {
   const qs = new URLSearchParams(location.search);
   let pago = qs.get('pago');
@@ -2011,6 +2191,7 @@ document.addEventListener('click', async e => {
       $('#payDlg').showModal();
     }
     else if (act === 'pay-close') $('#payDlg').close();
+    else if (act === 'theme') { const nx = { auto: 'dark', dark: 'light', light: 'auto' }[getTheme()]; setTheme(nx); toast(`Tema ${THEME_TXT[nx]}`); }
     else if (act === 'filters') { S.fOpen = !S.fOpen; renderTx(); }
     else if (act === 'new-tx') { S.tab = 'transactions'; render(); openForm('transactions'); }
     else if (act === 'auth-mode') { $('#auth').dataset.touched = '1'; setAuthMode(b.dataset.mode); }
