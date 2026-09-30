@@ -4,8 +4,8 @@ import { getSession } from './_lib/auth.js';
 
 const R = {
   transactions: {
-    fields: ['type', 'description', 'amount', 'category', 'date', 'person'],
-    select: `id, type, description, amount::float8 AS amount, category, date::text AS date, person, bill_id,
+    fields: ['type', 'description', 'amount', 'category', 'date', 'person', 'method'],
+    select: `id, type, description, amount::float8 AS amount, category, date::text AS date, person, method, bill_id,
              installment_group, installment_no, installment_total`,
     order: 'date DESC, id DESC',
   },
@@ -28,6 +28,10 @@ const R = {
 
 const clean = (v) => (v === '' || v === undefined ? null : v);
 
+// Formas de pagamento aceitas (qualquer outro valor vira "não informado")
+const METHODS = ['Pix', 'Cartão de crédito', 'Cartão de débito', 'Dinheiro', 'Boleto'];
+const method = (v) => (METHODS.includes(v) ? v : null);
+
 export default async function handler(req, res) {
   try {
     const me = await getSession(req);
@@ -49,6 +53,7 @@ export default async function handler(req, res) {
       return res.json(await payBill(id, body, me));
     }
 
+    if ('method' in body) body.method = method(body.method);
     const keys = r.fields.filter((k) => k in body);
 
     if (req.method === 'POST' && table === 'transactions' && req.query.action === 'import') {
@@ -140,11 +145,11 @@ async function createInstallments(body, acc) {
   const values = [], params = [];
   for (let i = 0; i < n; i++) {
     const p = params.length;
-    values.push(`('saida', $${p + 1}, $${p + 2}, $${p + 3}, ($${p + 4}::date + make_interval(months => ${i}))::date, $${p + 5}, $${p + 6}, $${p + 7}, ${i + 1}, ${n})`);
-    params.push(`${desc} (${i + 1}/${n})`, (i === 0 ? first : base) / 100, clean(body.category), body.date, clean(body.person), acc, group);
+    values.push(`('saida', $${p + 1}, $${p + 2}, $${p + 3}, ($${p + 4}::date + make_interval(months => ${i}))::date, $${p + 5}, $${p + 6}, $${p + 7}, ${i + 1}, ${n}, $${p + 8})`);
+    params.push(`${desc} (${i + 1}/${n})`, (i === 0 ? first : base) / 100, clean(body.category), body.date, clean(body.person), acc, group, method(body.method) || 'Cartão de crédito');
   }
   return q(
-    `INSERT INTO transactions (type, description, amount, category, date, person, account_id, installment_group, installment_no, installment_total)
+    `INSERT INTO transactions (type, description, amount, category, date, person, account_id, installment_group, installment_no, installment_total, method)
      VALUES ${values.join(',')} RETURNING ${R.transactions.select}`,
     params
   );
@@ -179,7 +184,7 @@ async function importRows(rows, me) {
 }
 
 // Marca a conta como paga, lança a saída e, se for recorrente, cria a do mês seguinte
-async function payBill(id, { date, person }, me) {
+async function payBill(id, { date, person, method: how }, me) {
   const acc = me.account_id;
   const [b] = await q(
     `SELECT id, description, amount, category, recurring, paid, due_date::text AS due_date
@@ -192,9 +197,9 @@ async function payBill(id, { date, person }, me) {
 
   await q(`UPDATE bills SET paid = true, paid_at = $2 WHERE id = $1 AND account_id = $3`, [id, d, acc]);
   await q(
-    `INSERT INTO transactions (type, description, amount, category, date, person, bill_id, account_id)
-     VALUES ('saida', $1, $2, $3, $4, $5, $6, $7)`,
-    [b.description, b.amount, b.category, d, person || me.name, id, acc]
+    `INSERT INTO transactions (type, description, amount, category, date, person, bill_id, account_id, method)
+     VALUES ('saida', $1, $2, $3, $4, $5, $6, $7, $8)`,
+    [b.description, b.amount, b.category, d, person || me.name, id, acc, method(how)]
   );
   if (b.recurring) {
     await q(

@@ -13,7 +13,8 @@ Front-end em HTML/JS puro + funções serverless da Vercel + Postgres (Neon).
 - **Avisos no sistema**: sininho com contas vencidas/vencendo, orçamento estourando e fim do plano; faixa quando o plano/teste está acabando.
 - **Avisos no celular** (Web Push): o cliente ativa em Conta; rotina diária às 8h (`/api/cron`, em `vercel.json`). As chaves são geradas e guardadas no banco sozinhas. Opcional: `CRON_SECRET` na Vercel para proteger a rotina.
 - **App instalável** (PWA): `manifest.webmanifest`, `sw.js` e ícones em `/icons`.
-- **Parcelas**: compra em até 48x gera uma saída por mês.
+- **Forma de pagamento** em cada lançamento: Pix, cartão de crédito, cartão de débito, dinheiro ou boleto (o app lembra a última usada). Aparece na lista, no filtro, na planilha e ao pagar uma conta.
+- **Parcelas** (no cartão de crédito): compra em até 48x gera uma saída por mês.
 - **Orçamento por categoria** com avisos em 80% e ao estourar.
 - **Exportar** o mês em planilha (CSV para Excel) e relatório para PDF.
 - **Importar extrato** OFX/CSV (bancos, Nubank) com categorias sugeridas e sem duplicar.

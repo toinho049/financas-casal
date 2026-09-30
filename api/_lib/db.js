@@ -109,6 +109,7 @@ const DDL = [
   `ALTER TABLE transactions ADD COLUMN IF NOT EXISTS installment_no INTEGER`,
   `ALTER TABLE transactions ADD COLUMN IF NOT EXISTS installment_total INTEGER`,
   `ALTER TABLE transactions ADD COLUMN IF NOT EXISTS import_key TEXT`,
+  `ALTER TABLE transactions ADD COLUMN IF NOT EXISTS method TEXT`,
   `CREATE UNIQUE INDEX IF NOT EXISTS transactions_import_idx ON transactions(account_id, import_key) WHERE import_key IS NOT NULL`,
   `CREATE TABLE IF NOT EXISTS budgets (
     id SERIAL PRIMARY KEY,

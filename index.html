@@ -178,6 +178,12 @@ main{max-width:1100px;margin:0 auto;padding:18px 16px 80px}
 .date b{display:block;font-size:17px}
 .date small{color:var(--mut);font-size:11px;text-transform:uppercase}
 .empty{padding:28px;text-align:center;color:var(--mut)}
+.pm{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.pm label{margin:0}
+.pm input{position:absolute;opacity:0;pointer-events:none}
+.pm span{display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border:1.5px solid var(--bd);border-radius:99px;font-size:14px;font-weight:600;color:var(--tx);background:var(--card);cursor:pointer;user-select:none}
+.pm input:checked+span{border-color:var(--pri);background:var(--pri-soft);color:var(--pri)}
+.pm input:focus-visible+span{outline:2px solid var(--pri);outline-offset:2px}
 .badge{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;margin-left:6px;vertical-align:1px}
 .b-late{background:var(--out-soft);color:var(--out)}
 .b-today{background:var(--warn-soft);color:var(--warn)}
@@ -186,7 +192,8 @@ main{max-width:1100px;margin:0 auto;padding:18px 16px 80px}
 .section-t{margin:22px 0 8px;font-size:13px;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:.04em}
 
 /* Form / dialog */
-label.f{display:block;margin-bottom:12px;font-size:13px;color:var(--mut);font-weight:500}
+label.f,div.f{display:block;margin-bottom:12px;font-size:13px;color:var(--mut);font-weight:500}
+div.f .pm{margin-bottom:4px}
 label.f input,label.f select{display:block;width:100%;margin-top:5px;padding:10px 12px;border:1px solid var(--bd);border-radius:10px;background:var(--bg);font-size:15px}
 label.f input:focus,label.f select:focus{outline:2px solid var(--pri);outline-offset:-1px}
 label.chk{display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:14px}
@@ -487,6 +494,22 @@ dialog.wide{width:min(900px,calc(100vw - 24px))}
   </form>
 </dialog>
 
+<dialog id="payDlg">
+  <form id="payForm" method="dialog">
+    <div class="dlg-h"><h3>Pagar conta</h3><button type="button" class="ghost" data-act="pay-close">✕</button></div>
+    <div class="dlg-b">
+      <div id="payInfo" style="font-weight:700;margin-bottom:12px"></div>
+      <div class="f">Forma de pagamento<div id="payMethods"></div></div>
+      <label class="f">Data do pagamento<input type="date" name="date" required></label>
+      <p class="small mut" style="margin:0">Isso marca a conta como paga e lança a saída.</p>
+    </div>
+    <div class="dlg-f">
+      <button type="button" class="btn" data-act="pay-close">Cancelar</button>
+      <button type="submit" class="btn pri" id="paySave">Confirmar pagamento</button>
+    </div>
+  </form>
+</dialog>
+
 <dialog id="pixDlg">
   <div class="dlg-h"><h3>Pagar com Pix</h3><button type="button" class="ghost" data-act="pix-close">✕</button></div>
   <div class="dlg-b">
@@ -560,7 +583,7 @@ const CATS = {
 const KINDS = ['Tesouro Direto','CDB / LCI / LCA','Poupança','Ações','FIIs','Fundos','Cripto','Previdência','Reserva de emergência','Outros'];
 const PALETTE = ['#0f8a5f','#2f6fdb','#e0913a','#9b5de5','#d14343','#1fa2a8','#c9a227','#6c7a89','#e05599','#5aa84a'];
 
-const S = { user: null, users: [], tx: [], bills: [], inv: [], tab: 'painel', charts: {}, f: { type: '', person: '' } };
+const S = { user: null, users: [], tx: [], bills: [], inv: [], tab: 'painel', charts: {}, f: { type: '', person: '', method: '' } };
 const now = new Date(); S.y = now.getFullYear(); S.m = now.getMonth() + 1;
 const mk = () => `${S.y}-${pad(S.m)}`;
 
@@ -1255,11 +1278,14 @@ function renderTx() {
   const ent = sum(list.filter(t => t.type === 'entrada')), sai = sum(list.filter(t => t.type === 'saida'));
   if (S.f.type) list = list.filter(t => t.type === S.f.type);
   if (S.f.person) list = list.filter(t => t.person === S.f.person);
+  if (S.f.method) list = list.filter(t => (t.method || '') === (S.f.method === '-' ? '' : S.f.method));
+  const shown = S.f.method ? sum(list.filter(t => t.type === 'saida')) : 0;
   $('#view').innerHTML = `
     <div class="bar">
       <h2>Entradas e saídas</h2><div class="spacer"></div>
       <div class="bar-g">
         <select id="fType" aria-label="Tipo"><option value="">Entradas e saídas</option><option value="entrada">Só entradas</option><option value="saida">Só saídas</option></select>
+        <select id="fMethod" aria-label="Forma de pagamento"><option value="">Todas as formas</option>${METHODS.map(([m]) => `<option value="${esc(m)}">${esc(m)}</option>`).join('')}<option value="-">Não informada</option></select>
         <select id="fPerson" aria-label="Quem"><option value="">Todas as pessoas</option>${S.users.map(u => `<option value="${esc(u)}">${esc(cap(u))}</option>`).join('')}</select>
       </div>
       <div class="bar-g">
@@ -1274,15 +1300,17 @@ function renderTx() {
       <div class="card kpi"><div class="l">Saídas</div><div class="v out">${fm(sai)}</div></div>
       <div class="card kpi"><div class="l">Resultado</div><div class="v ${ent - sai >= 0 ? 'in' : 'out'}">${fm(ent - sai)}</div></div>
     </div>
+    ${S.f.method ? `<p class="small mut" style="margin:0 0 10px">Saídas em <b>${esc(S.f.method === '-' ? 'forma não informada' : S.f.method)}</b> neste mês: <b>${fm(shown)}</b></p>` : ''}
     <div class="list">${list.length ? list.map(t => `
       <div class="row" data-act="edit" data-id="${t.id}">${dateBox(t.date)}
         <div class="main"><div class="t">${esc(t.description)}</div>
-          <div class="m">${esc([t.category, cap(t.person)].filter(Boolean).join(' · '))}</div></div>
+          <div class="m">${esc([t.category, METHOD_SHORT[t.method] || t.method, cap(t.person)].filter(Boolean).join(' · '))}</div></div>
         <div class="amt ${t.type === 'entrada' ? 'in' : 'out'}">${t.type === 'entrada' ? '+' : '−'} ${fm(t.amount)}</div>
         <div class="acts"><button class="ghost" data-act="edit" data-id="${t.id}" title="Editar">✎</button>
           <button class="ghost" data-act="del" data-id="${t.id}" title="Excluir">🗑</button></div>
       </div>`).join('') : '<div class="empty">Nenhum lançamento neste mês.</div>'}</div>`;
-  $('#fType').value = S.f.type; $('#fPerson').value = S.f.person;
+  $('#fType').value = S.f.type; $('#fPerson').value = S.f.person; $('#fMethod').value = S.f.method;
+  $('#fMethod').onchange = e => { S.f.method = e.target.value; renderTx(); };
   $('#fType').onchange = e => { S.f.type = e.target.value; renderTx(); };
   $('#fPerson').onchange = e => { S.f.person = e.target.value; renderTx(); };
 }
@@ -1418,7 +1446,8 @@ const FORMS = {
     { k: 'type', t: 'seg' },
     { k: 'description', l: 'Descrição', req: 1 },
     { k: 'amount', l: 'Valor (R$)', t: 'money', req: 1 },
-    { k: 'installments', l: 'Pagamento', t: 'parc', newOnly: 1 },
+    { k: 'method', l: 'Forma de pagamento', t: 'method' },
+    { k: 'installments', l: 'Parcelas', t: 'parc', newOnly: 1 },
     { k: 'category', l: 'Categoria', t: 'cat' },
     { k: 'date', l: 'Data', t: 'date', req: 1 },
     { k: 'person', l: 'Quem', t: 'person' },
@@ -1444,11 +1473,16 @@ const FORMS = {
   ],
 };
 const DEFAULTS = {
-  transactions: () => ({ type: 'saida', date: today(), person: S.user }),
+  transactions: () => ({ type: 'saida', date: today(), person: S.user, method: lastMethod() }),
   bills: () => ({ due_date: today(), recurring: false }),
   investments: () => ({ date: today(), kind: KINDS[0] }),
   budgets: () => ({ category: S.budgetCat || '' }),
 };
+const METHODS = [['Pix', '⚡'], ['Cartão de crédito', '💳'], ['Cartão de débito', '💳'], ['Dinheiro', '💵'], ['Boleto', '🧾']];
+const METHOD_SHORT = { 'Cartão de crédito': 'Crédito', 'Cartão de débito': 'Débito' };
+const lastMethod = () => { try { return localStorage.getItem('fc-method') || 'Pix'; } catch { return 'Pix'; } };
+const methodChips = (v, name = 'method') => `<div class="pm" role="radiogroup">${METHODS.map(([m, ic]) =>
+  `<label><input type="radio" name="${name}" value="${esc(m)}" ${m === v ? 'checked' : ''}><span>${ic} ${esc(m)}</span></label>`).join('')}</div>`;
 const PARC = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 18, 24, 36, 48];
 const moneyVal = v => v == null ? '' : Number(v).toFixed(2).replace('.', ',');
 
@@ -1464,6 +1498,7 @@ function fieldHtml(f, v) {
     case 'parc': return `<label class="f" id="parcField">${f.l}<select name="${f.k}">${PARC.map(n =>
       `<option value="${n}">${n === 1 ? 'À vista (1x)' : `Parcelado em ${n}x`}</option>`).join('')}</select>
       <span class="small mut hidden" id="parcHint" style="display:block;margin-top:6px"></span></label>`;
+    case 'method': return `<div class="f" id="methodField"><span id="methodLbl">${f.l}</span>${methodChips(v)}</div>`;
     case 'check': return `<label class="chk"><input type="checkbox" name="${f.k}" ${v ? 'checked' : ''}> ${f.l}</label>`;
     case 'person': return `<label class="f">${f.l}<select name="${f.k}"><option value="">Casal</option>${S.users.map(u =>
       `<option value="${esc(u)}" ${u === v ? 'selected' : ''}>${esc(cap(u))}</option>`).join('')}</select></label>`;
@@ -1488,8 +1523,9 @@ function openForm(res, item) {
   const parc = () => {
     const sel = $('#dlgBody [name=installments]'); if (!sel) return;
     const saida = $('#dlgBody input[name=type]:checked')?.value !== 'entrada';
-    $('#parcField').classList.toggle('hidden', !saida);
-    if (!saida) sel.value = '1';
+    const credito = $('#dlgBody input[name=method]:checked')?.value === 'Cartão de crédito';
+    $('#parcField').classList.toggle('hidden', !(saida && credito));
+    if (!(saida && credito)) sel.value = '1';
     const n = Number(sel.value), amt = $('#dlgBody [name=amount]');
     amt.parentElement.firstChild.textContent = n > 1 ? 'Valor total da compra (R$)' : 'Valor (R$)';
     $('#dlgBody [name=date]').parentElement.firstChild.textContent = n > 1 ? 'Data da 1ª parcela' : 'Data';
@@ -1499,6 +1535,9 @@ function openForm(res, item) {
   };
   $('#dlgBody').querySelectorAll('input[name=type]').forEach(r => r.onchange = () => { setCats(r.value); parc(); });
   $('#dlgBody [name=installments]')?.addEventListener('change', parc);
+  $('#dlgBody').querySelectorAll('input[name=method]').forEach(r => r.addEventListener('change', parc));
+  const typeLbl = () => { const l = $('#methodLbl'); if (l) l.textContent = $('#dlgBody input[name=type]:checked')?.value === 'entrada' ? 'Recebido via' : 'Forma de pagamento'; };
+  $('#dlgBody').querySelectorAll('input[name=type]').forEach(r => r.addEventListener('change', typeLbl)); typeLbl();
   $('#dlgBody [name=amount]')?.addEventListener('input', parc);
   parc();
   $('#dlg').showModal();
@@ -1522,10 +1561,23 @@ $('#dlgForm').addEventListener('submit', async e => {
   $('#dlgSave').disabled = true;
   try {
     const out = await api(`/api/data?r=${res}${id ? '&id=' + id : ''}`, { method: id ? 'PUT' : 'POST', body });
+    if (res === 'transactions' && body.method) { try { localStorage.setItem('fc-method', body.method); } catch {} }
     await load(res); $('#dlg').close(); render();
     toast(Array.isArray(out) ? `${out.length} parcelas lançadas ✓` : 'Salvo!');
   } catch (err) { if (err.message !== 'auth') $('#dlgErr').textContent = err.message; }
   finally { $('#dlgSave').disabled = false; }
+});
+$('#payForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const f = e.target, how = f.elements.paymethod?.value || '';
+  $('#paySave').disabled = true;
+  try {
+    await api(`/api/data?r=bills&action=pay&id=${S.paying}`, { method: 'POST', body: { date: f.elements.date.value || today(), person: S.user, method: how } });
+    if (how) { try { localStorage.setItem('fc-method', how); } catch {} }
+    $('#payDlg').close();
+    await Promise.all([load('bills'), load('transactions')]); render(); toast('Conta paga ✓');
+  } catch (err) { if (err.message !== 'auth') toast(err.message); }
+  finally { $('#paySave').disabled = false; }
 });
 
 /* ---------- WhatsApp ---------- */
@@ -1579,9 +1631,9 @@ function exportCSV() {
   const k = mk();
   const num = v => Number(v).toFixed(2).replace('.', ',');
   const cell = v => { const s = String(v ?? ''); return /[;"\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
-  const L = [['Data', 'Tipo', 'Descrição', 'Categoria', 'Quem', 'Valor (R$)'].join(';')];
+  const L = [['Data', 'Tipo', 'Descrição', 'Categoria', 'Forma de pagamento', 'Quem', 'Valor (R$)'].join(';')];
   S.tx.filter(t => t.date.startsWith(k)).sort((a, b) => a.date.localeCompare(b.date))
-    .forEach(t => L.push([fd(t.date), t.type === 'entrada' ? 'Entrada' : 'Saída', t.description, t.category, cap(t.person), (t.type === 'saida' ? '-' : '') + num(t.amount)].map(cell).join(';')));
+    .forEach(t => L.push([fd(t.date), t.type === 'entrada' ? 'Entrada' : 'Saída', t.description, t.category, t.method, cap(t.person), (t.type === 'saida' ? '-' : '') + num(t.amount)].map(cell).join(';')));
   L.push('', ['Contas a pagar'].join(';'), ['Vencimento', 'Descrição', 'Categoria', 'Situação', 'Valor (R$)'].join(';'));
   S.bills.filter(b => b.due_date.startsWith(k)).forEach(b => L.push([fd(b.due_date), b.description, b.category, b.paid ? `Paga em ${fd(b.paid_at)}` : b.due_date < today() ? 'Vencida' : 'Pendente', num(b.amount)].map(cell).join(';')));
   download(`financas-${k}.csv`, '﻿' + L.join('\r\n'), 'text/csv;charset=utf-8');
@@ -1835,11 +1887,13 @@ document.addEventListener('click', async e => {
     }
     else if (act === 'pay') {
       const bill = findItem('bills', id);
-      if (!confirm(`Marcar "${bill.description}" (${fm(bill.amount)}) como paga hoje?\nIsso também lança a saída.`)) return;
-      b.disabled = true;
-      await api(`/api/data?r=bills&action=pay&id=${id}`, { method: 'POST', body: { date: today(), person: S.user } });
-      await Promise.all([load('bills'), load('transactions')]); render(); toast('Conta paga ✓');
+      S.paying = id;
+      $('#payInfo').textContent = `${bill.description} · ${fm(bill.amount)}`;
+      $('#payMethods').innerHTML = methodChips(lastMethod(), 'paymethod');
+      $('#payForm').elements.date.value = today();
+      $('#payDlg').showModal();
     }
+    else if (act === 'pay-close') $('#payDlg').close();
     else if (act === 'auth-mode') { $('#auth').dataset.touched = '1'; setAuthMode(b.dataset.mode); }
     else if (act === 'lp-go') {
       $('#auth').dataset.touched = '1'; setAuthMode(b.dataset.mode);
