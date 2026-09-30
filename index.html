@@ -338,8 +338,9 @@ function applyMe(d) {
 }
 async function loadMe() { applyMe(await api('/api/auth')); }
 
-function planCards(plans, highlight = 'anual') {
-  const mensal = plans.find(p => p.id === 'mensal');
+function planCards(plans, highlight) {
+  const mensal = plans.find(p => p.id === 'mensal'), anual = plans.find(p => p.id === 'anual');
+  if (!highlight) highlight = anual && mensal && anual.price / 12 < mensal.price ? 'anual' : 'mensal';
   return plans.map(p => {
     const per = p.id === 'anual' ? p.price / 12 : null;
     const econ = per && mensal ? Math.round((1 - per / mensal.price) * 100) : 0;
@@ -361,7 +362,11 @@ function showAuth(msg) {
   $('#authErr').textContent = msg || '';
   fetch('/api/billing?action=plans').then(r => r.json()).then(pl => {
     const m = pl.find(p => p.id === 'mensal'), a = pl.find(p => p.id === 'anual');
-    if (m) $('#pitchPrice').innerHTML = `A partir de <b>${fm(a ? a.price / 12 : m.price)}</b>/mês${a ? ` no plano anual · ou ${fm(m.price)} no mensal` : ''}`;
+    if (!m) return;
+    const porMesAnual = a ? a.price / 12 : Infinity;
+    $('#pitchPrice').innerHTML = porMesAnual < m.price
+      ? `A partir de <b>${fm(porMesAnual)}</b>/mês no plano anual · ou ${fm(m.price)} no mensal`
+      : `A partir de <b>${fm(m.price)}</b>/mês${a ? ` · ou ${fm(a.price)} no plano anual` : ''}`;
   }).catch(() => {});
 }
 

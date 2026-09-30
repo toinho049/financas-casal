@@ -6,7 +6,7 @@ const num = (v, d) => (Number.isFinite(Number(v)) && Number(v) > 0 ? Number(v) :
 // Preços configuráveis pelas variáveis PRICE_MENSAL e PRICE_ANUAL
 export const PLANS = {
   mensal: { id: 'mensal', title: 'Mensal', period: '1 mês', price: num(process.env.PRICE_MENSAL, 10), interval: '1 month' },
-  anual: { id: 'anual', title: 'Anual', period: '12 meses', price: num(process.env.PRICE_ANUAL, 20), interval: '1 year' },
+  anual: { id: 'anual', title: 'Anual', period: '12 meses', price: num(process.env.PRICE_ANUAL, 149.9), interval: '1 year' },
 };
 
 export const publicPlans = () =>
