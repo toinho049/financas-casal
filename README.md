@@ -6,6 +6,20 @@ senha, e acesso liberado por pagamento no Mercado Pago (Pix ou cartão).
 
 Front-end em HTML/JS puro + funções serverless da Vercel + Postgres (Neon).
 
+## Novidades (setembro/2026)
+
+- **Página de vendas** para quem não está logado (recursos, planos, dúvidas) e imagem de prévia do link (`og.png`).
+- **Teste grátis**: padrão para todo cadastro (Admin → Teste grátis) e **links de campanha** `/?convite=CODIGO` com dias próprios.
+- **Avisos no sistema**: sininho com contas vencidas/vencendo, orçamento estourando e fim do plano; faixa quando o plano/teste está acabando.
+- **Avisos no celular** (Web Push): o cliente ativa em Conta; rotina diária às 8h (`/api/cron`, em `vercel.json`). As chaves são geradas e guardadas no banco sozinhas. Opcional: `CRON_SECRET` na Vercel para proteger a rotina.
+- **App instalável** (PWA): `manifest.webmanifest`, `sw.js` e ícones em `/icons`.
+- **Parcelas**: compra em até 48x gera uma saída por mês.
+- **Orçamento por categoria** com avisos em 80% e ao estourar.
+- **Exportar** o mês em planilha (CSV para Excel) e relatório para PDF.
+- **Importar extrato** OFX/CSV (bancos, Nubank) com categorias sugeridas e sem duplicar.
+- **Assinatura automática** no cartão (Mercado Pago preapproval), com cancelamento na aba Conta. A 1ª cobrança só acontece quando o acesso atual termina.
+- **Termos de Uso** e **Política de Privacidade** (`termos.html`, `privacidade.html`), aceite obrigatório no cadastro. Preencha os campos entre colchetes com seus dados.
+
 ## Estrutura
 
 ```

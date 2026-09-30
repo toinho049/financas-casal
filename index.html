@@ -5,6 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0f8a5f">
 <meta name="description" content="Controle as finanças do casal: entradas, saídas, contas a pagar, orçamento e investimentos num lugar só.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Finanças do Casal">
+<meta property="og:title" content="Finanças do Casal · o dinheiro de vocês dois num lugar só">
+<meta property="og:description" content="Contas a pagar com aviso no celular, orçamento por categoria, gráficos e resumo no WhatsApp. Teste grátis.">
+<meta property="og:url" content="https://www.financasdocasal.sbs/">
+<meta property="og:image" content="https://www.financasdocasal.sbs/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="pt_BR">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://www.financasdocasal.sbs/">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="icon" href="/icons/favicon-32.png" type="image/png">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
@@ -32,16 +43,48 @@ button,input,select{font:inherit;color:inherit}
 .hidden{display:none!important}
 
 /* Entrada / cadastro */
-#auth{min-height:100vh;display:grid;place-items:center;padding:24px 16px}
-.auth-wrap{display:grid;grid-template-columns:1.1fr 380px;gap:48px;align-items:center;max-width:980px;width:100%}
-.pitch h1{font-size:34px;line-height:1.15;margin:18px 0 18px;letter-spacing:-.02em}
+#auth{min-height:100vh}
+.auth-wrap{display:grid;grid-template-columns:1.1fr 380px;gap:48px;align-items:center;max-width:1040px;margin:0 auto;padding:48px 16px 56px;box-sizing:border-box}
+.pitch h1{font-size:40px;line-height:1.1;margin:6px 0 14px;letter-spacing:-.025em}
 .feat{list-style:none;padding:0;margin:0 0 22px}
 .feat li{padding:7px 0 7px 28px;position:relative;color:var(--tx)}
 .feat li::before{content:"✓";position:absolute;left:0;top:6px;width:20px;height:20px;border-radius:50%;background:var(--pri-soft);color:var(--pri);font-size:12px;font-weight:700;display:grid;place-items:center}
 .pitch-price{font-size:15px;color:var(--mut)}
 .pitch-price b{color:var(--tx);font-size:22px}
 .login-box{background:var(--card);border:1px solid var(--bd);border-radius:18px;padding:24px;width:100%;box-shadow:var(--sh)}
-@media (max-width:820px){.auth-wrap{grid-template-columns:1fr;gap:24px}.pitch h1{font-size:26px}#authForm{order:-1}}
+@media (max-width:820px){.auth-wrap{grid-template-columns:1fr;gap:24px;padding-top:28px}.pitch h1{font-size:30px}}
+/* Página de vendas */
+.lp-top{position:sticky;top:0;z-index:6;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--bd)}
+.lp-in{max-width:1040px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:10px}
+.lp-in .linkbtn{color:var(--tx);font-weight:500;text-decoration:none;padding:6px 8px}
+.lp-sub{font-size:18px;color:var(--mut);margin:0 0 18px;line-height:1.5}
+.lp{max-width:1040px;margin:0 auto;padding:0 16px}
+.lp-sec{padding:44px 0;border-top:1px solid var(--bd);scroll-margin-top:64px}
+.lp-h{font-size:28px;letter-spacing:-.02em;margin:0 0 22px;text-align:center}
+.lp-lead{text-align:center;color:var(--mut);margin:-10px 0 20px;font-size:16px}
+.lp-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.lp-step{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:22px}
+.lp-step b{display:inline-flex;width:34px;height:34px;border-radius:50%;background:var(--pri);color:#fff;align-items:center;justify-content:center;font-size:16px}
+.lp-step h3,.lp-card h3{margin:12px 0 6px;font-size:17px}.lp-step p,.lp-card p{margin:0;color:var(--mut);font-size:14.5px;line-height:1.5}
+.lp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.lp-card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:20px}
+.lp-ic{width:42px;height:42px;border-radius:12px;background:var(--pri-soft);display:flex;align-items:center;justify-content:center}
+.lp-ic svg{width:22px;height:22px;fill:none;stroke:var(--pri);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.lp-plans{max-width:720px;margin:0 auto 12px}
+.faq{max-width:760px;margin:0 auto;display:grid;gap:10px}
+.faq details{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:4px 18px}
+.faq summary{cursor:pointer;font-weight:600;padding:14px 0;list-style:none;display:flex;justify-content:space-between;gap:12px}
+.faq summary::after{content:"+";font-size:20px;color:var(--pri);line-height:1}
+.faq details[open] summary::after{content:"−"}
+.faq summary::-webkit-details-marker{display:none}
+.faq p{margin:0 0 16px;color:var(--mut);line-height:1.55}
+.faq a{color:var(--pri)}
+.lp-cta{text-align:center}
+.lp-big{font-size:18px;padding:14px 28px;border-radius:14px}
+.lp-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:26px 0 40px;border-top:1px solid var(--bd)}
+.lp-foot a{color:inherit}
+@media (max-width:900px){.lp-grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:640px){.lp-in .brand{font-size:15px;gap:8px;white-space:nowrap}.lp-in .brand i{width:26px;height:26px;font-size:12px}.lp-in .btn{white-space:nowrap}.lp-in{gap:6px}.lp-steps,.lp-grid{grid-template-columns:1fr}.lp-hide-sm{display:none}.lp-h{font-size:23px}.lp-sub{font-size:16px}}
 .mut{color:var(--mut)}.small{font-size:13px}
 .linkbtn{background:none;border:0;color:var(--pri);cursor:pointer;font-weight:500;padding:4px}
 .linkbtn:hover{text-decoration:underline}
@@ -211,17 +254,22 @@ dialog.wide{width:min(900px,calc(100vw - 24px))}
 <body>
 
 <section id="auth" class="hidden">
+  <div class="lp-top">
+    <div class="lp-in"><div class="brand"><i>R$</i>Finanças do Casal</div><div class="spacer"></div>
+      <a class="linkbtn lp-hide-sm" href="#recursos">Recursos</a><a class="linkbtn lp-hide-sm" href="#planos">Planos</a><a class="linkbtn lp-hide-sm" href="#duvidas">Dúvidas</a>
+      <button class="btn sm" data-act="lp-go" data-mode="login">Entrar</button>
+      <button class="btn sm pri" data-act="lp-go" data-mode="signup">Criar conta</button></div>
+  </div>
   <div class="auth-wrap">
     <div class="pitch">
-      <div class="brand"><i>R$</i>Finanças do Casal</div>
       <div class="trial-badge hidden" id="trialBadge"></div>
       <h1>O dinheiro de vocês dois, organizado num lugar só.</h1>
+      <p class="lp-sub">Contas a pagar, gastos do mês, orçamento e investimentos do casal, com avisos no celular antes de vencer. Cada um com seu login, os mesmos números.</p>
       <ul class="feat">
-        <li>Entradas, saídas e contas a pagar com aviso de vencimento</li>
-        <li>Gráficos do mês, gastos por categoria e evolução do saldo</li>
-        <li>Investimentos com rendimento acompanhado</li>
-        <li>Resumo pronto para mandar no grupo do WhatsApp</li>
-        <li>Um login para cada um, os mesmos dados</li>
+        <li>Contas a pagar com aviso no celular antes de vencer</li>
+        <li>Orçamento por categoria que avisa quando está estourando</li>
+        <li>Compras parceladas e importação do extrato do banco</li>
+        <li>Gráficos do mês e resumo pronto para o WhatsApp</li>
       </ul>
       <div class="pitch-price" id="pitchPrice"></div>
     </div>
@@ -247,6 +295,61 @@ dialog.wide{width:min(900px,calc(100vw - 24px))}
       </p>
       <p class="small mut" style="margin:14px 0 0;text-align:center"><a href="/termos.html" style="color:inherit">Termos</a> · <a href="/privacidade.html" style="color:inherit">Privacidade</a></p>
     </form>
+  </div>
+
+  <div class="lp">
+    <section class="lp-sec">
+      <h2 class="lp-h">Como funciona</h2>
+      <div class="lp-steps">
+        <div class="lp-step"><b>1</b><h3>Crie a conta</h3><p>Em 1 minuto, só com nome, e-mail e senha. Sem cartão para testar.</p></div>
+        <div class="lp-step"><b>2</b><h3>Chame quem divide as contas</h3><p>Cada um entra com o próprio e-mail e senha e vê os mesmos dados, em tempo real.</p></div>
+        <div class="lp-step"><b>3</b><h3>Lance ou importe o extrato</h3><p>Digite os gastos ou importe o arquivo do banco. O sistema sugere as categorias.</p></div>
+      </div>
+    </section>
+
+    <section class="lp-sec" id="recursos">
+      <h2 class="lp-h">Tudo que o casal precisa, sem planilha</h2>
+      <div class="lp-grid">
+        <div class="lp-card"><div class="lp-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></div><h3>Avisos antes de vencer</h3><p>Lembrete no celular às 8h quando uma conta vence hoje ou amanhã. Nada de juros por esquecimento.</p></div>
+        <div class="lp-card"><div class="lp-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 6-6"/></svg></div><h3>Gráficos do mês</h3><p>Entradas × saídas, gastos por categoria e evolução do saldo, prontos, sem fórmula nenhuma.</p></div>
+        <div class="lp-card"><div class="lp-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><h3>Orçamento por categoria</h3><p>Defina quanto pode gastar em mercado, lazer, combustível… O sistema avisa em 80% e quando estourar.</p></div>
+        <div class="lp-card"><div class="lp-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></div><h3>Parcelas no automático</h3><p>Comprou em 10x? Lance uma vez e as parcelas aparecem sozinhas nos próximos meses.</p></div>
+        <div class="lp-card"><div class="lp-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg></div><h3>Importa o extrato do banco</h3><p>Arquivo OFX ou CSV do seu banco ou do Nubank: o sistema lê, categoriza e não duplica.</p></div>
+        <div class="lp-card"><div class="lp-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 21l2.1-5.6A8.4 8.4 0 1 1 21 11.5z"/></svg></div><h3>Resumo no WhatsApp</h3><p>Um toque e o resumo do mês vai para o grupo da família, com o que vence e onde mais gastaram.</p></div>
+        <div class="lp-card"><div class="lp-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg></div><h3>Investimentos</h3><p>Acompanhe quanto aplicaram e quanto rendeu, junto com o resto das finanças.</p></div>
+        <div class="lp-card"><div class="lp-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg></div><h3>App no celular</h3><p>Instale na tela inicial do celular e use como um aplicativo. Funciona no computador também.</p></div>
+      </div>
+    </section>
+
+    <section class="lp-sec" id="planos">
+      <h2 class="lp-h">Planos</h2>
+      <p class="lp-lead" id="lpTrial"></p>
+      <div class="plans lp-plans" id="lpPlans"></div>
+      <p class="small mut" style="text-align:center">Pagamento pelo Mercado Pago, com Pix ou cartão. Renovação automática opcional, que você cancela quando quiser.</p>
+    </section>
+
+    <section class="lp-sec" id="duvidas">
+      <h2 class="lp-h">Dúvidas frequentes</h2>
+      <div class="faq">
+        <details><summary>Preciso conectar minha conta do banco?</summary><p>Não. O sistema não pede senha de banco e não se conecta a ele. Você lança os gastos ou importa o arquivo de extrato que o próprio banco gera.</p></details>
+        <details><summary>Meus dados ficam seguros?</summary><p>Sim. A conexão é criptografada (cadeado HTTPS), as senhas são guardadas de forma protegida e os dados de cada conta ficam separados dos outros. Não vendemos nem compartilhamos seus dados. Veja a <a href="/privacidade.html">Política de Privacidade</a>.</p></details>
+        <details><summary>Quantas pessoas podem usar a mesma conta?</summary><p>Até 5 pessoas por conta, cada uma com seu e-mail e senha. Todos veem e editam os mesmos dados.</p></details>
+        <details><summary>Tem teste grátis? E se eu não gostar?</summary><p id="faqTrial">Você pode testar antes de pagar. No fim do teste nada é cobrado automaticamente: se não quiser continuar, é só não assinar. Na primeira compra, você ainda tem 7 dias para pedir o dinheiro de volta.</p></details>
+        <details><summary>Posso cancelar a renovação automática?</summary><p>Sim, a qualquer momento, com um clique na aba Conta. Você continua com acesso até o fim do período já pago.</p></details>
+        <details><summary>Funciona no iPhone e no Android?</summary><p>Sim, no navegador de qualquer celular e computador. Dá para instalar na tela inicial como aplicativo, e os avisos funcionam nos dois.</p></details>
+      </div>
+    </section>
+
+    <section class="lp-sec lp-cta">
+      <h2 class="lp-h" style="margin-bottom:10px">Comece hoje e pare de brigar por dinheiro 💚</h2>
+      <p class="lp-lead" id="lpCtaTxt">Leva 1 minuto para criar a conta.</p>
+      <button class="btn pri lp-big" data-act="lp-go" data-mode="signup">Criar minha conta</button>
+    </section>
+
+    <footer class="lp-foot">
+      <div class="brand"><i>R$</i>Finanças do Casal</div>
+      <div class="small mut"><a href="/termos.html">Termos de Uso</a> · <a href="/privacidade.html">Privacidade</a> · © 2026</div>
+    </footer>
   </div>
 </section>
 
@@ -471,6 +574,19 @@ function showAuth(msg) {
         : `A partir de <b>${fm(m.price)}</b>/mês${a ? ` · ou ${fm(a.price)} no plano anual` : ''}`)
         + (o.trial_days ? ` · <b>${diasTxt(o.trial_days)} grátis</b> para testar` : '');
     }
+    // Página de vendas: planos e textos com os valores reais
+    const mensal = pl.find(p => p.id === 'mensal');
+    $('#lpPlans').innerHTML = pl.map(p => {
+      const per = p.id === 'anual' ? p.price / 12 : null;
+      const econ = per && mensal ? Math.round((1 - per / mensal.price) * 100) : 0;
+      const best = econ > 0;
+      return `<div class="plan ${best ? 'best' : ''}">${best ? `<span class="tag">Economize ${econ}%</span>` : ''}
+        <h3>Plano ${esc(p.title)}</h3><div class="pr">${fm(p.price)} <small>/ ${esc(p.period)}</small></div>
+        <div class="eq">${per ? `equivale a ${fm(per)} por mês` : 'sem fidelidade'}</div>
+        <button class="btn ${best ? 'pri' : ''}" style="width:100%" data-act="lp-go" data-mode="signup">${o.trial_days ? `Testar ${diasTxt(o.trial_days)} grátis` : 'Começar agora'}</button></div>`;
+    }).join('');
+    $('#lpTrial').textContent = o.trial_days ? `Teste tudo por ${diasTxt(o.trial_days)} sem pagar nada. Depois escolha o plano.` : 'Escolha o plano ideal para vocês.';
+    $('#lpCtaTxt').textContent = o.trial_days ? `${diasTxt(o.trial_days)} grátis, sem cartão. Leva 1 minuto.` : 'Leva 1 minuto para criar a conta.';
     $('#trialBadge').textContent = o.trial_days ? `🎁 Teste grátis por ${diasTxt(o.trial_days)} · sem cartão` : '';
     $('#trialBadge').classList.toggle('hidden', !o.trial_days);
     if (o.campaign && o.trial_days && !$('#auth').dataset.touched) setAuthMode('signup');
@@ -1552,6 +1668,11 @@ document.addEventListener('click', async e => {
       await Promise.all([load('bills'), load('transactions')]); render(); toast('Conta paga ✓');
     }
     else if (act === 'auth-mode') { $('#auth').dataset.touched = '1'; setAuthMode(b.dataset.mode); }
+    else if (act === 'lp-go') {
+      $('#auth').dataset.touched = '1'; setAuthMode(b.dataset.mode);
+      $('#authForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(() => $(b.dataset.mode === 'signup' ? '#authForm [name=name]' : '#authForm [name=email]').focus({ preventScroll: true }), 350);
+    }
     else if (act === 'bell') toggleNotifs();
     else if (act === 'budget-for') { S.budgetCat = b.dataset.cat; openForm('budgets'); S.budgetCat = ''; }
     else if (act === 'import-open') openImport();
