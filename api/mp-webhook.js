@@ -25,6 +25,12 @@ export default async function handler(req, res) {
     const r = await fn(String(id));
     res.status(200).json(r);
   } catch (e) {
+    // Item que não existe no Mercado Pago (ex.: o "Simular notificação" do painel usa id 123456):
+    // responde 200 para não ficar recebendo a mesma notificação de novo.
+    if ([400, 404].includes(e.status)) {
+      console.warn('mp-webhook: ignorado', type, id, e.status, e.message);
+      return res.status(200).json({ ignored: true, reason: 'não encontrado no Mercado Pago' });
+    }
     console.error('mp-webhook', type, e);
     res.status(500).json({ error: e.message }); // o Mercado Pago tenta de novo
   }

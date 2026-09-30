@@ -30,7 +30,11 @@ async function mp(path, { method = 'GET', body, idem } = {}) {
     body: body ? JSON.stringify(body) : undefined,
   });
   const d = await r.json().catch(() => ({}));
-  if (!r.ok) throw new Error(d.message || `Mercado Pago respondeu ${r.status}`);
+  if (!r.ok) {
+    const err = new Error(d.message || `Mercado Pago respondeu ${r.status}`);
+    err.status = r.status;
+    throw err;
+  }
   return d;
 }
 
