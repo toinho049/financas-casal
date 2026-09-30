@@ -1,11 +1,18 @@
+import crypto from 'node:crypto';
 import { q } from './_lib/db.js';
 import { getSession } from './_lib/auth.js';
 
 const R = {
   transactions: {
     fields: ['type', 'description', 'amount', 'category', 'date', 'person'],
-    select: `id, type, description, amount::float8 AS amount, category, date::text AS date, person, bill_id`,
+    select: `id, type, description, amount::float8 AS amount, category, date::text AS date, person, bill_id,
+             installment_group, installment_no, installment_total`,
     order: 'date DESC, id DESC',
+  },
+  budgets: {
+    fields: ['category', 'amount'],
+    select: `id, category, amount::float8 AS amount`,
+    order: 'lower(category)',
   },
   bills: {
     fields: ['description', 'amount', 'due_date', 'category', 'recurring', 'paid', 'paid_at'],
@@ -44,6 +51,30 @@ export default async function handler(req, res) {
 
     const keys = r.fields.filter((k) => k in body);
 
+    if (req.method === 'POST' && table === 'transactions' && req.query.action === 'import') {
+      return res.json(await importRows(body.rows, me));
+    }
+
+    // Compra parcelada: gera uma saída por mês
+    if (req.method === 'POST' && table === 'transactions' && Number(body.installments) > 1) {
+      return res.status(201).json(await createInstallments(body, acc));
+    }
+
+    // Orçamento: um limite por categoria (salvar de novo atualiza)
+    if (req.method === 'POST' && table === 'budgets') {
+      const cat = String(body.category || '').trim().slice(0, 60);
+      const amount = Number(body.amount);
+      if (!cat) return res.status(400).json({ error: 'Informe a categoria' });
+      if (!(amount > 0)) return res.status(400).json({ error: 'Informe um limite maior que zero' });
+      const rows = await q(
+        `INSERT INTO budgets (account_id, category, amount) VALUES ($1, $2, $3)
+         ON CONFLICT (account_id, lower(category)) DO UPDATE SET amount = EXCLUDED.amount
+         RETURNING ${r.select}`,
+        [acc, cat, amount]
+      );
+      return res.status(201).json(rows[0]);
+    }
+
     if (req.method === 'POST') {
       if (!keys.length) return res.status(400).json({ error: 'Nada para salvar' });
       const cols = [...keys, 'account_id'];
@@ -70,15 +101,81 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'DELETE') {
+      // Parcelas: ?scope=future apaga esta e as seguintes do mesmo parcelamento
+      if (table === 'transactions' && req.query.scope === 'future') {
+        const rows = await q(
+          `DELETE FROM transactions t USING transactions x
+           WHERE x.id = $1 AND x.account_id = $2 AND x.installment_group IS NOT NULL
+             AND t.account_id = x.account_id AND t.installment_group = x.installment_group
+             AND t.installment_no >= x.installment_no
+           RETURNING t.id`,
+          [id, acc]
+        );
+        if (rows.length) return res.json({ ok: true, deleted: rows.length });
+      }
       await q(`DELETE FROM ${table} WHERE id = $1 AND account_id = $2`, [id, acc]);
-      return res.json({ ok: true });
+      return res.json({ ok: true, deleted: 1 });
     }
 
     res.status(405).json({ error: 'Método não permitido' });
   } catch (e) {
+    if (e.status) return res.status(e.status).json({ error: e.message });
+    if (e.code === '23505') return res.status(400).json({ error: 'Já existe um limite para essa categoria' });
     console.error(e);
     res.status(500).json({ error: e.message });
   }
+}
+
+// Divide o total em N parcelas mensais (centavos que sobram vão na 1ª)
+async function createInstallments(body, acc) {
+  const n = Math.trunc(Number(body.installments));
+  const total = Number(body.amount);
+  if (!(n >= 2 && n <= 48)) throw Object.assign(new Error('Parcelas: de 2 a 48'), { status: 400 });
+  if (!(total > 0)) throw Object.assign(new Error('Informe o valor total'), { status: 400 });
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(body.date || ''))) throw Object.assign(new Error('Informe a data da 1ª parcela'), { status: 400 });
+  const cents = Math.round(total * 100);
+  const base = Math.floor(cents / n), first = cents - base * (n - 1);
+  const group = crypto.randomUUID();
+  const desc = String(body.description || '').trim().slice(0, 120) || 'Compra parcelada';
+  const values = [], params = [];
+  for (let i = 0; i < n; i++) {
+    const p = params.length;
+    values.push(`('saida', $${p + 1}, $${p + 2}, $${p + 3}, ($${p + 4}::date + make_interval(months => ${i}))::date, $${p + 5}, $${p + 6}, $${p + 7}, ${i + 1}, ${n})`);
+    params.push(`${desc} (${i + 1}/${n})`, (i === 0 ? first : base) / 100, clean(body.category), body.date, clean(body.person), acc, group);
+  }
+  return q(
+    `INSERT INTO transactions (type, description, amount, category, date, person, account_id, installment_group, installment_no, installment_total)
+     VALUES ${values.join(',')} RETURNING ${R.transactions.select}`,
+    params
+  );
+}
+
+// Importa lançamentos de extrato; linhas repetidas (mesma chave) são ignoradas
+async function importRows(rows, me) {
+  if (!Array.isArray(rows) || !rows.length) throw Object.assign(new Error('Nenhuma linha para importar'), { status: 400 });
+  if (rows.length > 2000) throw Object.assign(new Error('Máximo de 2000 linhas por vez'), { status: 400 });
+  let inserted = 0;
+  for (let s = 0; s < rows.length; s += 200) {
+    const chunk = rows.slice(s, s + 200), values = [], params = [];
+    for (const r of chunk) {
+      const amount = Math.abs(Number(r.amount));
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(String(r.date)) || !(amount > 0) || !['entrada', 'saida'].includes(r.type)) continue;
+      const p = params.length;
+      values.push(`($${p + 1}, $${p + 2}, $${p + 3}, $${p + 4}, $${p + 5}::date, $${p + 6}, $${p + 7}, $${p + 8})`);
+      params.push(r.type, String(r.description || 'Sem descrição').trim().slice(0, 120), amount, clean(r.category), r.date, me.name, me.account_id,
+        String(r.key || `${r.date}|${r.type}|${amount.toFixed(2)}|${r.description}`).slice(0, 200));
+    }
+    if (!values.length) continue;
+    const ins = await q(
+      `INSERT INTO transactions (type, description, amount, category, date, person, account_id, import_key)
+       VALUES ${values.join(',')}
+       ON CONFLICT (account_id, import_key) WHERE import_key IS NOT NULL DO NOTHING
+       RETURNING id`,
+      params
+    );
+    inserted += ins.length;
+  }
+  return { inserted, skipped: rows.length - inserted };
 }
 
 // Marca a conta como paga, lança a saída e, se for recorrente, cria a do mês seguinte

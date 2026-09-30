@@ -63,6 +63,21 @@ export async function dailyDigest(accountId) {
   if (b?.hoje) lines.push(`📅 Vence hoje: ${b.hoje === 1 && b.primeira ? b.primeira + ' — ' : b.hoje + ' conta(s) — '}${brl(b.hoje_valor)}`);
   if (b?.amanha) lines.push(`🗓️ Vence amanhã: ${b.amanha} conta(s) — ${brl(b.amanha_valor)}`);
 
+  // Orçamentos estourados no mês atual
+  const over = await q(
+    `WITH m AS (SELECT date_trunc('month', (now() AT TIME ZONE 'America/Sao_Paulo'))::date AS ini)
+     SELECT b.category, b.amount::float8 AS lim, COALESCE(sum(t.amount), 0)::float8 AS gasto
+     FROM budgets b CROSS JOIN m
+     LEFT JOIN transactions t ON t.account_id = b.account_id AND t.type = 'saida'
+       AND lower(COALESCE(t.category, '')) = lower(b.category)
+       AND t.date >= m.ini AND t.date < (m.ini + interval '1 month')
+     WHERE b.account_id = $1
+     GROUP BY b.category, b.amount HAVING COALESCE(sum(t.amount), 0) > b.amount
+     ORDER BY COALESCE(sum(t.amount), 0) / b.amount DESC LIMIT 2`,
+    [accountId]
+  );
+  for (const o of over) lines.push(`💸 Orçamento de ${o.category} estourado: ${brl(o.gasto)} de ${brl(o.lim)}`);
+
   const dl = acc.days_left;
   const plano = acc.plan === 'teste' ? 'Seu teste grátis' : 'Seu plano';
   if (acc.plan !== 'vitalicio' && dl != null && [7, 3, 1].includes(dl)) {
@@ -72,6 +87,6 @@ export async function dailyDigest(accountId) {
   return {
     title: b?.vencidas || b?.hoje ? 'Contas para pagar' : 'Finanças do Casal',
     body: lines.join('\n'),
-    url: b?.vencidas || b?.hoje || b?.amanha ? '/?tab=bills' : '/?tab=conta',
+    url: b?.vencidas || b?.hoje || b?.amanha ? '/?tab=bills' : over.length ? '/?tab=budgets' : '/?tab=conta',
   };
 }

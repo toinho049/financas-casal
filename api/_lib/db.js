@@ -102,6 +102,19 @@ const DDL = [
     auth TEXT NOT NULL,
     created_at TIMESTAMPTZ DEFAULT now()
   )`,
+  `ALTER TABLE transactions ADD COLUMN IF NOT EXISTS installment_group TEXT`,
+  `ALTER TABLE transactions ADD COLUMN IF NOT EXISTS installment_no INTEGER`,
+  `ALTER TABLE transactions ADD COLUMN IF NOT EXISTS installment_total INTEGER`,
+  `ALTER TABLE transactions ADD COLUMN IF NOT EXISTS import_key TEXT`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS transactions_import_idx ON transactions(account_id, import_key) WHERE import_key IS NOT NULL`,
+  `CREATE TABLE IF NOT EXISTS budgets (
+    id SERIAL PRIMARY KEY,
+    account_id INTEGER NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+    category TEXT NOT NULL,
+    amount NUMERIC(12,2) NOT NULL CHECK (amount > 0),
+    created_at TIMESTAMPTZ DEFAULT now()
+  )`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS budgets_acc_cat_idx ON budgets(account_id, lower(category))`,
   `CREATE TABLE IF NOT EXISTS push_log (
     sub_id INTEGER NOT NULL,
     day DATE NOT NULL,
