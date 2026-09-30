@@ -27,7 +27,7 @@ api/_lib/billing.js     # integração Mercado Pago e regra de liberação do ac
 | `DATABASE_URL` | sim | Criada sozinha ao conectar o Neon em Storage |
 | `SESSION_SECRET` | sim | Texto longo e aleatório. Trocar desloga todo mundo |
 | `MP_ACCESS_TOKEN` | sim, para cobrar | Access Token de **produção** do Mercado Pago |
-| `PRICE_MENSAL` | não | Preço do plano mensal (padrão `10`) |
+| `PRICE_MENSAL` | não | Preço do plano mensal (padrão `19.90`) |
 | `PRICE_ANUAL` | não | Preço do plano anual (padrão `149.90`) |
 | `MP_WEBHOOK_SECRET` | não | Assinatura secreta do webhook (camada extra de segurança) |
 | `APP_URL` | não | Domínio próprio, ex. `https://financasdocasal.com.br` |
