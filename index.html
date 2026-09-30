@@ -164,6 +164,7 @@ main{max-width:1100px;margin:0 auto;padding:18px 16px 80px}
 .bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
 .bar h2{margin:0;font-size:18px}
 .bar select{border:1px solid var(--bd);background:var(--card);border-radius:10px;padding:7px 10px}
+.bar-g{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 
 .list{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh)}
 .row{display:flex;align-items:center;gap:12px;padding:11px 14px;border-top:1px solid var(--bd)}
@@ -205,11 +206,7 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 .seg input[value=entrada]:checked+span{color:var(--in)}
 
 .fab{position:fixed;right:18px;bottom:18px;width:56px;height:56px;border-radius:50%;border:0;background:var(--pri);color:#fff;font-size:28px;box-shadow:0 6px 20px rgba(0,0,0,.2);cursor:pointer;display:none}
-@media (max-width:640px){
-  .fab{display:block}.desk{display:none}.who{display:none}
-  .top{flex-wrap:wrap}.month{order:3;width:100%;justify-content:center}
-  .kpi .v{font-size:19px}
-}
+
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:14px;z-index:50}
 
 /* Avisos */
@@ -218,9 +215,11 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 .bell-n{position:absolute;top:3px;right:2px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--out);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;box-sizing:border-box}
 .notif-pop{position:absolute;right:0;top:46px;width:min(360px,calc(100vw - 24px));max-height:70vh;overflow:auto;background:var(--card);border:1px solid var(--bd);border-radius:14px;box-shadow:0 16px 40px rgba(0,0,0,.18);z-index:20}
 .notif-h{display:flex;align-items:center;padding:12px 14px;border-bottom:1px solid var(--bd);position:sticky;top:0;background:var(--card)}
-.notif{display:flex;gap:12px;padding:12px 14px;border-bottom:1px solid var(--bd);cursor:pointer;text-align:left;width:100%;background:none;border-left:0;border-right:0;border-top:0;font:inherit;color:inherit}
+.notif{display:flex;align-items:flex-start;border-bottom:1px solid var(--bd)}
 .notif:last-child{border-bottom:0}
+.notif-go{flex:1;display:flex;gap:12px;padding:12px 4px 12px 14px;cursor:pointer;text-align:left;background:none;border:0;font:inherit;color:inherit;min-width:0}
 .notif:hover{background:var(--bg)}
+.notif-x{flex:none;width:40px;height:40px;margin:8px 6px 0 0;font-size:14px}
 .notif .ic{width:34px;height:34px;border-radius:10px;flex:none;display:flex;align-items:center;justify-content:center;font-size:16px}
 .notif .nt{font-weight:600;font-size:14px}.notif .nd{font-size:13px;color:var(--mut);margin-top:2px}
 .notif.new .nt::after{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--pri);margin-left:6px;vertical-align:2px}
@@ -249,6 +248,58 @@ dialog.wide{width:min(900px,calc(100vw - 24px))}
 .budget-row .main{min-width:0}
 .code{font-family:ui-monospace,monospace;font-size:13px;background:var(--bg);padding:2px 6px;border-radius:6px;word-break:break-all}
 .trial-badge{display:inline-block;background:var(--gold,#f2c14e);color:#14201a;font-weight:700;border-radius:99px;padding:6px 14px;font-size:14px;margin-bottom:14px}
+/* Barra de navegação de baixo (só celular) */
+.bnav{display:none}
+.more-sheet .ms-item{display:flex;align-items:center;gap:14px;width:100%;padding:14px 18px;background:none;border:0;border-top:1px solid var(--bd);font:inherit;font-size:16px;color:var(--tx);cursor:pointer;text-align:left}
+.more-sheet .ms-item:first-child{border-top:0}
+.more-sheet .ms-item svg{width:22px;height:22px;fill:none;stroke:var(--mut);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.more-sheet .ms-item.out{color:var(--out)}.more-sheet .ms-item.out svg{stroke:var(--out)}
+.row[data-act]{cursor:pointer}
+@media (max-width:640px){
+  body{padding-bottom:calc(64px + env(safe-area-inset-bottom))}
+  .fab{display:block;bottom:calc(78px + env(safe-area-inset-bottom));right:16px}
+  .desk{display:none}.who{display:none}.top-out{display:none}
+  nav.tabs{display:none}
+  .top{padding:8px 10px;gap:4px}
+  .top .brand{font-size:0;gap:0}.top .brand i{width:32px;height:32px}
+  .month{flex:1;justify-content:center;min-width:0}.month span{min-width:0;font-size:16px;white-space:nowrap}
+  .month .ghost{width:40px;height:40px;font-size:22px}
+  .bnav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:15;background:var(--card);border-top:1px solid var(--bd);padding:4px 4px env(safe-area-inset-bottom);box-shadow:0 -4px 20px rgba(0,0,0,.05)}
+  .bnav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:0;padding:7px 2px 6px;font:inherit;font-size:11px;font-weight:600;color:var(--mut);cursor:pointer;position:relative;min-height:54px;border-radius:12px}
+  .bnav svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .bnav button.on{color:var(--pri)}
+  .bnav button.on svg{stroke-width:2.4}
+  .bnav .bn-dot{position:absolute;top:4px;left:calc(50% + 6px);min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--out);color:#fff;font-size:10px;line-height:16px;box-sizing:border-box}
+  main{padding:12px 12px 24px}
+  .plan-banner{margin-top:8px;padding:0 12px}
+  .plan-banner .pb{font-size:13px;padding:8px 12px;gap:8px}
+  .plan-banner .pb .btn{padding:4px 10px;font-size:12.5px}
+  .bar{gap:6px}.bar h2{flex-basis:100%;font-size:20px}
+  .bar .btn{padding:7px 10px;font-size:13px}
+  .bar-g{flex-basis:100%;flex-wrap:nowrap;gap:6px}
+  .bar-g>*{flex:1 1 0;min-width:0}
+  .bar select{padding:9px 8px;font-size:14px}
+  .top > .spacer{display:none}
+  .kpi .v{font-size:19px}
+  .kpis{gap:8px}.card{padding:13px}
+  .row{flex-wrap:wrap;row-gap:4px;padding:11px 12px;gap:10px}
+  .row .main{flex:1 1 0}
+  .row .t{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.3}
+  .row .acts{display:none}
+  .row .btn.sm{padding:7px 12px}
+  .row .badge{margin-left:0;margin-right:4px}
+  .t .badge{display:inline-block;margin-top:2px}
+  /* Diálogos viram "folha" que sobe de baixo */
+  dialog,dialog.wide{width:100vw;max-width:100vw;margin:auto 0 0;border-radius:20px 20px 0 0;max-height:92vh;overflow:auto;padding-bottom:env(safe-area-inset-bottom)}
+  dialog[open]{animation:sheet .22s ease-out}
+  .dlg-f{position:sticky;bottom:0;background:var(--card);padding-top:10px}
+  .dlg-f .btn{flex:1;padding:12px}
+  label.f input,label.f select{font-size:16px}
+  /* Avisos: painel ocupa a largura da tela */
+  .notif-pop{position:fixed;left:8px;right:8px;top:58px;width:auto;max-height:calc(100vh - 150px)}
+  .bell{width:44px;height:44px}
+}
+@keyframes sheet{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
 </style>
 </head>
 <body>
@@ -382,11 +433,13 @@ dialog.wide{width:min(900px,calc(100vw - 24px))}
           <span class="bell-n hidden" id="bellN"></span>
         </button>
         <div class="notif-pop hidden" id="notifPop" role="dialog" aria-label="Avisos">
-          <div class="notif-h"><b>Avisos</b><div class="spacer"></div><button class="linkbtn small" data-act="notif-read">Marcar como vistos</button></div>
+          <div class="notif-h"><b>Avisos</b><div class="spacer"></div>
+            <button class="ghost small" data-act="sound-toggle" id="soundBtn" title="Som dos avisos" aria-label="Som dos avisos"></button>
+            <button class="linkbtn small" data-act="notif-clear" id="notifClear">Limpar tudo</button></div>
           <div id="notifList"></div>
         </div>
       </div>
-      <button class="ghost" data-act="logout">Sair</button>
+      <button class="ghost top-out" data-act="logout">Sair</button>
     </div>
     <nav class="tabs">
       <button data-act="tab" data-tab="painel">Painel</button>
@@ -401,7 +454,25 @@ dialog.wide{width:min(900px,calc(100vw - 24px))}
   <div class="plan-banner hidden" id="planBanner"></div>
   <main id="view"></main>
   <button class="fab" id="fab" data-act="new" aria-label="Adicionar">+</button>
+  <nav class="bnav" aria-label="Navegação">
+    <button data-act="tab" data-tab="painel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg>Painel</button>
+    <button data-act="tab" data-tab="transactions"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4v16"/><path d="M3 8l4-4 4 4"/><path d="M17 20V4"/><path d="M13 16l4 4 4-4"/></svg>Lançamentos</button>
+    <button data-act="tab" data-tab="bills"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Contas<span class="bn-dot hidden" id="bnBills"></span></button>
+    <button data-act="tab" data-tab="budgets"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-9-9v9z"/><path d="M15 3.5A9 9 0 0 1 20.5 9H15z"/></svg>Orçamento</button>
+    <button data-act="more" id="bnMore"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>Mais</button>
+  </nav>
 </div>
+
+<dialog id="moreDlg" class="more-sheet" aria-label="Mais opções">
+  <div class="dlg-h"><h3 id="moreWho">Mais</h3><button type="button" class="ghost" data-act="more-close" aria-label="Fechar">✕</button></div>
+  <div style="padding-bottom:10px">
+    <button class="ms-item" data-act="tab" data-tab="investments"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>Investimentos</button>
+    <button class="ms-item" data-act="tab" data-tab="conta"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Conta, plano e avisos</button>
+    <button class="ms-item hidden" id="moreAdmin" data-act="tab" data-tab="admin"><svg viewBox="0 0 24 24"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/></svg>Administração</button>
+    <button class="ms-item" data-act="sound-toggle"><svg viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg><span id="moreSound">Som dos avisos: ligado</span></button>
+    <button class="ms-item out" data-act="logout"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg>Sair</button>
+  </div>
+</dialog>
 
 <dialog id="dlg">
   <form id="dlgForm" method="dialog">
@@ -409,6 +480,7 @@ dialog.wide{width:min(900px,calc(100vw - 24px))}
     <div class="dlg-b" id="dlgBody"></div>
     <p class="err" id="dlgErr" style="padding:0 18px"></p>
     <div class="dlg-f">
+      <button type="button" class="btn del-btn hidden" id="dlgDel" data-act="del-edit" style="margin-right:auto;color:var(--out)">Excluir</button>
       <button type="button" class="btn" data-act="close">Cancelar</button>
       <button type="submit" class="btn pri" id="dlgSave">Salvar</button>
     </div>
@@ -526,6 +598,8 @@ function applyMe(d) {
   S.me = d.user; S.account = d.account; S.members = d.members; S.plans = d.plans;
   S.user = d.user.name; S.users = d.members.map(m => m.name); S.mail = d.mail;
   $('#adminTab').classList.toggle('hidden', !d.user.admin);
+  $('#moreAdmin').classList.toggle('hidden', !d.user.admin);
+  $('#moreWho').textContent = `Olá, ${cap(d.user.name.split(' ')[0])}`;
 }
 async function loadMe() { applyMe(await api('/api/auth')); }
 
@@ -705,7 +779,11 @@ async function start() {
 /* ---------- Render ---------- */
 function render() {
   $('#monthLbl').textContent = `${MESES[S.m - 1]} ${S.y}`;
-  document.querySelectorAll('nav.tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === S.tab));
+  document.querySelectorAll('nav.tabs button, .bnav [data-tab]').forEach(b => {
+    b.classList.toggle('on', b.dataset.tab === S.tab);
+    if (b.closest('.bnav')) b.toggleAttribute('aria-current', b.dataset.tab === S.tab);
+  });
+  $('#bnMore').classList.toggle('on', ['investments', 'conta', 'admin'].includes(S.tab));
   $('#fab').classList.toggle('hidden', ['painel', 'conta', 'admin'].includes(S.tab));
   $('.month').style.visibility = ['conta', 'admin'].includes(S.tab) ? 'hidden' : '';
   Object.values(S.charts).forEach(c => c.destroy()); S.charts = {};
@@ -906,18 +984,74 @@ function buildNotifs() {
   return list.sort((x, y) => x.ord - y.ord);
 }
 
+// Avisos apagados (por aparelho). Voltam só se a situação mudar (ex.: nova conta, novo nível do orçamento).
+const dismissed = {
+  get() { try { return new Set(JSON.parse(store.get('fc-dismissed') || '[]')); } catch { return new Set(); } },
+  add(ids) { const s = dismissed.get(); ids.forEach(i => s.add(i)); store.set('fc-dismissed', JSON.stringify([...s].slice(-500))); },
+};
+
+/* Som de sino (gerado no próprio navegador, sem arquivo) */
+const soundOn = () => store.get('fc-sound') !== 'off';
+let audioCtx = null, pendingRing = false;
+function bell() {
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') { pendingRing = true; audioCtx.resume().catch(() => {}); return; }
+    const t0 = audioCtx.currentTime;
+    [[0, 1318.5], [0.18, 1046.5]].forEach(([dt, f]) => {                 // "ding-dong"
+      [[f, 0.32], [f * 2.01, 0.1], [f * 3.02, 0.05]].forEach(([freq, vol]) => {
+        const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+        o.type = 'sine'; o.frequency.value = freq;
+        g.gain.setValueAtTime(0.0001, t0 + dt);
+        g.gain.exponentialRampToValueAtTime(vol, t0 + dt + 0.01);
+        g.gain.exponentialRampToValueAtTime(0.0001, t0 + dt + 1.3);
+        o.connect(g).connect(audioCtx.destination); o.start(t0 + dt); o.stop(t0 + dt + 1.35);
+      });
+    });
+    pendingRing = false;
+  } catch {}
+}
+// O navegador só libera som depois de um toque na tela: se o aviso chegou antes, toca no primeiro toque.
+['pointerdown', 'keydown'].forEach(ev => document.addEventListener(ev, () => {
+  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().then(() => { if (pendingRing) bell(); }).catch(() => {});
+  else if (pendingRing) bell();
+}, { capture: true }));
+
+function ringIfNew(list, vistos) {
+  let tocados; try { tocados = new Set(JSON.parse(store.get('fc-rang') || '[]')); } catch { tocados = new Set(); }
+  const novos = list.filter(n => !vistos.has(n.id) && !tocados.has(n.id));
+  if (!novos.length) return;
+  novos.forEach(n => tocados.add(n.id));
+  store.set('fc-rang', JSON.stringify([...tocados].slice(-500)));
+  if (soundOn()) { if (!audioCtx || audioCtx.state !== 'running') pendingRing = true; bell(); }
+  if (navigator.vibrate) try { navigator.vibrate([120, 80, 120]); } catch {}
+}
+
 function refreshAlerts() {
-  const list = S.notifs = buildNotifs(), vistos = seen.get();
+  const apagados = dismissed.get();
+  const list = S.notifs = buildNotifs().filter(n => !apagados.has(n.id)), vistos = seen.get();
   const novos = list.filter(n => !vistos.has(n.id)).length;
   $('#bellN').textContent = novos > 9 ? '9+' : novos;
   $('#bellN').classList.toggle('hidden', !novos);
   $('#bellBtn').setAttribute('aria-label', novos ? `Avisos: ${novos} novo(s)` : 'Avisos');
   const ic = { late: '!', warn: '⏰', ok: '📅' };
   $('#notifList').innerHTML = list.length ? list.map(n => `
-    <button class="notif ${vistos.has(n.id) ? '' : 'new'}" data-act="notif-go" data-tab="${n.tab}">
-      <span class="ic ic-${n.kind}" aria-hidden="true">${ic[n.kind] || '•'}</span>
-      <span><span class="nt">${esc(n.title)}</span><span class="nd" style="display:block">${esc(n.desc)}</span></span>
-    </button>`).join('') : '<div class="empty" style="padding:22px">Tudo em dia por aqui ✓</div>';
+    <div class="notif ${vistos.has(n.id) ? '' : 'new'}">
+      <button class="notif-go" data-act="notif-go" data-tab="${n.tab}">
+        <span class="ic ic-${n.kind}" aria-hidden="true">${ic[n.kind] || '•'}</span>
+        <span><span class="nt">${esc(n.title)}</span><span class="nd" style="display:block">${esc(n.desc)}</span></span>
+      </button>
+      <button class="ghost notif-x" data-act="notif-del" data-nid="${esc(n.id)}" aria-label="Apagar aviso: ${esc(n.title)}" title="Apagar">✕</button>
+    </div>`).join('') : '<div class="empty" style="padding:22px">Nenhum aviso por aqui ✓</div>';
+  $('#notifClear').classList.toggle('hidden', !list.length);
+  $('#soundBtn').textContent = soundOn() ? '🔔' : '🔕';
+  $('#soundBtn').setAttribute('aria-label', soundOn() ? 'Som dos avisos ligado (tocar para desligar)' : 'Som dos avisos desligado (tocar para ligar)');
+  $('#moreSound').textContent = `Som dos avisos: ${soundOn() ? 'ligado' : 'desligado'}`;
+  // bolinha em "Contas" na barra de baixo: vencidas + vencendo hoje
+  const urg = (S.bills || []).filter(b => !b.paid && b.due_date <= today()).length;
+  $('#bnBills').textContent = urg > 9 ? '9+' : urg;
+  $('#bnBills').classList.toggle('hidden', !urg);
+  ringIfNew(list, vistos);
 
   // Faixa de aviso do plano / teste
   const a = S.account || {}, dl = a.days_left;
@@ -932,6 +1066,23 @@ function refreshAlerts() {
   $('#planBanner').innerHTML = html;
   $('#planBanner').classList.toggle('hidden', !html || S.tab === 'conta');
 }
+
+// Busca novidades a cada 2 minutos (e ao voltar para o app), para avisar o que a outra pessoa lançou
+let lastSync = 0;
+async function syncData() {
+  if ($('#app').classList.contains('hidden') || document.visibilityState !== 'visible') return;
+  if (Date.now() - lastSync < 20000) return;
+  lastSync = Date.now();
+  const antes = JSON.stringify([S.tx, S.bills, S.budgets]);
+  try { await Promise.all(['transactions', 'bills', 'budgets'].map(load)); } catch { return; }
+  if (JSON.stringify([S.tx, S.bills, S.budgets]) === antes) return;
+  const ocupado = document.querySelector('dialog[open]') || ['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement?.tagName)
+    || ['conta', 'admin'].includes(S.tab) || !$('#notifPop').classList.contains('hidden');
+  if (ocupado) refreshAlerts();
+  else { const y = scrollY; render(); scrollTo(0, y); }
+}
+setInterval(syncData, 120000);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') syncData(); });
 
 function toggleNotifs(open) {
   const pop = $('#notifPop'), on = open ?? pop.classList.contains('hidden');
@@ -1107,12 +1258,16 @@ function renderTx() {
   $('#view').innerHTML = `
     <div class="bar">
       <h2>Entradas e saídas</h2><div class="spacer"></div>
-      <select id="fType"><option value="">Tudo</option><option value="entrada">Entradas</option><option value="saida">Saídas</option></select>
-      <select id="fPerson"><option value="">Todos</option>${S.users.map(u => `<option value="${esc(u)}">${esc(cap(u))}</option>`).join('')}</select>
-      <button class="btn" data-act="import-open" title="Importar extrato do banco">⬆ Importar</button>
-      <button class="btn" data-act="export-csv" title="Baixar planilha do mês">⬇ Excel</button>
-      <button class="btn" data-act="export-pdf" title="Relatório do mês em PDF">PDF</button>
-      <button class="btn pri desk" data-act="new">+ Lançamento</button>
+      <div class="bar-g">
+        <select id="fType" aria-label="Tipo"><option value="">Entradas e saídas</option><option value="entrada">Só entradas</option><option value="saida">Só saídas</option></select>
+        <select id="fPerson" aria-label="Quem"><option value="">Todas as pessoas</option>${S.users.map(u => `<option value="${esc(u)}">${esc(cap(u))}</option>`).join('')}</select>
+      </div>
+      <div class="bar-g">
+        <button class="btn" data-act="import-open" title="Importar extrato do banco">⬆ Importar</button>
+        <button class="btn" data-act="export-csv" title="Baixar planilha do mês">⬇ Excel</button>
+        <button class="btn" data-act="export-pdf" title="Relatório do mês em PDF">PDF</button>
+        <button class="btn pri desk" data-act="new">+ Lançamento</button>
+      </div>
     </div>
     <div class="grid kpis">
       <div class="card kpi"><div class="l">Entradas</div><div class="v in">${fm(ent)}</div></div>
@@ -1120,7 +1275,7 @@ function renderTx() {
       <div class="card kpi"><div class="l">Resultado</div><div class="v ${ent - sai >= 0 ? 'in' : 'out'}">${fm(ent - sai)}</div></div>
     </div>
     <div class="list">${list.length ? list.map(t => `
-      <div class="row">${dateBox(t.date)}
+      <div class="row" data-act="edit" data-id="${t.id}">${dateBox(t.date)}
         <div class="main"><div class="t">${esc(t.description)}</div>
           <div class="m">${esc([t.category, cap(t.person)].filter(Boolean).join(' · '))}</div></div>
         <div class="amt ${t.type === 'entrada' ? 'in' : 'out'}">${t.type === 'entrada' ? '+' : '−'} ${fm(t.amount)}</div>
@@ -1133,7 +1288,7 @@ function renderTx() {
 }
 
 function billRow(b) {
-  return `<div class="row">${dateBox(b.due_date)}
+  return `<div class="row" data-act="edit" data-id="${b.id}">${dateBox(b.due_date)}
     <div class="main"><div class="t">${esc(b.description)}${billStatus(b)}${b.recurring ? '<span class="badge b-rec">Mensal</span>' : ''}</div>
       <div class="m">${esc(b.category || '')}</div></div>
     <div class="amt">${fm(b.amount)}</div>
@@ -1194,7 +1349,7 @@ function renderBudgets() {
       <div class="card kpi"><div class="l">Estouradas</div><div class="v ${rows.some(r => r.lvl === 'late') ? 'out' : 'in'}">${rows.filter(r => r.lvl === 'late').length}</div><div class="s">${rows.filter(r => r.lvl === 'warn').length} perto do limite</div></div>
     </div>` : ''}
     <div class="list">${rows.length ? rows.map(r => `
-      <div class="row budget-row">
+      <div class="row budget-row" data-act="edit" data-id="${r.id}">
         <div class="main">
           <div class="t">${esc(r.category)}${r.lvl === 'late' ? '<span class="badge b-late">Estourou</span>' : r.lvl === 'warn' ? '<span class="badge b-today">Perto do limite</span>' : ''}</div>
           <div class="bbar" role="progressbar" aria-label="${esc(r.category)}: ${Math.round(r.pct * 100)}% do limite" aria-valuenow="${Math.round(r.pct * 100)}" aria-valuemin="0" aria-valuemax="100">
@@ -1233,7 +1388,7 @@ function renderInv() {
     <div class="grid charts">
       <div class="list">${S.inv.length ? S.inv.map(i => {
         const cur = i.current_value ?? i.invested, r = cur - i.invested;
-        return `<div class="row">
+        return `<div class="row" data-act="edit" data-id="${i.id}">
           <div class="main"><div class="t">${esc(i.name)}</div>
             <div class="m">${esc([i.kind, i.date && 'desde ' + fd(i.date), i.notes].filter(Boolean).join(' · '))}</div></div>
           <div style="text-align:right"><div class="amt">${fm(cur)}</div>
@@ -1326,6 +1481,7 @@ function openForm(res, item) {
   const it = item ? { ...item } : DEFAULTS[res]();
   S.editing = { res, id: item?.id };
   $('#dlgTitle').textContent = (item ? 'Editar ' : 'Novo ') + LABEL[res];
+  $('#dlgDel').classList.toggle('hidden', !item);
   $('#dlgBody').innerHTML = FORMS[res].filter(f => !(f.newOnly && item)).map(f => fieldHtml(f, it[f.k])).join('');
   $('#dlgErr').textContent = '';
   setCats(res === 'transactions' ? it.type : res === 'bills' || res === 'budgets' ? 'saida' : null);
@@ -1642,7 +1798,24 @@ document.addEventListener('click', async e => {
   const b = e.target.closest('[data-act]'); if (!b) return;
   const act = b.dataset.act, id = Number(b.dataset.id);
   try {
-    if (act === 'tab') { S.tab = b.dataset.tab; render(); window.scrollTo(0, 0); }
+    if (act === 'tab') { if ($('#moreDlg').open) $('#moreDlg').close(); S.tab = b.dataset.tab; render(); window.scrollTo(0, 0); }
+    else if (act === 'more') $('#moreDlg').showModal();
+    else if (act === 'more-close') $('#moreDlg').close();
+    else if (act === 'sound-toggle') {
+      store.set('fc-sound', soundOn() ? 'off' : 'on');
+      if (soundOn()) bell();
+      refreshAlerts(); toast(soundOn() ? 'Som dos avisos ligado 🔔' : 'Som dos avisos desligado 🔕');
+    }
+    else if (act === 'notif-del') { e.stopPropagation(); dismissed.add([b.dataset.nid]); refreshAlerts(); }
+    else if (act === 'notif-clear') { dismissed.add((S.notifs || []).map(n => n.id)); refreshAlerts(); toast('Avisos apagados'); }
+    else if (act === 'del-edit') {
+      const { res, id: eid } = S.editing, it = findItem(res, eid);
+      if (!confirm(`Excluir "${it.description || it.name || 'limite de ' + it.category}"?`)) return;
+      const rest = it.installment_group ? it.installment_total - it.installment_no : 0;
+      const futuras = rest > 0 && confirm(`Esta é a parcela ${it.installment_no} de ${it.installment_total}.\n\nOK = excluir também as ${rest} parcela(s) seguinte(s)\nCancelar = excluir só esta`);
+      const r = await api(`/api/data?r=${res}&id=${eid}${futuras ? '&scope=future' : ''}`, { method: 'DELETE' });
+      $('#dlg').close(); await load(res); render(); toast(r.deleted > 1 ? `${r.deleted} parcelas excluídas` : 'Excluído');
+    }
     else if (act === 'prev' || act === 'next') {
       S.m += act === 'next' ? 1 : -1;
       if (S.m > 12) { S.m = 1; S.y++; } if (S.m < 1) { S.m = 12; S.y--; }

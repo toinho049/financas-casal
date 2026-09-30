@@ -1,5 +1,5 @@
 // Service worker do Finanças do Casal: abre rápido, funciona como app e recebe avisos.
-const CACHE = 'fc-v1';
+const CACHE = 'fc-v2';
 const SHELL = ['/', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png'];
 
 self.addEventListener('install', (e) => {
@@ -41,6 +41,8 @@ self.addEventListener('push', (e) => {
       badge: '/icons/icon-192.png',
       tag: 'fc-diario',
       renotify: true,
+      silent: false,                     // toca o som de notificação do celular
+      vibrate: [200, 100, 200, 100, 300],
       data: { url: d.url || '/' },
     })
   );
