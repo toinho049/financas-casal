@@ -189,6 +189,33 @@ main{max-width:1100px;margin:0 auto;padding:18px 16px 80px}
 .b-today{background:var(--warn-soft);color:var(--warn)}
 .b-ok{background:var(--pri-soft);color:var(--pri)}
 .b-rec{background:var(--bg);color:var(--mut)}
+/* Painel: destaque do mês */
+.card.hero{display:grid;grid-template-columns:1.5fr 1fr;gap:18px;align-items:center;margin-bottom:14px;padding:20px 22px}
+.hero .hl{font-size:14px;color:var(--mut);font-weight:600}
+.hero .hv{font-size:38px;font-weight:800;letter-spacing:-.5px;margin:2px 0 4px;font-variant-numeric:tabular-nums;line-height:1.1}
+.hero .hs{font-size:13.5px;color:var(--mut)}
+.hero .hs b{color:var(--tx);font-weight:600}
+.hbar{height:10px;border-radius:99px;background:var(--bg);overflow:hidden;margin:12px 0 6px}
+.hbar i{display:block;height:100%;border-radius:99px;background:var(--pri)}
+.hbar i.warn{background:var(--warn)}.hbar i.late{background:var(--out)}
+.alert{display:flex;gap:12px;align-items:center;padding:14px 16px;border-radius:14px;background:var(--pri-soft);color:var(--tx);border:0;font:inherit;text-align:left;cursor:pointer;width:100%}
+.alert .ai{font-size:24px;line-height:1}
+.alert b{display:block;font-size:14.5px}
+.alert span{font-size:12.5px;color:var(--mut)}
+.alert.warn{background:var(--warn-soft)}.alert.late{background:var(--out-soft)}
+.alert.late b{color:var(--out)}
+.card.stats{display:grid;grid-template-columns:repeat(3,1fr);margin-bottom:14px;padding:0}
+.stats>div{padding:14px 18px;border-left:1px solid var(--bd);min-width:0}
+.stats>div:first-child{border-left:0}
+.stats .l{font-size:12.5px;color:var(--mut)}
+.stats .v{font-size:19px;font-weight:700;margin-top:3px;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stats .s{font-size:12px;color:var(--mut);margin-top:1px}
+/* Ícone de categoria */
+.ci{--c:#8a948f;width:38px;height:38px;flex-shrink:0;border-radius:12px;display:grid;place-items:center;font-size:18px;background:color-mix(in srgb,var(--c) 17%,transparent);color:var(--c);font-weight:700}
+.day-h{display:flex;justify-content:space-between;padding:10px 14px 6px;font-size:12.5px;font-weight:600;color:var(--mut);background:var(--bg);border-top:1px solid var(--bd)}
+.day-h:first-child{border-top:0}
+.list .day-h+.row{border-top:0}
+.mob{display:none}
 .section-t{margin:22px 0 8px;font-size:13px;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:.04em}
 
 /* Form / dialog */
@@ -287,6 +314,23 @@ dialog.wide{width:min(900px,calc(100vw - 24px))}
   .bar-g>*{flex:1 1 0;min-width:0}
   .bar select{padding:9px 8px;font-size:14px}
   .top > .spacer{display:none}
+  main{padding-bottom:96px}
+  .mob{display:inline-flex;align-items:center;justify-content:center;gap:4px}
+  .filters{display:none}
+  .filters.open{display:grid;grid-template-columns:1fr;gap:6px}
+  .filters.open select{width:100%}
+  .card.hero{grid-template-columns:1fr;gap:12px;padding:16px}
+  .hero .hv{font-size:32px}
+  .card.stats{grid-template-columns:1fr}
+  .stats>div{display:grid;grid-template-columns:1fr auto;column-gap:10px;align-items:center;padding:11px 14px;border-left:0;border-top:1px solid var(--bd)}
+  .stats>div:first-child{border-top:0}
+  .stats .l{grid-column:1;font-size:13.5px;color:var(--tx);font-weight:500}
+  .stats .s{grid-column:1;grid-row:2}
+  .stats .v{grid-column:2;grid-row:1/3;font-size:17px;margin:0}
+  .kpis>.kpi:nth-child(3):last-child{grid-column:span 2}
+  .bar-g>.btn{white-space:nowrap;padding-left:6px;padding-right:6px}
+  .charts .upc{order:-1}
+  .ci{width:36px;height:36px;font-size:17px}
   .kpi .v{font-size:19px}
   .kpis{gap:8px}.card{padding:13px}
   .row{flex-wrap:wrap;row-gap:4px;padding:11px 12px;gap:10px}
@@ -1178,6 +1222,49 @@ function billStatus(b) {
   if (b.due_date === t) return '<span class="badge b-today">Vence hoje</span>';
   return '';
 }
+// Ícone e cor por categoria (por palavra-chave, funciona com categorias criadas pelo casal)
+const CAT_IC = [
+  [/mercad|feira|supermerc|hortifr|a[cç]ougue|padaria/, '🛒', '#1f9d6b'],
+  [/aluguel|moradia|condom|casa|iptu|reforma/, '🏠', '#3b6fd8'],
+  [/luz|energia|contas da casa|g[aá]s\b/, '💡', '#d99a1e'],
+  [/[aá]gua|saneamento/, '💧', '#2a9fd6'],
+  [/internet|telefone|celular|tv\b|streaming|assinatura|netflix|spotify/, '📶', '#6b5bd6'],
+  [/combust|gasolina|posto|etanol|diesel/, '⛽', '#e0782b'],
+  [/transporte|uber|99|[oô]nibus|carro|estaciona|ped[aá]gio|metr[oô]/, '🚗', '#e0782b'],
+  [/restaurante|alimenta|lanche|ifood|delivery|comida|caf[eé]|bar\b/, '🍽️', '#e0562b'],
+  [/lazer|cinema|passeio|show|festa|jogo/, '🎉', '#9b4fd6'],
+  [/viagem|hotel|passagem/, '✈️', '#2a9fd6'],
+  [/sa[uú]de|farm[aá]cia|rem[eé]dio|m[eé]dic|dentista|plano de sa|academia|exame/, '💊', '#d6454f'],
+  [/educa|escola|curso|faculdade|livro|mensalidade/, '📚', '#3b6fd8'],
+  [/vestu|roupa|cal[cç]ado|sapato/, '👕', '#c2549d'],
+  [/beleza|cabel|sal[aã]o|est[eé]tica/, '💅', '#c2549d'],
+  [/pet|cachorro|gato|veterin/, '🐾', '#a0703a'],
+  [/presente/, '🎁', '#d6454f'],
+  [/imposto|taxa|ipva|multa|tarifa/, '🧾', '#7a8580'],
+  [/cart[aã]o|fatura/, '💳', '#5a6b8c'],
+  [/filho|crian[cç]a|beb[eê]|creche/, '🧸', '#d99a1e'],
+  [/empr[eé]stimo|d[ií]vida|financiamento|parcela/, '🏦', '#7a8580'],
+  [/sal[aá]rio|freela|renda|pagamento|pro.?labore|13|f[eé]rias/, '💰', '#1f9d6b'],
+  [/rendimento|investim|dividend|juros/, '📈', '#1f9d6b'],
+  [/reembolso|venda|pix recebido/, '💵', '#1f9d6b'],
+];
+const PAL_IC = ['#3b6fd8', '#1f9d6b', '#e0782b', '#9b4fd6', '#d6454f', '#2a9fd6', '#c2549d', '#a0703a'];
+function catIcon(cat, type) {
+  const k = String(cat || '').toLowerCase();
+  const hit = k && CAT_IC.find(([re]) => re.test(k));
+  if (hit) return `<div class="ci" style="--c:${hit[2]}" aria-hidden="true">${hit[1]}</div>`;
+  if (!k) return `<div class="ci" style="--c:${type === 'entrada' ? '#1f9d6b' : '#8a948f'}" aria-hidden="true">${type === 'entrada' ? '💰' : '•'}</div>`;
+  let h = 0; for (const ch of k) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return `<div class="ci" style="--c:${PAL_IC[h % PAL_IC.length]}" aria-hidden="true">${esc(k[0].toUpperCase())}</div>`;
+}
+const WEEK = ['domingo','segunda','terça','quarta','quinta','sexta','sábado'];
+function dayLabel(s) {
+  const t = today(), d = new Date(s + 'T12:00:00');
+  const y = new Date(t + 'T12:00:00'); y.setDate(y.getDate() - 1);
+  if (s === t) return 'Hoje';
+  if (s === y.toISOString().slice(0, 10)) return 'Ontem';
+  return `${cap(WEEK[d.getDay()])}, ${+s.slice(8, 10)} de ${MESES[+s.slice(5, 7) - 1].toLowerCase()}`;
+}
 const dateBox = s => `<div class="date"><b>${s.slice(8,10)}</b><small>${MES_C[+s.slice(5,7)-1]}</small></div>`;
 
 function renderPainel() {
@@ -1193,27 +1280,48 @@ function renderPainel() {
 
   const proximas = S.bills.filter(b => !b.paid).slice(0, 6);
 
+  // Destaque: quanto sobrou e o que precisa de atenção
+  const res = ent - sai, mes = MESES[S.m - 1].toLowerCase();
+  const pctG = ent > 0 ? sai / ent : (sai > 0 ? 1 : 0);
+  const em7 = new Date(today() + 'T12:00:00'); em7.setDate(em7.getDate() + 7);
+  const lim7 = em7.toISOString().slice(0, 10);
+  const lateAll = S.bills.filter(b => !b.paid && b.due_date < today());
+  const hoje = S.bills.filter(b => !b.paid && b.due_date === today());
+  const semana = S.bills.filter(b => !b.paid && b.due_date > today() && b.due_date <= lim7);
+  const alerta = lateAll.length
+    ? { c: 'late', i: '⚠️', t: `${lateAll.length} conta${lateAll.length > 1 ? 's' : ''} vencida${lateAll.length > 1 ? 's' : ''} · ${fm(sum(lateAll))}`, s: 'Toque para ver e pagar' }
+    : hoje.length
+    ? { c: 'warn', i: '⏰', t: hoje.length > 1 ? `${hoje.length} contas vencem hoje · ${fm(sum(hoje))}` : `${hoje[0].description} vence hoje · ${fm(hoje[0].amount)}`, s: semana.length ? `e mais ${semana.length} nos próximos 7 dias` : 'Toque para pagar' }
+    : semana.length
+    ? { c: '', i: '📅', t: `${semana.length} conta${semana.length > 1 ? 's' : ''} nos próximos 7 dias · ${fm(sum(semana))}`, s: `A próxima: ${semana[0].description}, dia ${+semana[0].due_date.slice(8, 10)}` }
+    : { c: '', i: '✅', t: 'Nenhuma conta vencendo esta semana', s: 'Tudo em dia por aqui' };
+  const vazio = !ent && !sai;
+
   $('#view').innerHTML = `
     <div class="bar"><h2>Resumo do mês</h2><div class="spacer"></div>
       <button class="btn wa" data-act="wa" data-kind="resumo">📲 Enviar no WhatsApp</button></div>
-    <div class="grid kpis">
-      <div class="card kpi"><div class="l">Entradas do mês</div><div class="v in">${fm(ent)}</div></div>
-      <div class="card kpi"><div class="l">Saídas do mês</div><div class="v out">${fm(sai)}</div></div>
-      <div class="card kpi"><div class="l">Resultado do mês</div><div class="v ${ent - sai >= 0 ? 'in' : 'out'}">${fm(ent - sai)}</div>
-        <div class="s">${ent ? Math.round((ent - sai) / ent * 100) + '% das entradas' : '&nbsp;'}</div></div>
-      <div class="card kpi"><div class="l">Saldo em caixa</div><div class="v">${fm(caixa)}</div><div class="s">todas as entradas − saídas</div></div>
-      <div class="card kpi"><div class="l">Investido</div><div class="v">${fm(invC)}</div>
-        <div class="s ${invC - invA >= 0 ? 'in' : 'out'}">${invC - invA >= 0 ? '+' : ''}${fm(invC - invA)} de rendimento</div></div>
-      <div class="card kpi"><div class="l">A pagar até o fim do mês</div><div class="v ${late.length ? 'out' : ''}">${fm(sum(pend))}</div>
-        <div class="s">${pend.length} conta(s)${late.length ? ` · <span class="out">${late.length} vencida(s)</span>` : ''}</div></div>
+    <div class="card hero">
+      <div>
+        ${vazio ? `<div class="hl">${cap(mes)} ainda está vazio</div>
+          <div class="hv" style="font-size:24px">Lance a primeira entrada ou saída</div>
+          <button class="btn pri" data-act="new-tx" style="margin-top:8px">+ Novo lançamento</button>`
+        : `<div class="hl">${res >= 0 ? 'Sobrou' : 'Faltou'} em ${mes}</div>
+          <div class="hv ${res >= 0 ? 'in' : 'out'}">${fm(Math.abs(res))}</div>
+          <div class="hbar" role="progressbar" aria-label="Gasto em relação ao que entrou" aria-valuenow="${Math.round(pctG * 100)}" aria-valuemin="0" aria-valuemax="100"><i class="${pctG > 1 ? 'late' : pctG > .85 ? 'warn' : ''}" style="width:${Math.min(100, pctG * 100).toFixed(1)}%"></i></div>
+          <div class="hs">Entrou <b>${fm(ent)}</b> · saiu <b>${fm(sai)}</b>${ent ? ` · gastaram ${Math.round(pctG * 100)}% do que entrou` : ''}</div>`}
+      </div>
+      <button class="alert ${alerta.c}" data-act="tab" data-tab="bills"><span class="ai" aria-hidden="true">${alerta.i}</span><div><b>${esc(alerta.t)}</b><span>${esc(alerta.s)}</span></div></button>
+    </div>
+    <div class="card stats">
+      <div><div class="l">Saldo em caixa</div><div class="v">${fm(caixa)}</div><div class="s">tudo que entrou − saiu</div></div>
+      <div><div class="l">Investido</div><div class="v">${fm(invC)}</div>
+        <div class="s ${invC - invA >= 0 ? 'in' : 'out'}">${invC - invA >= 0 ? '+' : ''}${fm(invC - invA)}</div></div>
+      <div><div class="l">A pagar no mês</div><div class="v ${late.length ? 'out' : ''}">${fm(sum(pend))}</div>
+        <div class="s">${pend.length} conta(s)</div></div>
     </div>
     <div class="grid charts">
       <div class="card"><h3>Entradas × saídas (últimos 6 meses)</h3><div class="chart-wrap"><canvas id="cBar"></canvas></div></div>
-      <div class="card"><h3>Gastos por categoria</h3><div class="chart-wrap"><canvas id="cCat"></canvas></div></div>
-    </div>
-    <div class="grid charts">
-      <div class="card"><h3>Evolução do saldo em caixa</h3><div class="chart-wrap"><canvas id="cSaldo"></canvas></div></div>
-      <div class="card" style="padding:0">
+      <div class="card upc" style="padding:0">
         <h3 style="padding:16px 16px 0">Próximas contas</h3>
         ${proximas.length ? `<div>${proximas.map(b => `
           <div class="row">${dateBox(b.due_date)}
@@ -1222,6 +1330,10 @@ function renderPainel() {
             <button class="btn sm" data-act="pay" data-id="${b.id}">Pagar</button>
           </div>`).join('')}</div>` : '<div class="empty">Nenhuma conta pendente 🎉</div>'}
       </div>
+    </div>
+    <div class="grid charts">
+      <div class="card"><h3>Evolução do saldo em caixa</h3><div class="chart-wrap"><canvas id="cSaldo"></canvas></div></div>
+      <div class="card"><h3>Gastos por categoria</h3><div class="chart-wrap"><canvas id="cCat"></canvas></div></div>
     </div>`;
 
   // Últimos 6 meses
@@ -1280,15 +1392,18 @@ function renderTx() {
   if (S.f.person) list = list.filter(t => t.person === S.f.person);
   if (S.f.method) list = list.filter(t => (t.method || '') === (S.f.method === '-' ? '' : S.f.method));
   const shown = S.f.method ? sum(list.filter(t => t.type === 'saida')) : 0;
+  const nF = [S.f.type, S.f.person, S.f.method].filter(Boolean).length;
+  let lastDay = '';
   $('#view').innerHTML = `
     <div class="bar">
       <h2>Entradas e saídas</h2><div class="spacer"></div>
-      <div class="bar-g">
+      <div class="bar-g filters ${S.fOpen ? 'open' : ''}">
         <select id="fType" aria-label="Tipo"><option value="">Entradas e saídas</option><option value="entrada">Só entradas</option><option value="saida">Só saídas</option></select>
         <select id="fMethod" aria-label="Forma de pagamento"><option value="">Todas as formas</option>${METHODS.map(([m]) => `<option value="${esc(m)}">${esc(m)}</option>`).join('')}<option value="-">Não informada</option></select>
         <select id="fPerson" aria-label="Quem"><option value="">Todas as pessoas</option>${S.users.map(u => `<option value="${esc(u)}">${esc(cap(u))}</option>`).join('')}</select>
       </div>
       <div class="bar-g">
+        <button class="btn mob ${nF ? 'pri' : ''}" data-act="filters" aria-expanded="${S.fOpen ? 'true' : 'false'}">⚙ Filtros${nF ? ` (${nF})` : ''}</button>
         <button class="btn" data-act="import-open" title="Importar extrato do banco">⬆ Importar</button>
         <button class="btn" data-act="export-csv" title="Baixar planilha do mês">⬇ Excel</button>
         <button class="btn" data-act="export-pdf" title="Relatório do mês em PDF">PDF</button>
@@ -1301,8 +1416,8 @@ function renderTx() {
       <div class="card kpi"><div class="l">Resultado</div><div class="v ${ent - sai >= 0 ? 'in' : 'out'}">${fm(ent - sai)}</div></div>
     </div>
     ${S.f.method ? `<p class="small mut" style="margin:0 0 10px">Saídas em <b>${esc(S.f.method === '-' ? 'forma não informada' : S.f.method)}</b> neste mês: <b>${fm(shown)}</b></p>` : ''}
-    <div class="list">${list.length ? list.map(t => `
-      <div class="row" data-act="edit" data-id="${t.id}">${dateBox(t.date)}
+    <div class="list">${list.length ? list.map(t => `${t.date !== lastDay ? `<div class="day-h"><span>${dayLabel(lastDay = t.date)}</span></div>` : ''}
+      <div class="row" data-act="edit" data-id="${t.id}">${catIcon(t.category, t.type)}
         <div class="main"><div class="t">${esc(t.description)}</div>
           <div class="m">${esc([t.category, METHOD_SHORT[t.method] || t.method, cap(t.person)].filter(Boolean).join(' · '))}</div></div>
         <div class="amt ${t.type === 'entrada' ? 'in' : 'out'}">${t.type === 'entrada' ? '+' : '−'} ${fm(t.amount)}</div>
@@ -1377,7 +1492,7 @@ function renderBudgets() {
       <div class="card kpi"><div class="l">Estouradas</div><div class="v ${rows.some(r => r.lvl === 'late') ? 'out' : 'in'}">${rows.filter(r => r.lvl === 'late').length}</div><div class="s">${rows.filter(r => r.lvl === 'warn').length} perto do limite</div></div>
     </div>` : ''}
     <div class="list">${rows.length ? rows.map(r => `
-      <div class="row budget-row" data-act="edit" data-id="${r.id}">
+      <div class="row budget-row" data-act="edit" data-id="${r.id}">${catIcon(r.category)}
         <div class="main">
           <div class="t">${esc(r.category)}${r.lvl === 'late' ? '<span class="badge b-late">Estourou</span>' : r.lvl === 'warn' ? '<span class="badge b-today">Perto do limite</span>' : ''}</div>
           <div class="bbar" role="progressbar" aria-label="${esc(r.category)}: ${Math.round(r.pct * 100)}% do limite" aria-valuenow="${Math.round(r.pct * 100)}" aria-valuemin="0" aria-valuemax="100">
@@ -1389,7 +1504,7 @@ function renderBudgets() {
           <button class="ghost" data-act="del" data-id="${r.id}" title="Excluir limite">🗑</button></div>
       </div>`).join('') : `<div class="empty">Defina quanto pode gastar por mês em cada categoria.<br>O sistema avisa quando chegar em 80% e quando passar do limite.</div>`}</div>
     ${semLimite.length ? `<div class="section-t">Gastos sem limite em ${MESES[S.m - 1].toLowerCase()}</div>
-      <div class="list">${semLimite.map(s => `<div class="row"><div class="main"><div class="t">${esc(s.category)}</div></div>
+      <div class="list">${semLimite.map(s => `<div class="row">${catIcon(s.category)}<div class="main"><div class="t">${esc(s.category)}</div></div>
         <div class="amt">${fm(s.gasto)}</div><button class="btn sm" data-act="budget-for" data-cat="${esc(s.category)}">Definir limite</button></div>`).join('')}</div>` : ''}`;
 }
 
@@ -1894,6 +2009,8 @@ document.addEventListener('click', async e => {
       $('#payDlg').showModal();
     }
     else if (act === 'pay-close') $('#payDlg').close();
+    else if (act === 'filters') { S.fOpen = !S.fOpen; renderTx(); }
+    else if (act === 'new-tx') { S.tab = 'transactions'; render(); openForm('transactions'); }
     else if (act === 'auth-mode') { $('#auth').dataset.touched = '1'; setAuthMode(b.dataset.mode); }
     else if (act === 'lp-go') {
       $('#auth').dataset.touched = '1'; setAuthMode(b.dataset.mode);
