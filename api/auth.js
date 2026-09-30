@@ -1,5 +1,5 @@
 import crypto from 'node:crypto';
-import { q } from './_lib/db.js';
+import { q, getSetting } from './_lib/db.js';
 import { getSession, makeToken, setCookie, requireSecret, SESSION_SELECT } from './_lib/auth.js';
 import { hashPassword, verifyPassword } from './_lib/password.js';
 import { publicPlans, baseUrl } from './_lib/billing.js';
@@ -14,7 +14,7 @@ async function mePayload(u) {
   const members = await q(`SELECT id, name, email, role FROM users WHERE account_id = $1 ORDER BY id`, [u.account_id]);
   return {
     user: { id: u.id, name: u.name, email: u.email, role: u.role, admin: isAdmin(u) },
-    account: { name: u.account_name, plan: u.plan, paid_until: u.paid_until, active: u.active },
+    account: { name: u.account_name, plan: u.plan, paid_until: u.paid_until, active: u.active, days_left: u.days_left },
     members,
     plans: publicPlans(),
     mail: mailEnabled(),
@@ -108,17 +108,32 @@ export default async function handler(req, res) {
       if (name.length < 2) return res.status(400).json({ error: 'Informe seu nome' });
       if (!EMAIL_RE.test(email)) return res.status(400).json({ error: 'E-mail inválido' });
       if (password.length < 8) return res.status(400).json({ error: 'A senha precisa ter pelo menos 8 caracteres' });
+      if (body.terms !== true) return res.status(400).json({ error: 'Para criar a conta, aceite os Termos de Uso e a Política de Privacidade.' });
+      const kIp = `signup-ip:${clientIp(req)}`;
+      if (await tooMany([[kIp, 5]], 24 * 60)) return res.status(429).json({ error: 'Muitos cadastros deste aparelho hoje. Tente amanhã.' });
+
+      // Teste grátis: link de campanha (?convite=CODIGO) ou o padrão definido no Admin
+      const code = String(body.convite || '').trim().toUpperCase().slice(0, 40);
+      const [camp] = code ? await q(`SELECT code, days FROM campaigns WHERE code = $1 AND active`, [code]) : [];
+      const trialDays = camp ? camp.days : Math.max(0, Math.trunc(Number(await getSetting('trial_days', 0)) || 0));
+
       try {
         await q(
-          `WITH a AS (INSERT INTO accounts (name) VALUES ($1) RETURNING id)
-           INSERT INTO users (account_id, email, name, pass_hash, role)
-           SELECT id, $2, $3, $4, 'owner' FROM a`,
-          [String(body.account_name || `Casa de ${name.split(' ')[0]}`).slice(0, 80), email, name.slice(0, 60), hashPassword(password)]
+          `WITH a AS (
+             INSERT INTO accounts (name, plan, paid_until, campaign)
+             VALUES ($1, CASE WHEN $5::int > 0 THEN 'teste' END,
+                     CASE WHEN $5::int > 0 THEN now() + make_interval(days => $5::int) END, $6)
+             RETURNING id)
+           INSERT INTO users (account_id, email, name, pass_hash, role, terms_at)
+           SELECT id, $2, $3, $4, 'owner', now() FROM a`,
+          [String(body.account_name || `Casa de ${name.split(' ')[0]}`).slice(0, 80), email, name.slice(0, 60), hashPassword(password), trialDays, camp ? camp.code : null]
         );
       } catch (e) {
         if (e.code === '23505') return res.status(400).json({ error: 'Este e-mail já tem cadastro. Use "Entrar".' });
         throw e;
       }
+      await record([kIp]);
+      if (camp) await q(`UPDATE campaigns SET uses = uses + 1 WHERE code = $1`, [camp.code]);
       const u = await loadUser('u.email = $1', [email]);
       setCookie(res, makeToken(u));
       return res.status(201).json(await mePayload(u));

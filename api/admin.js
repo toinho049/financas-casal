@@ -1,4 +1,4 @@
-import { q } from './_lib/db.js';
+import { q, getSetting, setSetting } from './_lib/db.js';
 import { getSession } from './_lib/auth.js';
 import { isAdmin } from './_lib/security.js';
 
@@ -12,7 +12,8 @@ export default async function handler(req, res) {
     if (req.method === 'GET' && action === 'overview') {
       const [stats] = await q(`
         SELECT count(*)::int AS contas,
-               count(*) FILTER (WHERE paid_until > now() AND plan IS DISTINCT FROM 'vitalicio')::int AS pagantes,
+               count(*) FILTER (WHERE paid_until > now() AND plan IS DISTINCT FROM 'vitalicio' AND plan IS DISTINCT FROM 'teste')::int AS pagantes,
+               count(*) FILTER (WHERE paid_until > now() AND plan = 'teste')::int AS em_teste,
                count(*) FILTER (WHERE paid_until IS NULL)::int AS sem_pagamento,
                count(*) FILTER (WHERE paid_until IS NOT NULL AND paid_until <= now())::int AS vencidas,
                count(*) FILTER (WHERE created_at > now() - interval '30 days')::int AS novas_30d
@@ -24,7 +25,7 @@ export default async function handler(req, res) {
                count(*)::int AS pagamentos
         FROM payments WHERE credited`);
       const accounts = await q(`
-        SELECT a.id, a.name, a.plan,
+        SELECT a.id, a.name, a.plan, a.campaign,
                (a.paid_until AT TIME ZONE 'America/Sao_Paulo')::date::text AS paid_until,
                (a.paid_until IS NOT NULL AND a.paid_until > now()) AS active,
                (a.created_at AT TIME ZONE 'America/Sao_Paulo')::date::text AS created,
@@ -37,7 +38,38 @@ export default async function handler(req, res) {
                to_char(p.updated_at AT TIME ZONE 'America/Sao_Paulo', 'DD/MM/YYYY HH24:MI') AS quando
         FROM payments p LEFT JOIN accounts a ON a.id = p.account_id
         ORDER BY p.updated_at DESC LIMIT 50`);
-      return res.json({ stats, revenue: rev, accounts, payments });
+      const campaigns = await q(`SELECT code, days, active, uses FROM campaigns ORDER BY created_at DESC`);
+      const trial_days = Math.max(0, Math.trunc(Number(await getSetting('trial_days', 0)) || 0));
+      return res.json({ stats, revenue: rev, accounts, payments, campaigns, trial_days });
+    }
+
+    // Teste grátis padrão para qualquer cadastro novo (0 = sem teste)
+    if (req.method === 'POST' && action === 'trial') {
+      const days = Math.trunc(Number(req.body?.days));
+      if (!(days >= 0 && days <= 365)) return res.status(400).json({ error: 'Informe de 0 a 365 dias' });
+      await setSetting('trial_days', days);
+      return res.json({ trial_days: days });
+    }
+
+    // Links de campanha: quem se cadastra pelo link ganha N dias grátis
+    if (req.method === 'POST' && action === 'campaign') {
+      const code = String(req.body?.code || '').trim().toUpperCase();
+      const days = Math.trunc(Number(req.body?.days));
+      if (!/^[A-Z0-9_-]{3,40}$/.test(code)) return res.status(400).json({ error: 'Código com 3 a 40 letras, números, - ou _' });
+      if (!(days >= 1 && days <= 3650)) return res.status(400).json({ error: 'Informe de 1 a 3650 dias' });
+      try {
+        await q(`INSERT INTO campaigns (code, days) VALUES ($1, $2)`, [code, days]);
+      } catch (e) {
+        if (e.code === '23505') return res.status(400).json({ error: 'Já existe uma campanha com esse código' });
+        throw e;
+      }
+      return res.status(201).json({ ok: true });
+    }
+
+    if (req.method === 'POST' && action === 'campaign-toggle') {
+      const rows = await q(`UPDATE campaigns SET active = NOT active WHERE code = $1 RETURNING active`, [String(req.body?.code || '')]);
+      if (!rows.length) return res.status(404).json({ error: 'Campanha não encontrada' });
+      return res.json(rows[0]);
     }
 
     // Dar (ou tirar) dias de acesso manualmente: cortesia, Pix que não caiu, etc.

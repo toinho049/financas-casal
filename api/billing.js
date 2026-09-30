@@ -1,10 +1,19 @@
 import { getSession } from './_lib/auth.js';
+import { q, getSetting } from './_lib/db.js';
 import { createCheckout, createPix, processPayment, publicPlans, baseUrl } from './_lib/billing.js';
 
 export default async function handler(req, res) {
   const action = req.query.action || '';
   try {
     if (action === 'plans') return res.json(publicPlans());
+
+    // Quantos dias de teste grátis o visitante ganha (padrão ou link de campanha)
+    if (action === 'offer') {
+      const code = String(req.query.convite || '').trim().toUpperCase().slice(0, 40);
+      const [camp] = code ? await q(`SELECT days FROM campaigns WHERE code = $1 AND active`, [code]) : [];
+      const days = camp ? camp.days : Math.max(0, Math.trunc(Number(await getSetting('trial_days', 0)) || 0));
+      return res.json({ trial_days: days, campaign: camp ? code : null, plans: publicPlans() });
+    }
 
     if (req.method !== 'POST') return res.status(405).json({ error: 'Método não permitido' });
     const me = await getSession(req);

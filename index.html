@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0f8a5f">
+<meta name="description" content="Controle as finanças do casal: entradas, saídas, contas a pagar, orçamento e investimentos num lugar só.">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icons/favicon-32.png" type="image/png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Finanças">
 <title>Finanças do Casal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -161,6 +168,31 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
   .kpi .v{font-size:19px}
 }
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:14px;z-index:50}
+
+/* Avisos */
+.bell-wrap{position:relative}
+.bell{position:relative;display:flex;align-items:center;justify-content:center;width:40px;height:40px;padding:0}
+.bell-n{position:absolute;top:3px;right:2px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--out);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;box-sizing:border-box}
+.notif-pop{position:absolute;right:0;top:46px;width:min(360px,calc(100vw - 24px));max-height:70vh;overflow:auto;background:var(--card);border:1px solid var(--bd);border-radius:14px;box-shadow:0 16px 40px rgba(0,0,0,.18);z-index:20}
+.notif-h{display:flex;align-items:center;padding:12px 14px;border-bottom:1px solid var(--bd);position:sticky;top:0;background:var(--card)}
+.notif{display:flex;gap:12px;padding:12px 14px;border-bottom:1px solid var(--bd);cursor:pointer;text-align:left;width:100%;background:none;border-left:0;border-right:0;border-top:0;font:inherit;color:inherit}
+.notif:last-child{border-bottom:0}
+.notif:hover{background:var(--bg)}
+.notif .ic{width:34px;height:34px;border-radius:10px;flex:none;display:flex;align-items:center;justify-content:center;font-size:16px}
+.notif .nt{font-weight:600;font-size:14px}.notif .nd{font-size:13px;color:var(--mut);margin-top:2px}
+.notif.new .nt::after{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--pri);margin-left:6px;vertical-align:2px}
+.ic-late{background:var(--out-soft);color:var(--out)}.ic-warn{background:var(--warn-soft);color:var(--warn)}.ic-ok{background:var(--pri-soft);color:var(--pri)}
+.plan-banner{max-width:1100px;margin:12px auto 0;padding:0 16px}
+.plan-banner .pb{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--warn-soft);color:var(--warn);border-radius:12px;padding:10px 14px;font-size:14px;font-weight:500}
+.plan-banner .pb.info{background:var(--pri-soft);color:var(--pri)}
+.plan-banner .pb.late{background:var(--out-soft);color:var(--out)}
+.plan-banner .pb .btn{margin-left:auto}
+.feature-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.feature-row .spacer{flex:1}
+.pill{display:inline-block;font-size:12px;font-weight:600;padding:3px 10px;border-radius:99px;background:var(--bg);color:var(--mut)}
+.pill.on{background:var(--pri-soft);color:var(--pri)}
+.code{font-family:ui-monospace,monospace;font-size:13px;background:var(--bg);padding:2px 6px;border-radius:6px;word-break:break-all}
+.trial-badge{display:inline-block;background:var(--gold,#f2c14e);color:#14201a;font-weight:700;border-radius:99px;padding:6px 14px;font-size:14px;margin-bottom:14px}
 </style>
 </head>
 <body>
@@ -169,6 +201,7 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
   <div class="auth-wrap">
     <div class="pitch">
       <div class="brand"><i>R$</i>Finanças do Casal</div>
+      <div class="trial-badge hidden" id="trialBadge"></div>
       <h1>O dinheiro de vocês dois, organizado num lugar só.</h1>
       <ul class="feat">
         <li>Entradas, saídas e contas a pagar com aviso de vencimento</li>
@@ -190,6 +223,8 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
       <label class="f" id="emailField">E-mail<input name="email" type="text" inputmode="email" autocomplete="username" autocapitalize="none"></label>
       <label class="f" id="passField">Senha<input name="password" type="password" autocomplete="current-password"></label>
       <label class="f hidden" id="pass2Field">Repita a nova senha<input name="password2" type="password" autocomplete="new-password"></label>
+      <label class="chk hidden" id="termsField" style="font-size:13px;align-items:flex-start;line-height:1.4"><input type="checkbox" name="terms" style="margin-top:2px"><span>Li e aceito os <a href="/termos.html" target="_blank">Termos de Uso</a> e a <a href="/privacidade.html" target="_blank">Política de Privacidade</a></span></label>
+      <div class="ok-msg hidden" id="trialNote"></div>
       <p class="err" id="authErr"></p>
       <p class="ok-msg hidden" id="authOk"></p>
       <button class="btn pri" id="authBtn" style="width:100%">Entrar</button>
@@ -197,6 +232,7 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
         <button type="button" class="linkbtn" id="forgotLink" data-act="auth-mode" data-mode="forgot">Esqueci minha senha</button>
         <button type="button" class="linkbtn hidden" id="backLink" data-act="auth-mode" data-mode="login">← Voltar para entrar</button>
       </p>
+      <p class="small mut" style="margin:14px 0 0;text-align:center"><a href="/termos.html" style="color:inherit">Termos</a> · <a href="/privacidade.html" style="color:inherit">Privacidade</a></p>
     </form>
   </div>
 </section>
@@ -224,6 +260,16 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
       </div>
       <div class="spacer"></div>
       <span class="who" id="whoLbl"></span>
+      <div class="bell-wrap">
+        <button class="ghost bell" id="bellBtn" data-act="bell" aria-label="Avisos" aria-expanded="false">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+          <span class="bell-n hidden" id="bellN"></span>
+        </button>
+        <div class="notif-pop hidden" id="notifPop" role="dialog" aria-label="Avisos">
+          <div class="notif-h"><b>Avisos</b><div class="spacer"></div><button class="linkbtn small" data-act="notif-read">Marcar como vistos</button></div>
+          <div id="notifList"></div>
+        </div>
+      </div>
       <button class="ghost" data-act="logout">Sair</button>
     </div>
     <nav class="tabs">
@@ -235,6 +281,7 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
       <button data-act="tab" data-tab="admin" id="adminTab" class="hidden">Admin</button>
     </nav>
   </header>
+  <div class="plan-banner hidden" id="planBanner"></div>
   <main id="view"></main>
   <button class="fab" id="fab" data-act="new" aria-label="Adicionar">+</button>
 </div>
@@ -357,16 +404,35 @@ function planCards(plans, highlight) {
   }).join('');
 }
 
+// Guarda o código de campanha do link (?convite=...) para usar no cadastro
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch {} },
+  del(k) { try { localStorage.removeItem(k); } catch {} },
+};
+S.convite = (new URLSearchParams(location.search).get('convite') || store.get('fc-convite') || '').trim().toUpperCase();
+if (S.convite) store.set('fc-convite', S.convite);
+
+const diasTxt = d => d % 30 === 0 && d >= 60 ? `${d / 30} meses` : d === 30 ? '1 mês' : `${d} dias`;
+
 function showAuth(msg) {
   show('#auth');
   $('#authErr').textContent = msg || '';
-  fetch('/api/billing?action=plans').then(r => r.json()).then(pl => {
+  fetch('/api/billing?action=offer&convite=' + encodeURIComponent(S.convite)).then(r => r.json()).then(o => {
+    S.offer = o;
+    const pl = o.plans || [];
     const m = pl.find(p => p.id === 'mensal'), a = pl.find(p => p.id === 'anual');
-    if (!m) return;
-    const porMesAnual = a ? a.price / 12 : Infinity;
-    $('#pitchPrice').innerHTML = porMesAnual < m.price
-      ? `A partir de <b>${fm(porMesAnual)}</b>/mês no plano anual · ou ${fm(m.price)} no mensal`
-      : `A partir de <b>${fm(m.price)}</b>/mês${a ? ` · ou ${fm(a.price)} no plano anual` : ''}`;
+    if (m) {
+      const porMesAnual = a ? a.price / 12 : Infinity;
+      $('#pitchPrice').innerHTML = (porMesAnual < m.price
+        ? `A partir de <b>${fm(porMesAnual)}</b>/mês no plano anual · ou ${fm(m.price)} no mensal`
+        : `A partir de <b>${fm(m.price)}</b>/mês${a ? ` · ou ${fm(a.price)} no plano anual` : ''}`)
+        + (o.trial_days ? ` · <b>${diasTxt(o.trial_days)} grátis</b> para testar` : '');
+    }
+    $('#trialBadge').textContent = o.trial_days ? `🎁 Teste grátis por ${diasTxt(o.trial_days)} · sem cartão` : '';
+    $('#trialBadge').classList.toggle('hidden', !o.trial_days);
+    if (o.campaign && o.trial_days && !$('#auth').dataset.touched) setAuthMode('signup');
+    else setAuthMode(authMode);
   }).catch(() => {});
 }
 
@@ -374,8 +440,11 @@ function showPaywall(pago) {
   show('#paywall');
   const a = S.account || {};
   const venceu = a.paid_until && !a.active;
-  $('#payTitle').textContent = venceu ? 'Seu acesso venceu' : `Falta pouco${S.me ? ', ' + cap(S.me.name.split(' ')[0]) : ''}!`;
-  $('#payMsg').textContent = venceu
+  const fimTeste = venceu && a.plan === 'teste';
+  $('#payTitle').textContent = fimTeste ? 'Seu teste grátis terminou' : venceu ? 'Seu acesso venceu' : `Falta pouco${S.me ? ', ' + cap(S.me.name.split(' ')[0]) : ''}!`;
+  $('#payMsg').textContent = fimTeste
+    ? 'Gostou? Escolha um plano para continuar. Tudo o que você cadastrou continua guardado.'
+    : venceu
     ? `O acesso terminou em ${fd(a.paid_until)}. Renove para continuar usando. Seus dados continuam guardados.`
     : 'Escolha um plano para liberar o acesso da sua conta.';
   $('#payErr').textContent =
@@ -406,22 +475,28 @@ function setAuthMode(mode) {
   $('#authSub').textContent = mode === 'forgot'
     ? 'Informe o e-mail do cadastro. Vamos enviar um link para você criar uma nova senha.'
     : 'Escolha uma nova senha com pelo menos 8 caracteres.';
-  $('#authBtn').textContent = { login: 'Entrar', signup: 'Criar conta e escolher plano', forgot: 'Enviar link', reset: 'Salvar nova senha e entrar' }[mode];
+  const trial = S.offer?.trial_days || 0;
+  tog('#termsField', mode === 'signup');
+  tog('#trialNote', mode === 'signup' && trial > 0);
+  $('#trialNote').textContent = trial ? `Você ganha ${diasTxt(trial)} de acesso completo grátis. Não pedimos cartão e não há cobrança automática.` : '';
+  $('#authBtn').textContent = { login: 'Entrar', signup: trial ? `Criar conta e testar ${diasTxt(trial)} grátis` : 'Criar conta e escolher plano', forgot: 'Enviar link', reset: 'Salvar nova senha e entrar' }[mode];
   $('#passField').firstChild.textContent = mode === 'reset' ? 'Nova senha' : 'Senha';
   $('#authForm [name=password]').autocomplete = mode === 'login' ? 'current-password' : 'new-password';
   $('#authErr').textContent = ''; tog('#authOk', false);
   if (mode === 'login' || mode === 'signup') $(`#authForm input[name=mode][value=${mode}]`).checked = true;
 }
-$('#authForm').querySelectorAll('input[name=mode]').forEach(r => r.onchange = () => setAuthMode(r.value));
+$('#authForm').querySelectorAll('input[name=mode]').forEach(r => r.onchange = () => { $('#auth').dataset.touched = '1'; setAuthMode(r.value); });
 $('#authForm').addEventListener('submit', async e => {
   e.preventDefault();
   const f = new FormData(e.target), btn = $('#authBtn');
   if (authMode === 'reset' && f.get('password') !== f.get('password2')) return ($('#authErr').textContent = 'As senhas não conferem');
   btn.disabled = true; $('#authErr').textContent = '';
   try {
+    if (authMode === 'signup' && !f.get('terms')) throw new Error('Para criar a conta, aceite os Termos de Uso e a Política de Privacidade.');
     const body = authMode === 'reset' ? { token: resetToken, password: f.get('password') }
-      : { name: f.get('name'), email: f.get('email'), password: f.get('password') };
+      : { name: f.get('name'), email: f.get('email'), password: f.get('password'), terms: !!f.get('terms'), convite: S.convite };
     const d = await api(`/api/auth?action=${authMode}`, { method: 'POST', body });
+    if (authMode === 'signup') store.del('fc-convite');
     if (authMode === 'forgot') { $('#authOk').textContent = d.message; $('#authOk').classList.remove('hidden'); return; }
     const wasReset = authMode === 'reset';
     applyMe(d); e.target.reset(); setAuthMode('login'); resetToken = null; route();
@@ -442,7 +517,9 @@ async function start() {
   const qs = new URLSearchParams(location.search);
   const pago = qs.get('pago'), pid = qs.get('payment_id') || qs.get('collection_id');
   const reset = qs.get('reset');
-  if (pago || reset) history.replaceState(null, '', location.pathname);
+  const tabQ = qs.get('tab');
+  if (['painel', 'transactions', 'bills', 'investments', 'conta'].includes(tabQ)) S.tab = tabQ;
+  if (pago || reset || tabQ || qs.get('convite') || qs.get('origem')) history.replaceState(null, '', location.pathname);
   if (reset) { resetToken = reset; showAuth(); setAuthMode('reset'); return; }
   try {
     await loadMe();
@@ -461,6 +538,7 @@ function render() {
   $('.month').style.visibility = ['conta', 'admin'].includes(S.tab) ? 'hidden' : '';
   Object.values(S.charts).forEach(c => c.destroy()); S.charts = {};
   ({ painel: renderPainel, transactions: renderTx, bills: renderBills, investments: renderInv, conta: renderConta, admin: renderAdmin })[S.tab]();
+  refreshAlerts();
 }
 
 async function renderAdmin() {
@@ -469,7 +547,8 @@ async function renderAdmin() {
   try { d = S.adm = await api('/api/admin?action=overview'); }
   catch (e) { if (e.message !== 'auth') $('#view').innerHTML = `<div class="empty">Erro: ${esc(e.message)}</div>`; return; }
   const s = d.stats, r = d.revenue;
-  const planLbl = p => p === 'vitalicio' ? 'Vitalício' : p ? cap(p) : '—';
+  const planLbl = p => p === 'vitalicio' ? 'Vitalício' : p === 'teste' ? 'Teste grátis' : p ? cap(p) : '—';
+  const linkCamp = c => `${location.origin}/?convite=${encodeURIComponent(c)}`;
   $('#view').innerHTML = `
     <div class="bar"><h2>Administração</h2><div class="spacer"></div>
       <input id="admSearch" placeholder="Buscar conta ou e-mail" style="border:1px solid var(--bd);background:var(--card);border-radius:10px;padding:7px 10px;min-width:220px"></div>
@@ -477,8 +556,36 @@ async function renderAdmin() {
       <div class="card kpi"><div class="l">Recebido no mês</div><div class="v in">${fm(r.mes)}</div><div class="s">${r.pagamentos} pagamento(s) no total</div></div>
       <div class="card kpi"><div class="l">Recebido desde o início</div><div class="v">${fm(r.total)}</div></div>
       <div class="card kpi"><div class="l">Contas pagantes ativas</div><div class="v">${s.pagantes}</div><div class="s">${s.contas} contas no total · ${s.novas_30d} novas em 30 dias</div></div>
+      <div class="card kpi"><div class="l">Em teste grátis</div><div class="v">${s.em_teste}</div></div>
       <div class="card kpi"><div class="l">Cadastraram e não pagaram</div><div class="v">${s.sem_pagamento}</div></div>
-      <div class="card kpi"><div class="l">Vencidas</div><div class="v ${s.vencidas ? 'out' : ''}">${s.vencidas}</div></div>
+      <div class="card kpi"><div class="l">Vencidas</div><div class="v ${s.vencidas ? 'out' : ''}">${s.vencidas}</div><div class="s">inclui testes que acabaram</div></div>
+    </div>
+    <div class="section-t">Teste grátis e campanhas</div>
+    <div class="card" style="display:grid;gap:18px">
+      <form id="trialForm" class="feature-row">
+        <label class="f" style="margin:0;min-width:220px">Teste grátis para todo cadastro novo (dias)
+          <input name="days" type="number" min="0" max="365" value="${d.trial_days}"></label>
+        <button class="btn">Salvar</button>
+        <span class="small mut" style="flex-basis:100%">${d.trial_days ? `Hoje, quem se cadastra pelo site ganha <b>${d.trial_days} dias</b>.` : 'Hoje não há teste: quem se cadastra vai direto para os planos.'} Use 0 para desligar.</span>
+      </form>
+      <div>
+        <div style="font-weight:600;margin-bottom:8px">Links de campanha</div>
+        <p class="small mut" style="margin:0 0 10px">Quem se cadastra pelo link ganha os dias da campanha, sem você liberar um por um. Ideal para divulgar no WhatsApp e no Instagram.</p>
+        <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Código</th><th>Dias</th><th>Cadastros</th><th>Status</th><th>Link</th><th></th></tr></thead><tbody>
+        ${d.campaigns.map(c => `<tr><td><b>${esc(c.code)}</b></td><td>${c.days}</td><td>${c.uses}</td>
+          <td>${c.active ? '<span class="badge b-ok">Ativa</span>' : '<span class="badge b-rec">Pausada</span>'}</td>
+          <td><span class="code">${esc(linkCamp(c.code))}</span></td>
+          <td style="white-space:nowrap"><button class="btn sm" data-act="camp-copy" data-code="${esc(c.code)}">Copiar link</button>
+            <button class="btn sm" data-act="camp-toggle" data-code="${esc(c.code)}">${c.active ? 'Pausar' : 'Ativar'}</button></td></tr>`).join('')
+          || '<tr><td colspan="6" class="mut">Nenhuma campanha ainda</td></tr>'}
+        </tbody></table></div>
+        <form id="campForm" class="form-row" style="grid-template-columns:1fr 140px auto;margin-top:12px">
+          <label class="f">Código (aparece no link)<input name="code" placeholder="Ex.: 2MESES" autocapitalize="characters" required></label>
+          <label class="f">Dias grátis<input name="days" type="number" min="1" max="3650" value="60" required></label>
+          <button class="btn pri">Criar link</button>
+        </form>
+        <p class="err" id="campErr"></p>
+      </div>
     </div>
     <div class="section-t">Contas</div>
     <div class="card tbl-wrap" style="padding:4px 6px"><table class="tbl"><thead><tr>
@@ -502,6 +609,22 @@ async function renderAdmin() {
     }).join('') || '<tr><td colspan="8" class="mut">Nenhuma conta encontrada</td></tr>';
   };
   rows(); $('#admSearch').oninput = rows;
+  $('#trialForm').onsubmit = async e => {
+    e.preventDefault();
+    try { await api('/api/admin?action=trial', { method: 'POST', body: { days: Number(new FormData(e.target).get('days')) } }); toast('Teste grátis salvo ✓'); renderAdmin(); }
+    catch (err) { if (err.message !== 'auth') toast(err.message); }
+  };
+  $('#campForm').onsubmit = async e => {
+    e.preventDefault(); const f = new FormData(e.target);
+    try {
+      await api('/api/admin?action=campaign', { method: 'POST', body: { code: f.get('code'), days: Number(f.get('days')) } });
+      toast('Link de campanha criado ✓'); renderAdmin();
+    } catch (err) { if (err.message !== 'auth') $('#campErr').textContent = err.message; }
+  };
+}
+async function copyText(t) {
+  try { await navigator.clipboard.writeText(t); }
+  catch { const x = document.createElement('textarea'); x.value = t; document.body.appendChild(x); x.select(); document.execCommand('copy'); x.remove(); }
 }
 
 function renderConta() {
@@ -522,8 +645,8 @@ function renderConta() {
     <div class="card">
       <h3>Assinatura</h3>
       <div class="kpi"><div class="l">${esc(a.name)}</div>
-        <div class="v">${vital ? 'Acesso vitalício' : a.active ? `Ativa até ${fd(a.paid_until)}` : 'Vencida'}</div>
-        <div class="s">${vital ? '' : a.plan ? 'Último plano: ' + esc(cap(a.plan)) : ''}</div></div>
+        <div class="v">${vital ? 'Acesso vitalício' : a.plan === 'teste' && a.active ? `Teste grátis até ${fd(a.paid_until)}` : a.active ? `Ativa até ${fd(a.paid_until)}` : 'Vencida'}</div>
+        <div class="s">${vital ? '' : a.plan === 'teste' ? `${a.days_left > 0 ? `Faltam ${a.days_left} dia(s). ` : ''}Assine agora e os dias do teste continuam valendo.` : a.plan ? 'Último plano: ' + esc(cap(a.plan)) : ''}</div></div>
       ${vital ? '' : `<p class="small mut" style="margin:14px 0 0">Pagar agora soma o período ao que você já tem. Nenhum dia é perdido.</p>
         <div class="plans">${planCards(S.plans)}</div><p class="err" id="contaPayErr"></p>`}
     </div>
@@ -543,6 +666,7 @@ function renderConta() {
           <button class="btn pri">Adicionar</button>
         </div><p class="err" id="memberErr"></p></form>` : ''}
     </div>
+    <div class="stack" id="deviceCards"></div>
     <div class="card">
       <h3>Trocar minha senha</h3>
       <form id="passForm"><div class="form-row" style="grid-template-columns:1fr 1fr auto">
@@ -551,7 +675,9 @@ function renderConta() {
         <button class="btn">Salvar</button>
       </div><p class="err" id="passErr"></p></form>
     </div>
+    <p class="small mut" style="text-align:center"><a href="/termos.html" style="color:inherit">Termos de Uso</a> · <a href="/privacidade.html" style="color:inherit">Política de Privacidade</a></p>
   </div>`;
+  renderDeviceCards();
 
   $('#memberForm')?.addEventListener('submit', async e => {
     e.preventDefault(); const f = new FormData(e.target);
@@ -575,6 +701,124 @@ function renderConta() {
       e.target.reset(); $('#passErr').textContent = ''; toast('Senha alterada ✓');
     } catch (err) { if (err.message !== 'auth') $('#passErr').textContent = err.message; }
   });
+}
+
+/* ---------- Avisos no sistema ---------- */
+const addDays = (s, n) => { const d = new Date(s + 'T12:00:00'); d.setDate(d.getDate() + n); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; };
+const seen = {
+  get() { try { return new Set(JSON.parse(store.get('fc-seen') || '[]')); } catch { return new Set(); } },
+  add(ids) { const s = seen.get(); ids.forEach(i => s.add(i)); store.set('fc-seen', JSON.stringify([...s].slice(-400))); },
+};
+
+function buildNotifs() {
+  const t = today(), list = [];
+  const pend = (S.bills || []).filter(b => !b.paid);
+  for (const b of pend) {
+    const base = { tab: 'bills', val: fm(b.amount) };
+    if (b.due_date < t) list.push({ ...base, id: `late-${b.id}-${b.due_date}`, kind: 'late', ord: 0, title: `${b.description} está vencida`, desc: `Venceu em ${fd(b.due_date)} · ${fm(b.amount)}` });
+    else if (b.due_date === t) list.push({ ...base, id: `today-${b.id}-${b.due_date}`, kind: 'warn', ord: 1, title: `${b.description} vence hoje`, desc: fm(b.amount) });
+    else if (b.due_date === addDays(t, 1)) list.push({ ...base, id: `d1-${b.id}-${b.due_date}`, kind: 'warn', ord: 2, title: `${b.description} vence amanhã`, desc: fm(b.amount) });
+    else if (b.due_date <= addDays(t, 3)) list.push({ ...base, id: `d3-${b.id}-${b.due_date}`, kind: 'ok', ord: 3, title: `${b.description} vence em ${fd(b.due_date).slice(0, 5)}`, desc: fm(b.amount) });
+  }
+  const a = S.account || {};
+  if (a.plan !== 'vitalicio' && a.days_left != null && a.days_left <= 7) {
+    const dl = a.days_left, oq = a.plan === 'teste' ? 'Seu teste grátis' : 'Seu plano';
+    list.push({ id: `plan-${a.paid_until}-${dl}`, kind: dl <= 2 ? 'late' : 'warn', ord: -1, tab: 'conta',
+      title: `${oq} termina ${dl <= 1 ? 'amanhã' : `em ${dl} dias`}`, desc: `Renove para continuar com acesso. Vence em ${fd(a.paid_until)}.` });
+  }
+  for (const n of (S.budgetAlerts || [])) list.push(n);
+  return list.sort((x, y) => x.ord - y.ord);
+}
+
+function refreshAlerts() {
+  const list = S.notifs = buildNotifs(), vistos = seen.get();
+  const novos = list.filter(n => !vistos.has(n.id)).length;
+  $('#bellN').textContent = novos > 9 ? '9+' : novos;
+  $('#bellN').classList.toggle('hidden', !novos);
+  $('#bellBtn').setAttribute('aria-label', novos ? `Avisos: ${novos} novo(s)` : 'Avisos');
+  const ic = { late: '!', warn: '⏰', ok: '📅' };
+  $('#notifList').innerHTML = list.length ? list.map(n => `
+    <button class="notif ${vistos.has(n.id) ? '' : 'new'}" data-act="notif-go" data-tab="${n.tab}">
+      <span class="ic ic-${n.kind}" aria-hidden="true">${ic[n.kind] || '•'}</span>
+      <span><span class="nt">${esc(n.title)}</span><span class="nd" style="display:block">${esc(n.desc)}</span></span>
+    </button>`).join('') : '<div class="empty" style="padding:22px">Tudo em dia por aqui ✓</div>';
+
+  // Faixa de aviso do plano / teste
+  const a = S.account || {}, dl = a.days_left;
+  let html = '';
+  if (a.plan === 'teste' && dl != null) {
+    html = `<div class="pb ${dl <= 3 ? 'late' : dl <= 7 ? '' : 'info'}">🎁 Teste grátis: ${dl <= 1 ? 'termina amanhã' : `faltam ${dl} dias`} (até ${fd(a.paid_until)}).
+      <button class="btn sm ${dl <= 7 ? 'pri' : ''}" data-act="tab" data-tab="conta">Ver planos</button></div>`;
+  } else if (a.plan !== 'vitalicio' && dl != null && dl <= 7) {
+    html = `<div class="pb ${dl <= 2 ? 'late' : ''}">⏳ Seu plano vence ${dl <= 1 ? 'amanhã' : `em ${dl} dias`} (${fd(a.paid_until)}). Renove para não perder o acesso.
+      <button class="btn sm pri" data-act="tab" data-tab="conta">Renovar</button></div>`;
+  }
+  $('#planBanner').innerHTML = html;
+  $('#planBanner').classList.toggle('hidden', !html || S.tab === 'conta');
+}
+
+function toggleNotifs(open) {
+  const pop = $('#notifPop'), on = open ?? pop.classList.contains('hidden');
+  pop.classList.toggle('hidden', !on);
+  $('#bellBtn').setAttribute('aria-expanded', on);
+  if (on) { seen.add((S.notifs || []).map(n => n.id)); $('#bellN').classList.add('hidden'); }
+  else refreshAlerts();
+}
+document.addEventListener('click', e => {
+  if (!$('#notifPop').classList.contains('hidden') && !e.target.closest('.bell-wrap')) toggleNotifs(false);
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#notifPop').classList.contains('hidden')) toggleNotifs(false); });
+
+/* ---------- App instalável e avisos no aparelho ---------- */
+const isStandalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+const isIOS = () => /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); S.installEvt = e; if (S.tab === 'conta' && !$('#app').classList.contains('hidden')) renderConta(); });
+window.addEventListener('appinstalled', () => { S.installEvt = null; toast('App instalado ✓'); });
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
+
+const b64ToBytes = s => { const p = '='.repeat((4 - s.length % 4) % 4); const r = atob((s + p).replace(/-/g, '+').replace(/_/g, '/')); return Uint8Array.from(r, c => c.charCodeAt(0)); };
+async function pushState() {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) return 'unsupported';
+  if (Notification.permission === 'denied') return 'denied';
+  try { const reg = await navigator.serviceWorker.ready; return (await reg.pushManager.getSubscription()) ? 'on' : 'off'; }
+  catch { return 'off'; }
+}
+async function enablePush() {
+  const perm = await Notification.requestPermission();
+  if (perm !== 'granted') throw new Error('Permissão de avisos não concedida. Libere nas configurações do navegador.');
+  const reg = await navigator.serviceWorker.ready;
+  const { publicKey } = await api('/api/push?action=key');
+  const sub = await reg.pushManager.getSubscription() || await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToBytes(publicKey) });
+  await api('/api/push?action=subscribe', { method: 'POST', body: { subscription: sub.toJSON() } });
+}
+async function disablePush() {
+  const reg = await navigator.serviceWorker.ready, sub = await reg.pushManager.getSubscription();
+  if (sub) { await api('/api/push?action=unsubscribe', { method: 'POST', body: { subscription: { endpoint: sub.endpoint } } }).catch(() => {}); await sub.unsubscribe(); }
+}
+
+async function renderDeviceCards() {
+  const box = $('#deviceCards'); if (!box) return;
+  const st = await pushState();
+  const pushBody = {
+    unsupported: isIOS() && !isStandalone()
+      ? `<p class="small mut">No iPhone, os avisos funcionam depois de <b>instalar o app</b> (veja abaixo). Depois, abra o app pela tela inicial e ative aqui.</p>`
+      : `<p class="small mut">Este navegador não aceita avisos. Tente pelo Chrome, Edge ou Safari atualizado.</p>`,
+    denied: `<p class="small mut">Os avisos estão <b>bloqueados</b> neste aparelho. Libere nas configurações do navegador (Permissões → Notificações) e volte aqui.</p>`,
+    off: `<div class="feature-row"><span class="pill">Desativados</span><div class="spacer"></div><button class="btn pri" data-act="push-on">Ativar avisos neste aparelho</button></div>`,
+    on: `<div class="feature-row"><span class="pill on">Ativados ✓</span><div class="spacer"></div><button class="btn" data-act="push-test">Enviar teste</button><button class="btn" data-act="push-off">Desativar</button></div>`,
+  }[st];
+  const inst = isStandalone()
+    ? `<div class="feature-row"><span class="pill on">Instalado ✓</span><span class="small mut">Você está usando o app.</span></div>`
+    : S.installEvt
+    ? `<div class="feature-row"><span class="small mut">Ícone na tela inicial, abre em tela cheia, como um app.</span><div class="spacer"></div><button class="btn pri" data-act="install">Instalar app</button></div>`
+    : isIOS()
+    ? `<p class="small mut" style="margin:0">No Safari, toque em <b>Compartilhar</b> <span aria-hidden="true">⬆︎</span> e depois em <b>Adicionar à Tela de Início</b>.</p>`
+    : `<p class="small mut" style="margin:0">No menu do navegador (⋮), escolha <b>Instalar app</b> ou <b>Adicionar à tela inicial</b>.</p>`;
+  box.innerHTML = `
+    <div class="card"><h3>Avisos no celular</h3>
+      <p class="small mut" style="margin:-4px 0 12px">Um lembrete por dia, às 8h, quando houver conta vencida, vencendo hoje ou amanhã, ou quando o plano estiver acabando. Chega mesmo com o app fechado.</p>
+      ${pushBody}</div>
+    <div class="card"><h3>Instalar o app</h3>${inst}</div>`;
 }
 
 function billStatus(b) {
@@ -973,7 +1217,16 @@ document.addEventListener('click', async e => {
       await api(`/api/data?r=bills&action=pay&id=${id}`, { method: 'POST', body: { date: today(), person: S.user } });
       await Promise.all([load('bills'), load('transactions')]); render(); toast('Conta paga ✓');
     }
-    else if (act === 'auth-mode') setAuthMode(b.dataset.mode);
+    else if (act === 'auth-mode') { $('#auth').dataset.touched = '1'; setAuthMode(b.dataset.mode); }
+    else if (act === 'bell') toggleNotifs();
+    else if (act === 'notif-read') { seen.add((S.notifs || []).map(n => n.id)); toggleNotifs(false); }
+    else if (act === 'notif-go') { toggleNotifs(false); S.tab = b.dataset.tab; render(); window.scrollTo(0, 0); }
+    else if (act === 'push-on') { b.disabled = true; await enablePush(); toast('Avisos ativados ✓'); renderDeviceCards(); }
+    else if (act === 'push-off') { b.disabled = true; await disablePush(); toast('Avisos desativados'); renderDeviceCards(); }
+    else if (act === 'push-test') { b.disabled = true; await api('/api/push?action=test', { method: 'POST', body: {} }); toast('Aviso de teste enviado ✓'); b.disabled = false; }
+    else if (act === 'install') { const ev = S.installEvt; if (ev) { ev.prompt(); await ev.userChoice.catch(() => {}); S.installEvt = null; renderDeviceCards(); } }
+    else if (act === 'camp-copy') { await copyText(`${location.origin}/?convite=${encodeURIComponent(b.dataset.code)}`); toast('Link copiado ✓'); }
+    else if (act === 'camp-toggle') { await api('/api/admin?action=campaign-toggle', { method: 'POST', body: { code: b.dataset.code } }); renderAdmin(); }
     else if (act === 'member-pass') {
       const m = S.members.find(x => x.id === id);
       const pw = prompt(`Nova senha para ${cap(m.name)} (mínimo 8 caracteres).\nPasse para a pessoa; ela pode trocar depois em Conta.`);

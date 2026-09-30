@@ -81,6 +81,32 @@ const DDL = [
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
   )`,
   `CREATE INDEX IF NOT EXISTS login_attempts_idx ON login_attempts(key, created_at)`,
+  `CREATE TABLE IF NOT EXISTS settings (
+    key TEXT PRIMARY KEY,
+    value JSONB NOT NULL
+  )`,
+  `CREATE TABLE IF NOT EXISTS campaigns (
+    code TEXT PRIMARY KEY,
+    days INTEGER NOT NULL CHECK (days BETWEEN 1 AND 3650),
+    active BOOLEAN NOT NULL DEFAULT true,
+    uses INTEGER NOT NULL DEFAULT 0,
+    created_at TIMESTAMPTZ DEFAULT now()
+  )`,
+  `ALTER TABLE users ADD COLUMN IF NOT EXISTS terms_at TIMESTAMPTZ`,
+  `ALTER TABLE accounts ADD COLUMN IF NOT EXISTS campaign TEXT`,
+  `CREATE TABLE IF NOT EXISTS push_subscriptions (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    endpoint TEXT NOT NULL UNIQUE,
+    p256dh TEXT NOT NULL,
+    auth TEXT NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT now()
+  )`,
+  `CREATE TABLE IF NOT EXISTS push_log (
+    sub_id INTEGER NOT NULL,
+    day DATE NOT NULL,
+    PRIMARY KEY (sub_id, day)
+  )`,
 ];
 
 // Usuários antigos da variável USERS ("nome:senha;nome:senha") viram a conta
@@ -154,4 +180,18 @@ function ensureSchema() {
 export async function q(text, params = []) {
   await ensureSchema();
   return sql.query(text, params);
+}
+
+// Configurações gerais guardadas no banco (editáveis pelo Admin)
+export async function getSetting(key, fallback = null) {
+  const [r] = await q(`SELECT value FROM settings WHERE key = $1`, [key]);
+  return r ? r.value : fallback;
+}
+
+export async function setSetting(key, value) {
+  await q(
+    `INSERT INTO settings (key, value) VALUES ($1, $2::jsonb)
+     ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value`,
+    [key, JSON.stringify(value)]
+  );
 }

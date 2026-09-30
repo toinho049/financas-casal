@@ -28,7 +28,9 @@ export const SESSION_SELECT = `
   SELECT u.id, u.name, u.email, u.role, u.pass_hash, u.account_id,
          a.name AS account_name, a.plan,
          (a.paid_until AT TIME ZONE 'America/Sao_Paulo')::date::text AS paid_until,
-         (a.paid_until IS NOT NULL AND a.paid_until > now()) AS active
+         (a.paid_until IS NOT NULL AND a.paid_until > now()) AS active,
+         CASE WHEN a.paid_until IS NULL THEN NULL
+              ELSE CEIL(EXTRACT(EPOCH FROM (a.paid_until - now())) / 86400)::int END AS days_left
   FROM users u JOIN accounts a ON a.id = u.account_id`;
 
 export async function getSession(req) {
