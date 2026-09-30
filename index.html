@@ -17,7 +17,8 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="canonical" href="https://www.financasdocasal.sbs/">
 <link rel="manifest" href="/manifest.webmanifest">
-<link rel="icon" href="/icons/favicon-32.png" type="image/png">
+<link rel="icon" href="/icons/logo.svg" type="image/svg+xml">
+<link rel="icon" href="/icons/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -129,7 +130,8 @@ table.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
 header{position:sticky;top:0;z-index:5;background:var(--card);border-bottom:1px solid var(--bd)}
 .top{max-width:1100px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:12px}
 .brand{font-weight:700;font-size:17px;display:flex;align-items:center;gap:8px}
-.brand i{width:28px;height:28px;border-radius:8px;background:var(--pri);display:grid;place-items:center;color:#fff;font-style:normal;font-size:15px}
+.brand i{width:28px;height:28px;border-radius:8px;background:#0f8a5f;display:grid;place-items:center;color:#fff;font-style:normal;font-size:15px;flex-shrink:0}
+.brand i svg{width:80%;height:80%}
 .spacer{flex:1}
 .who{color:var(--mut);font-size:13px}
 .month{display:flex;align-items:center;gap:4px;font-weight:600}
@@ -357,7 +359,7 @@ dialog.wide{width:min(900px,calc(100vw - 24px))}
 
 <section id="auth" class="hidden">
   <div class="lp-top">
-    <div class="lp-in"><div class="brand"><i>R$</i>Finanças do Casal</div><div class="spacer"></div>
+    <div class="lp-in"><div class="brand"><i><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M14 48 L50 18 L86 48" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><path d="M24 42 L24 80 L76 80 L76 42" fill="none" stroke="#fff" stroke-width="8" stroke-linejoin="round"/><rect x="35" y="61" width="8" height="12" rx="2" fill="#f2c14e"/><rect x="46" y="53" width="8" height="20" rx="2" fill="#f2c14e"/><rect x="57" y="45" width="8" height="28" rx="2" fill="#f2c14e"/></svg></i>Finanças do Casal</div><div class="spacer"></div>
       <a class="linkbtn lp-hide-sm" href="#recursos">Recursos</a><a class="linkbtn lp-hide-sm" href="#planos">Planos</a><a class="linkbtn lp-hide-sm" href="#duvidas">Dúvidas</a>
       <button class="btn sm" data-act="lp-go" data-mode="login">Entrar</button>
       <button class="btn sm pri" data-act="lp-go" data-mode="signup">Criar conta</button></div>
@@ -449,7 +451,7 @@ dialog.wide{width:min(900px,calc(100vw - 24px))}
     </section>
 
     <footer class="lp-foot">
-      <div class="brand"><i>R$</i>Finanças do Casal</div>
+      <div class="brand"><i><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M14 48 L50 18 L86 48" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><path d="M24 42 L24 80 L76 80 L76 42" fill="none" stroke="#fff" stroke-width="8" stroke-linejoin="round"/><rect x="35" y="61" width="8" height="12" rx="2" fill="#f2c14e"/><rect x="46" y="53" width="8" height="20" rx="2" fill="#f2c14e"/><rect x="57" y="45" width="8" height="28" rx="2" fill="#f2c14e"/></svg></i>Finanças do Casal</div>
       <div class="small mut"><a href="/termos.html">Termos de Uso</a> · <a href="/privacidade.html">Privacidade</a> · © 2026</div>
     </footer>
   </div>
@@ -457,7 +459,7 @@ dialog.wide{width:min(900px,calc(100vw - 24px))}
 
 <section id="paywall" class="hidden">
   <div class="pay-box">
-    <div class="top-mini"><div class="brand"><i>R$</i>Finanças do Casal</div><div class="spacer"></div><button class="ghost" data-act="logout">Sair</button></div>
+    <div class="top-mini"><div class="brand"><i><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M14 48 L50 18 L86 48" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><path d="M24 42 L24 80 L76 80 L76 42" fill="none" stroke="#fff" stroke-width="8" stroke-linejoin="round"/><rect x="35" y="61" width="8" height="12" rx="2" fill="#f2c14e"/><rect x="46" y="53" width="8" height="20" rx="2" fill="#f2c14e"/><rect x="57" y="45" width="8" height="28" rx="2" fill="#f2c14e"/></svg></i>Finanças do Casal</div><div class="spacer"></div><button class="ghost" data-act="logout">Sair</button></div>
     <h1 id="payTitle"></h1>
     <p class="mut" id="payMsg"></p>
     <div class="plans" id="payPlans"></div>
@@ -470,7 +472,7 @@ dialog.wide{width:min(900px,calc(100vw - 24px))}
 <div id="app" class="hidden">
   <header>
     <div class="top">
-      <div class="brand"><i>R$</i>Finanças do Casal</div>
+      <div class="brand"><i><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M14 48 L50 18 L86 48" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><path d="M24 42 L24 80 L76 80 L76 42" fill="none" stroke="#fff" stroke-width="8" stroke-linejoin="round"/><rect x="35" y="61" width="8" height="12" rx="2" fill="#f2c14e"/><rect x="46" y="53" width="8" height="20" rx="2" fill="#f2c14e"/><rect x="57" y="45" width="8" height="28" rx="2" fill="#f2c14e"/></svg></i>Finanças do Casal</div>
       <div class="month">
         <button class="ghost" data-act="prev" aria-label="Mês anterior">‹</button>
         <span id="monthLbl"></span>
