@@ -441,6 +441,7 @@ function planCards(plans, highlight) {
         <button class="btn ${p.id === highlight ? 'pri' : ''}" data-act="pix" data-plan="${p.id}">Pix</button>
         <button class="btn" data-act="checkout" data-plan="${p.id}">Cartão</button>
       </div>
+      ${S.account?.sub_status === 'authorized' ? '' : `<button class="linkbtn small" style="margin-top:10px;width:100%" data-act="subscribe" data-plan="${p.id}">🔁 Assinar com renovação automática no cartão</button>`}
     </div>`;
   }).join('');
 }
@@ -490,8 +491,9 @@ function showPaywall(pago) {
     : 'Escolha um plano para liberar o acesso da sua conta.';
   $('#payErr').textContent =
     pago === 'pendente' ? 'Pagamento em processamento. Se foi Pix, assim que for confirmado o acesso é liberado. Toque em "Já paguei" em instantes.' :
-    pago === 'falhou' ? 'O pagamento não foi concluído. Tente de novo ou use outra forma de pagamento.' : '';
-  $('#recheckBtn').classList.toggle('hidden', pago !== 'pendente' && pago !== 'ok');
+    pago === 'falhou' ? 'O pagamento não foi concluído. Tente de novo ou use outra forma de pagamento.' :
+    pago === 'assinatura' ? 'Assinatura autorizada! O acesso é liberado assim que o Mercado Pago aprovar a primeira cobrança (costuma levar alguns minutos).' : '';
+  $('#recheckBtn').classList.toggle('hidden', !['pendente', 'ok', 'assinatura'].includes(pago));
   if (S.plans) $('#payPlans').innerHTML = planCards(S.plans);
 }
 
@@ -556,7 +558,20 @@ async function start() {
 
 (async () => {
   const qs = new URLSearchParams(location.search);
-  const pago = qs.get('pago'), pid = qs.get('payment_id') || qs.get('collection_id');
+  let pago = qs.get('pago');
+  const pid = qs.get('payment_id') || qs.get('collection_id');
+  const assinatura = qs.get('assinatura'), preId = qs.get('preapproval_id');
+  if (assinatura) {
+    history.replaceState(null, '', location.pathname);
+    try {
+      await loadMe();
+      const r = await api('/api/billing?action=confirm-sub', { method: 'POST', body: { preapproval_id: preId } });
+      await loadMe();
+      if (S.account.active) { S.tab = 'conta'; start(); toast(r.status === 'authorized' ? 'Renovação automática ativada ✓' : 'Assinatura recebida. Aguardando autorização.'); }
+      else showPaywall('assinatura');
+    } catch (e) { if (e.message !== 'auth') showAuth(e.message); }
+    return;
+  }
   const reset = qs.get('reset');
   const tabQ = qs.get('tab');
   if (['painel', 'transactions', 'bills', 'budgets', 'investments', 'conta'].includes(tabQ)) S.tab = tabQ;
@@ -643,7 +658,7 @@ async function renderAdmin() {
     $('#admRows').innerHTML = d.accounts.filter(a => !t || `${a.name} ${a.owner_email}`.toLowerCase().includes(t)).map(a => {
       const st = a.plan === 'vitalicio' ? '<span class="badge b-ok">Vitalício</span>'
         : a.active ? `${fd(a.paid_until)}` : a.paid_until ? `<span class="badge b-late">Venceu ${fd(a.paid_until)}</span>` : '<span class="badge b-rec">Nunca pagou</span>';
-      return `<tr><td>${esc(a.name)}</td><td class="mut">${esc(a.owner_email || '—')}</td><td>${esc(planLbl(a.plan))}</td><td>${st}</td>
+      return `<tr><td>${esc(a.name)}</td><td class="mut">${esc(a.owner_email || '—')}</td><td>${esc(planLbl(a.plan))}${a.subscription_status === 'authorized' ? ' <span title="Renovação automática ativa">🔁</span>' : ''}${a.campaign ? ` <span class="pill">${esc(a.campaign)}</span>` : ''}</td><td>${st}</td>
         <td><button class="linkbtn" data-act="adm-members" data-id="${a.id}" title="Ver pessoas">${a.members} ▸</button></td><td>${fm(a.paid_total)}</td><td class="mut">${fd(a.created)}</td>
         <td>${a.plan === 'vitalicio' ? '' : `<button class="btn sm" data-act="adm-extend" data-id="${a.id}">+ dias</button>
           <button class="ghost" data-act="adm-delete" data-id="${a.id}" title="Excluir conta">🗑</button>`}</td></tr>`;
@@ -688,6 +703,10 @@ function renderConta() {
       <div class="kpi"><div class="l">${esc(a.name)}</div>
         <div class="v">${vital ? 'Acesso vitalício' : a.plan === 'teste' && a.active ? `Teste grátis até ${fd(a.paid_until)}` : a.active ? `Ativa até ${fd(a.paid_until)}` : 'Vencida'}</div>
         <div class="s">${vital ? '' : a.plan === 'teste' ? `${a.days_left > 0 ? `Faltam ${a.days_left} dia(s). ` : ''}Assine agora e os dias do teste continuam valendo.` : a.plan ? 'Último plano: ' + esc(cap(a.plan)) : ''}</div></div>
+      ${vital ? '' : a.sub_status === 'authorized' ? `<div class="feature-row" style="margin-top:14px"><span class="pill on">🔁 Renovação automática ativa · ${esc(cap(a.sub_plan || ''))}</span>
+          <span class="small mut">A cobrança no cartão acontece sozinha a cada período.</span><div class="spacer"></div>
+          ${owner ? '<button class="btn sm" data-act="cancel-sub">Cancelar renovação</button>' : ''}</div>`
+        : a.sub_status === 'pending' ? `<div class="feature-row" style="margin-top:14px"><span class="pill">🔁 Assinatura aguardando autorização no Mercado Pago</span><div class="spacer"></div><button class="btn sm" data-act="check-sub">Verificar</button></div>` : ''}
       ${vital ? '' : `<p class="small mut" style="margin:14px 0 0">Pagar agora soma o período ao que você já tem. Nenhum dia é perdido.</p>
         <div class="plans">${planCards(S.plans)}</div><p class="err" id="contaPayErr"></p>`}
     </div>
@@ -1605,6 +1624,22 @@ document.addEventListener('click', async e => {
       b.disabled = true; b.textContent = 'Abrindo Mercado Pago…';
       const d = await api('/api/billing?action=checkout', { method: 'POST', body: { plan: b.dataset.plan } });
       location.href = d.url;
+    }
+    else if (act === 'subscribe') {
+      const plano = S.plans.find(p => p.id === b.dataset.plan);
+      if (!confirm(`Assinar o plano ${plano.title} por ${fm(plano.price)} ${plano.id === 'anual' ? 'a cada 12 meses' : 'por mês'}, com renovação automática no cartão?\n\n${S.account.active ? 'A 1ª cobrança só acontece quando seu acesso atual terminar. ' : ''}Você pode cancelar quando quiser na aba Conta.\n\nNo Mercado Pago, use o mesmo e-mail do cadastro: ${S.me.email}`)) return;
+      b.disabled = true; b.textContent = 'Abrindo Mercado Pago…';
+      const d = await api('/api/billing?action=subscribe', { method: 'POST', body: { plan: b.dataset.plan } });
+      location.href = d.url;
+    }
+    else if (act === 'cancel-sub') {
+      if (!confirm('Cancelar a renovação automática?\n\nNada mais será cobrado no cartão. Seu acesso continua até o fim do período já pago.')) return;
+      await api('/api/billing?action=cancel-sub', { method: 'POST', body: {} });
+      await loadMe(); renderConta(); toast('Renovação automática cancelada');
+    }
+    else if (act === 'check-sub') {
+      const r = await api('/api/billing?action=confirm-sub', { method: 'POST', body: {} });
+      await loadMe(); renderConta(); toast(r.status === 'authorized' ? 'Assinatura ativa ✓' : 'Ainda aguardando autorização');
     }
     else if (act === 'recheck') { await loadMe(); if (S.account.active) route('ok'); else toast('Ainda não confirmado. Tente em alguns instantes.'); }
     else if (act === 'rm-member') {

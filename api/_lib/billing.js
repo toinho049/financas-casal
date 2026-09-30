@@ -91,7 +91,8 @@ export async function createPix({ accountId, email, plan, base }) {
 // Idempotente: o mesmo pagamento nunca soma período duas vezes.
 export async function processPayment(paymentId) {
   const pay = await mp(`/v1/payments/${encodeURIComponent(paymentId)}`);
-  const m = /^acc:(\d+):(mensal|anual)$/.exec(pay.external_reference || '');
+  // "acc:ID:plano" (avulso) ou "sub:acc:ID:plano" (cobrança da assinatura automática)
+  const m = /^(?:sub:)?acc:(\d+):(mensal|anual)$/.exec(pay.external_reference || '');
   if (!m) return { ignored: true };
   const accountId = Number(m[1]);
   const p = PLANS[m[2]];
@@ -121,6 +122,68 @@ export async function processPayment(paymentId) {
     credited = rows.length > 0;
   }
   return { accountId, status: pay.status, credited };
+}
+
+/* ---------- Assinatura automática (Mercado Pago "preapproval") ---------- */
+const FREQ = { mensal: 1, anual: 12 };
+
+// Cria a assinatura e devolve o link para o cliente autorizar o cartão.
+// A 1ª cobrança só acontece quando o acesso atual (teste ou plano pago) terminar.
+export async function createSubscription({ accountId, email, plan, base, paidUntil }) {
+  const p = PLANS[plan];
+  if (!p) throw new Error('Plano inválido');
+  if (!email || !email.includes('@')) throw new Error('Cadastre seu e-mail em Conta → Meus dados antes de assinar.');
+  const start = paidUntil && new Date(paidUntil) > new Date(Date.now() + 5 * 60 * 1000) ? new Date(paidUntil) : null;
+  const sub = await mp('/preapproval', {
+    method: 'POST',
+    idem: crypto.randomUUID(),
+    body: {
+      reason: `Finanças do Casal — plano ${p.title} (renovação automática)`,
+      external_reference: `sub:acc:${accountId}:${p.id}`,
+      payer_email: email,
+      back_url: `${base}/?assinatura=ok`,
+      status: 'pending',
+      auto_recurring: {
+        frequency: FREQ[p.id], frequency_type: 'months',
+        transaction_amount: p.price, currency_id: 'BRL',
+        ...(start ? { start_date: start.toISOString() } : {}),
+      },
+    },
+  });
+  await q(`UPDATE accounts SET subscription_id = $1, subscription_status = $2, subscription_plan = $3 WHERE id = $4`,
+    [String(sub.id), sub.status || 'pending', p.id, accountId]);
+  return sub.init_point;
+}
+
+// Atualiza a situação da assinatura a partir do Mercado Pago (fonte da verdade)
+export async function syncSubscription(preapprovalId) {
+  const sub = await mp(`/preapproval/${encodeURIComponent(preapprovalId)}`);
+  const m = /^sub:acc:(\d+):(mensal|anual)$/.exec(sub.external_reference || '');
+  if (!m) return { ignored: true };
+  const accountId = Number(m[1]);
+  await q(
+    `UPDATE accounts SET subscription_id = $1, subscription_status = $2, subscription_plan = $3
+     WHERE id = $4 AND (subscription_id IS NULL OR subscription_id = $1 OR $2 = 'authorized')`,
+    [String(sub.id), sub.status, m[2], accountId]
+  );
+  return { accountId, status: sub.status, next: sub.next_payment_date || null };
+}
+
+// Cada cobrança da assinatura: credita o período pelo pagamento real (mesma regra do avulso)
+export async function processAuthorizedPayment(id) {
+  const ap = await mp(`/authorized_payments/${encodeURIComponent(id)}`);
+  if (ap.preapproval_id) await syncSubscription(ap.preapproval_id).catch(() => {});
+  const payId = ap.payment?.id;
+  if (!payId) return { status: ap.status, credited: false };
+  return processPayment(String(payId));
+}
+
+export async function cancelSubscription(accountId) {
+  const [a] = await q(`SELECT subscription_id FROM accounts WHERE id = $1`, [accountId]);
+  if (!a?.subscription_id) throw new Error('Nenhuma assinatura ativa');
+  await mp(`/preapproval/${encodeURIComponent(a.subscription_id)}`, { method: 'PUT', body: { status: 'cancelled' } });
+  await q(`UPDATE accounts SET subscription_status = 'cancelled' WHERE id = $1`, [accountId]);
+  return { ok: true };
 }
 
 // Validação opcional da assinatura do webhook (MP_WEBHOOK_SECRET)

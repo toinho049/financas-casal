@@ -94,6 +94,9 @@ const DDL = [
   )`,
   `ALTER TABLE users ADD COLUMN IF NOT EXISTS terms_at TIMESTAMPTZ`,
   `ALTER TABLE accounts ADD COLUMN IF NOT EXISTS campaign TEXT`,
+  `ALTER TABLE accounts ADD COLUMN IF NOT EXISTS subscription_id TEXT`,
+  `ALTER TABLE accounts ADD COLUMN IF NOT EXISTS subscription_status TEXT`,
+  `ALTER TABLE accounts ADD COLUMN IF NOT EXISTS subscription_plan TEXT`,
   `CREATE TABLE IF NOT EXISTS push_subscriptions (
     id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,

@@ -1,6 +1,6 @@
 import { getSession } from './_lib/auth.js';
 import { q, getSetting } from './_lib/db.js';
-import { createCheckout, createPix, processPayment, publicPlans, baseUrl } from './_lib/billing.js';
+import { createCheckout, createPix, processPayment, publicPlans, baseUrl, createSubscription, syncSubscription, cancelSubscription } from './_lib/billing.js';
 
 export default async function handler(req, res) {
   const action = req.query.action || '';
@@ -27,6 +27,26 @@ export default async function handler(req, res) {
     if (action === 'pix') {
       const pix = await createPix({ accountId: me.account_id, email: me.email, plan: req.body?.plan, base: baseUrl(req) });
       return res.json(pix);
+    }
+
+    // Assinatura automática no cartão
+    if (action === 'subscribe') {
+      const [a] = await q(`SELECT paid_until, subscription_status FROM accounts WHERE id = $1`, [me.account_id]);
+      if (a?.subscription_status === 'authorized') return res.status(400).json({ error: 'Sua assinatura automática já está ativa' });
+      const url = await createSubscription({ accountId: me.account_id, email: me.email, plan: req.body?.plan, base: baseUrl(req), paidUntil: a?.paid_until });
+      return res.json({ url });
+    }
+    if (action === 'confirm-sub') {
+      const [a] = await q(`SELECT subscription_id FROM accounts WHERE id = $1`, [me.account_id]);
+      const id = String(req.body?.preapproval_id || a?.subscription_id || '').replace(/[^\w-]/g, '');
+      if (!id) return res.status(400).json({ error: 'Assinatura não encontrada' });
+      const r = await syncSubscription(id);
+      if (r.accountId && r.accountId !== me.account_id) return res.status(403).json({ error: 'Assinatura de outra conta' });
+      return res.json(r);
+    }
+    if (action === 'cancel-sub') {
+      if (me.role !== 'owner') return res.status(403).json({ error: 'Só o titular pode cancelar a assinatura' });
+      return res.json(await cancelSubscription(me.account_id));
     }
 
     // Retorno do checkout: confere o pagamento na hora, sem esperar o webhook

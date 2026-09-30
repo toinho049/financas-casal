@@ -26,7 +26,7 @@ export function setCookie(res, token, maxAge = MAX_AGE) {
 
 export const SESSION_SELECT = `
   SELECT u.id, u.name, u.email, u.role, u.pass_hash, u.account_id,
-         a.name AS account_name, a.plan,
+         a.name AS account_name, a.plan, a.subscription_status, a.subscription_plan,
          (a.paid_until AT TIME ZONE 'America/Sao_Paulo')::date::text AS paid_until,
          (a.paid_until IS NOT NULL AND a.paid_until > now()) AS active,
          CASE WHEN a.paid_until IS NULL THEN NULL

@@ -14,7 +14,8 @@ async function mePayload(u) {
   const members = await q(`SELECT id, name, email, role FROM users WHERE account_id = $1 ORDER BY id`, [u.account_id]);
   return {
     user: { id: u.id, name: u.name, email: u.email, role: u.role, admin: isAdmin(u) },
-    account: { name: u.account_name, plan: u.plan, paid_until: u.paid_until, active: u.active, days_left: u.days_left },
+    account: { name: u.account_name, plan: u.plan, paid_until: u.paid_until, active: u.active, days_left: u.days_left,
+      sub_status: u.subscription_status, sub_plan: u.subscription_plan },
     members,
     plans: publicPlans(),
     mail: mailEnabled(),

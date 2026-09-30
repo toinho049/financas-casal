@@ -25,7 +25,7 @@ export default async function handler(req, res) {
                count(*)::int AS pagamentos
         FROM payments WHERE credited`);
       const accounts = await q(`
-        SELECT a.id, a.name, a.plan, a.campaign,
+        SELECT a.id, a.name, a.plan, a.campaign, a.subscription_status,
                (a.paid_until AT TIME ZONE 'America/Sao_Paulo')::date::text AS paid_until,
                (a.paid_until IS NOT NULL AND a.paid_until > now()) AS active,
                (a.created_at AT TIME ZONE 'America/Sao_Paulo')::date::text AS created,
