@@ -1762,20 +1762,31 @@ function goalsMini() {
 function cardsSection() {
   const k = mk();
   const semCartao = S.tx.filter(t => t.type === 'saida' && t.method === 'Cartão de crédito' && !t.card_id && t.date.startsWith(k));
+  const t = today(), mesAtual = k === t.slice(0, 7);
   const tiles = S.cards.map(c => {
-    const f = invoiceOf(c, S.y, S.m), t = today();
+    // No mês atual, mostra a fatura ABERTA (onde caem as compras de hoje); nos outros meses, a que vence naquele mês
+    let f;
+    if (mesAtual) { const ok = invoiceKeyOf(c, t).split('-').map(Number); f = invoiceOf(c, ok[0], ok[1]); }
+    else f = invoiceOf(c, S.y, S.m);
+    // Fatura já fechada que ainda vai vencer (ou venceu) e não foi marcada como paga
+    const fech = mesAtual ? [0, -1].map(d => { const [y, m] = ymdN(+f.key.slice(0, 4), +f.key.slice(5) - 1 + d, 1).split('-').map(Number); return invoiceOf(c, y, m); })
+      .find(x => x.key !== f.key && x.total > 0 && !x.paid && t > x.to) : null;
     const st = f.paid ? '<span class="pill">Paga ✓</span>'
       : t <= f.to ? `<span class="pill">Aberta · fecha ${fd(f.to).slice(0, 5)}</span>`
       : t > f.due ? '<span class="pill" style="background:rgba(248,113,113,.35)">Vencida</span>'
       : `<span class="pill">Fechada · vence ${fd(f.due).slice(0, 5)}</span>`;
     const used = c.credit_limit ? cardUsed(c) : 0;
+    const titulo = mesAtual ? `Fatura atual (${MESES[+f.key.slice(5) - 1].toLowerCase()})` : `Fatura de ${MESES[S.m - 1].toLowerCase()}`;
     return `<div class="cc">
       <div class="cc-h"><b>💳 ${esc(c.name)}</b><div class="spacer"></div>${st}<button class="ghost" data-act="card-edit" data-id="${c.id}" title="Editar cartão" aria-label="Editar cartão">✎</button></div>
-      <div class="cc-l">Fatura de ${MESES[S.m - 1].toLowerCase()} · vence ${fd(f.due)}</div>
+      <div class="cc-l">${titulo} · vence ${fd(f.due)}</div>
       <div class="cc-v">${fm(f.total)}</div>
-      <div class="cc-s">${f.items.length} compra(s) de ${fd(addDays(f.from, 1)).slice(0, 5)} a ${fd(f.to).slice(0, 5)}</div>
+      <div class="cc-s">${f.items.length ? `${f.items.length} compra(s) de ${fd(addDays(f.from, 1)).slice(0, 5)} a ${fd(f.to).slice(0, 5)}`
+        : `Nenhuma compra nesta fatura. Lance gastos com <b>Cartão de crédito</b> e escolha o ${esc(c.name)}.`}</div>
       ${c.credit_limit ? `<div class="cc-bar"><i style="width:${Math.min(100, used / c.credit_limit * 100)}%"></i></div>
-        <div class="cc-s">Limite: ${fm(used)} usado de ${fm(c.credit_limit)} · livre ${fm(Math.max(0, c.credit_limit - used))}</div>` : ''}
+        <div class="cc-s">Limite disponível <b>${fm(Math.max(0, c.credit_limit - used))}</b> de ${fm(c.credit_limit)}${used ? ` · ${fm(used)} usado` : ''}</div>` : ''}
+      ${fech ? `<div class="cc-s" style="margin-top:8px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.1)">Fatura fechada de ${MESES[+fech.key.slice(5) - 1].toLowerCase()}: <b>${fm(fech.total)}</b> · ${t > fech.due ? 'venceu' : 'vence'} ${fd(fech.due).slice(0, 5)}
+        <button class="btn sm" style="margin-left:6px;background:rgba(255,255,255,.18);border-color:transparent;color:#fff" data-act="card-pay" data-id="${c.id}" data-month="${fech.key}" data-paid="1">Marcar paga</button></div>` : ''}
       ${f.items.length ? `<details><summary>Ver compras</summary>${f.items.map(x => `<div class="cc-it"><span>${fd(x.date).slice(0, 5)} · ${esc(x.description)}</span><b>${fm(x.amount)}</b></div>`).join('')}</details>` : ''}
       ${f.total ? `<div class="cc-a"><button class="btn sm" data-act="card-pay" data-id="${c.id}" data-month="${f.key}" data-paid="${f.paid ? 0 : 1}">${f.paid ? 'Desmarcar pagamento' : 'Marcar fatura como paga'}</button></div>` : ''}
     </div>`;
@@ -2103,7 +2114,8 @@ const FORMS = {
     { k: 'name', l: 'Nome do cartão', req: 1, ph: 'Ex.: Nubank, Itaú Visa' },
     { k: 'closing_day', l: 'Dia em que a fatura fecha', t: 'int', req: 1, ph: 'Ex.: 5' },
     { k: 'due_day', l: 'Dia do vencimento', t: 'int', req: 1, ph: 'Ex.: 12' },
-    { k: 'credit_limit', l: 'Limite (opcional)', t: 'money' },
+    { k: 'credit_limit', l: 'Limite total do cartão (opcional)', t: 'money' },
+    { k: 'opening', l: 'Quanto já tem na fatura atual (opcional)', t: 'money', newOnly: 1, ph: 'Compras feitas antes de usar o app' },
   ],
   goals: [
     { k: 'name', l: 'Nome da meta', req: 1, ph: 'Ex.: Viagem de férias' },
@@ -2233,6 +2245,12 @@ $('#dlgForm').addEventListener('submit', async e => {
   $('#dlgSave').disabled = true;
   try {
     const out = await api(`/api/data?r=${res}${id ? '&id=' + id : ''}`, { method: id ? 'PUT' : 'POST', body });
+    // Cartão novo com valor que já estava na fatura: vira uma compra no crédito desse cartão, com data de hoje
+    if (res === 'cards' && !id && body.opening > 0) {
+      await api('/api/data?r=transactions', { method: 'POST', body: { type: 'saida', description: `Compras anteriores no ${out.name}`, amount: body.opening,
+        category: 'Cartão de crédito', date: today(), person: S.user, method: 'Cartão de crédito', card_id: out.id } });
+      await load('transactions');
+    }
     if (res === 'transactions' && body.method) { try { localStorage.setItem('fc-method', body.method); } catch {} }
     if (res === 'transactions' && body.card_id) store.set('fc-card', body.card_id);
     await load(res); $('#dlg').close(); render();
