@@ -492,6 +492,26 @@ dialog.wide{width:min(900px,calc(100vw - 24px))}
   .bar-g>.btn{white-space:nowrap;padding-left:6px;padding-right:6px}
   .charts .upc{order:-1}
   .ci{width:36px;height:36px;font-size:17px}
+  /* Admin no celular: tabelas viram cartões "rótulo: valor" e formulários em uma coluna */
+  .card>*{min-width:0}
+  #trialForm label.f{min-width:0!important;flex:1 1 100%}
+  #trialForm .btn{flex:1}
+  #campForm{grid-template-columns:1fr!important}
+  .code{word-break:break-all}
+  #admSearch{min-width:0!important;flex:1 1 100%}
+  .tbl.rsp thead{display:none}
+  .tbl.rsp,.tbl.rsp tbody,.tbl.rsp tr,.tbl.rsp td{display:block;width:100%}
+  .tbl.rsp tr{padding:10px 2px;border-bottom:1px solid var(--bd)}
+  .tbl.rsp tr:last-child{border-bottom:0}
+  .tbl.rsp td{display:flex;justify-content:space-between;align-items:center;gap:12px;border:0;padding:3px 6px;white-space:normal;text-align:right;overflow-wrap:anywhere}
+  .tbl.rsp td::before{content:attr(data-l);color:var(--mut);font-size:12.5px;text-align:left;flex-shrink:0;font-weight:500}
+  .tbl.rsp td:first-child{font-weight:700;font-size:15px}
+  .tbl.rsp td:first-child::before{content:none}
+  .tbl.rsp td:first-child{justify-content:flex-start;text-align:left}
+  .tbl.rsp td[data-l=""]{justify-content:flex-end;flex-wrap:wrap}
+  .tbl.rsp td[data-l=""]::before{content:none}
+  .tbl.rsp td[colspan]{justify-content:center;text-align:center}
+  .tbl-wrap.card{padding:2px 12px!important}
   .kpi .v{font-size:19px}
   .kpis{gap:8px}.card{padding:13px}
   .row{flex-wrap:wrap;row-gap:4px;padding:11px 12px;gap:10px}
@@ -1202,6 +1222,7 @@ async function renderAdmin() {
         <td>${a.plan === 'vitalicio' ? '' : `<button class="btn sm" data-act="adm-extend" data-id="${a.id}">+ dias</button>
           <button class="ghost" data-act="adm-delete" data-id="${a.id}" title="Excluir conta">🗑</button>`}</td></tr>`;
     }).join('') || '<tr><td colspan="8" class="mut">Nenhuma conta encontrada</td></tr>';
+    stackTables();
   };
   rows(); $('#admSearch').oninput = rows;
   const funil = async () => {
@@ -1209,7 +1230,7 @@ async function renderAdmin() {
       const f = await api('/api/admin?action=funnel&dias=' + $('#funDias').value);
       const tot = f.rows.reduce((a, r) => ({ cadastros: a.cadastros + r.cadastros, usaram: a.usaram + r.usaram, em_teste: a.em_teste + r.em_teste, pagaram: a.pagaram + r.pagaram, receita: a.receita + r.receita }), { cadastros: 0, usaram: 0, em_teste: 0, pagaram: 0, receita: 0 });
       const pct = (a, b) => b ? Math.round(a / b * 100) + '%' : '—';
-      const linha = (r, b) => `<tr${b ? ' style="font-weight:700"' : ''}><td>${esc(r.canal)}</td><td>${r.cadastros}</td><td>${r.usaram} <span class="mut">(${pct(r.usaram, r.cadastros)})</span></td>
+      const linha = (r, b) => `<tr${b ? ' style="font-weight:700"' : ''}><td>${esc(r.canal)}</td><td>${r.cadastros}</td><td><span>${r.usaram} <span class="mut">(${pct(r.usaram, r.cadastros)})</span></span></td>
         <td>${r.em_teste}</td><td>${r.pagaram}</td><td><b class="${r.pagaram ? 'in' : ''}">${pct(r.pagaram, r.cadastros)}</b></td><td>${fm(r.receita)}</td></tr>`;
       $('#funBox').innerHTML = `<div class="grid kpis">
           <div class="card kpi"><div class="l">Cadastros</div><div class="v">${tot.cadastros}</div><div class="s">${tot.usaram} começaram a usar (${pct(tot.usaram, tot.cadastros)})</div></div>
@@ -1220,6 +1241,7 @@ async function renderAdmin() {
         <p class="small mut" style="margin:8px 0 0">De onde vem cada cadastro: link de indicação, link de campanha (<span class="code">?convite=</span>), ou o site de onde a pessoa chegou (TikTok, Instagram…). Para separar por rede, use links como <span class="code">${esc(SITE)}/?convite=2MESES&amp;utm_source=tiktok</span>.</p>
         ${f.top.length ? `<div class="card tbl-wrap" style="padding:4px 6px;margin-top:10px"><table class="tbl"><thead><tr><th>Quem mais indica</th><th>E-mail</th><th>Indicados</th><th>Assinaram</th></tr></thead>
           <tbody>${f.top.map(t => `<tr><td>${esc(t.name)}</td><td class="mut">${esc(t.email || '—')}</td><td>${t.indicados}</td><td>${t.pagaram}</td></tr>`).join('')}</tbody></table></div>` : ''}`;
+      stackTables($('#funBox'));
     } catch (err) { if (err.message !== 'auth') $('#funBox').innerHTML = `<div class="card"><div class="empty">Erro: ${esc(err.message)}</div></div>`; }
   };
   $('#funDias').onchange = funil; funil();
@@ -1235,6 +1257,14 @@ async function renderAdmin() {
       toast('Link de campanha criado ✓'); renderAdmin();
     } catch (err) { if (err.message !== 'auth') $('#campErr').textContent = err.message; }
   };
+}
+// Coloca o nome da coluna em cada célula (no celular a tabela vira lista "rótulo: valor")
+function stackTables(root = $('#view')) {
+  root.querySelectorAll('table.tbl').forEach(t => {
+    const hs = [...t.querySelectorAll('thead th')].map(h => h.textContent.trim());
+    t.classList.add('rsp');
+    t.querySelectorAll('tbody tr').forEach(tr => [...tr.children].forEach((td, i) => { if (!td.hasAttribute('colspan')) td.dataset.l = hs[i] || ''; }));
+  });
 }
 async function copyText(t) {
   try { await navigator.clipboard.writeText(t); }

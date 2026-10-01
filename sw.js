@@ -1,5 +1,5 @@
 // Service worker do Finanças do Casal: abre rápido, funciona como app e recebe avisos.
-const CACHE = 'fc-v7';
+const CACHE = 'fc-v8';
 const SHELL = ['/', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png'];
 
 self.addEventListener('install', (e) => {
