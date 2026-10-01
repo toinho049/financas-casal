@@ -526,7 +526,7 @@ dialog.wide{width:min(900px,calc(100vw - 24px))}
   </div>
   <div class="auth-wrap">
     <div class="pitch">
-      <div class="trial-badge hidden" id="refBadge">💚 Você recebeu o convite de um casal amigo</div>
+      <div class="trial-badge hidden" id="refBadge">💚 Você recebeu um convite de quem já usa</div>
       <div class="trial-badge hidden" id="trialBadge"></div>
       <h1>O dinheiro de vocês dois, <span class="grad">num lugar só.</span></h1>
       <p class="lp-sub">Contas a pagar, gastos do mês, orçamento e investimentos do casal, com aviso no celular antes de vencer. Cada um com seu login, os mesmos números.</p>
@@ -617,7 +617,7 @@ dialog.wide{width:min(900px,calc(100vw - 24px))}
         <div class="lp-card"><div class="lp-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg></div><h3>Importa o extrato do banco</h3><p>Arquivo OFX ou CSV do seu banco ou do Nubank: o sistema lê, categoriza e não duplica.</p></div>
         <div class="lp-card"><div class="lp-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 21l2.1-5.6A8.4 8.4 0 1 1 21 11.5z"/></svg></div><h3>Resumo no WhatsApp</h3><p>Um toque e o resumo do mês vai para o grupo da família, com o que vence e onde mais gastaram.</p></div>
         <div class="lp-card"><div class="lp-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg></div><h3>Investimentos</h3><p>Acompanhe quanto aplicaram e quanto rendeu, junto com o resto das finanças.</p></div>
-        <div class="lp-card"><div class="lp-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg></div><h3>Tema claro ou escuro</h3><p>Instale na tela inicial e use como aplicativo, no visual que preferir. Funciona no computador também.</p></div>
+        <div class="lp-card"><div class="lp-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg></div><h3>Sozinho ou a dois</h3><p>Use sozinho(a) ou convide quem divide as contas. Instale na tela inicial, no tema claro ou escuro.</p></div>
       </div>
     </section>
 
@@ -635,6 +635,7 @@ dialog.wide{width:min(900px,calc(100vw - 24px))}
       <div class="faq">
         <details><summary>Preciso conectar minha conta do banco?</summary><p>Não. O sistema não pede senha de banco e não se conecta a ele. Você lança os gastos ou importa o arquivo de extrato que o próprio banco gera.</p></details>
         <details><summary>Meus dados ficam seguros?</summary><p>Sim. A conexão é criptografada (cadeado HTTPS), as senhas são guardadas de forma protegida e os dados de cada conta ficam separados dos outros. Não vendemos nem compartilhamos seus dados. Veja a <a href="/privacidade.html">Política de Privacidade</a>.</p></details>
+        <details><summary>Posso usar sozinho(a)?</summary><p>Pode, sim. Contas a pagar, orçamento, metas, cartões e gráficos funcionam do mesmo jeito para uma pessoa só. Se um dia quiser dividir com alguém, é só convidar pela aba Conta.</p></details>
         <details><summary>Quantas pessoas podem usar a mesma conta?</summary><p>Até 5 pessoas por conta, cada uma com seu e-mail e senha. Todos veem e editam os mesmos dados.</p></details>
         <details><summary>Tem teste grátis? E se eu não gostar?</summary><p id="faqTrial">Você pode testar antes de pagar. No fim do teste nada é cobrado automaticamente: se não quiser continuar, é só não assinar. Na primeira compra, você ainda tem 7 dias para pedir o dinheiro de volta.</p></details>
         <details><summary>Posso cancelar a renovação automática?</summary><p>Sim, a qualquer momento, com um clique na aba Conta. Você continua com acesso até o fim do período já pago.</p></details>
@@ -721,7 +722,7 @@ dialog.wide{width:min(900px,calc(100vw - 24px))}
 <dialog id="moreDlg" class="more-sheet" aria-label="Mais opções">
   <div class="dlg-h"><h3 id="moreWho">Mais</h3><button type="button" class="ghost" data-act="more-close" aria-label="Fechar">✕</button></div>
   <div style="padding-bottom:10px">
-    <button class="ms-item" data-act="tab" data-tab="goals"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg>Metas do casal</button>
+    <button class="ms-item" data-act="tab" data-tab="goals"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg>Metas</button>
     <button class="ms-item" data-act="tab" data-tab="investments"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>Investimentos</button>
     <button class="ms-item" data-act="tab" data-tab="conta"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Conta, plano e avisos</button>
     <button class="ms-item hidden" id="moreAdmin" data-act="tab" data-tab="admin"><svg viewBox="0 0 24 24"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/></svg>Administração</button>
@@ -1138,7 +1139,7 @@ async function renderAdmin() {
   catch (e) { if (e.message !== 'auth') $('#view').innerHTML = `<div class="empty">Erro: ${esc(e.message)}</div>`; return; }
   const s = d.stats, r = d.revenue;
   const planLbl = p => p === 'vitalicio' ? 'Vitalício' : p === 'teste' ? 'Teste grátis' : p ? cap(p) : '—';
-  const linkCamp = c => `${location.origin}/?convite=${encodeURIComponent(c)}`;
+  const linkCamp = c => `${SITE}/?convite=${encodeURIComponent(c)}`;
   $('#view').innerHTML = `
     <div class="bar"><h2>Administração</h2><div class="spacer"></div>
       <input id="admSearch" placeholder="Buscar conta ou e-mail" style="border:1px solid var(--bd);background:var(--card);border-radius:10px;padding:7px 10px;min-width:220px"></div>
@@ -1216,7 +1217,7 @@ async function renderAdmin() {
           <div class="card kpi"><div class="l">Receita desses cadastros</div><div class="v">${fm(tot.receita)}</div><div class="s">${tot.pagaram ? fm(tot.receita / tot.pagaram) + ' por pagante' : '&nbsp;'}</div></div></div>
         <div class="card tbl-wrap" style="padding:4px 6px"><table class="tbl"><thead><tr><th>Canal</th><th>Cadastros</th><th>Usaram</th><th>Em teste</th><th>Pagaram</th><th>Conversão</th><th>Receita</th></tr></thead>
           <tbody>${f.rows.map(r => linha(r)).join('') || '<tr><td colspan="7" class="mut">Nenhum cadastro no período</td></tr>'}${f.rows.length > 1 ? linha({ canal: 'Total', ...tot }, 1) : ''}</tbody></table></div>
-        <p class="small mut" style="margin:8px 0 0">De onde vem cada cadastro: link de indicação, link de campanha (<span class="code">?convite=</span>), ou o site de onde a pessoa chegou (TikTok, Instagram…). Para separar por rede, use links como <span class="code">${esc(location.origin)}/?convite=2MESES&amp;utm_source=tiktok</span>.</p>
+        <p class="small mut" style="margin:8px 0 0">De onde vem cada cadastro: link de indicação, link de campanha (<span class="code">?convite=</span>), ou o site de onde a pessoa chegou (TikTok, Instagram…). Para separar por rede, use links como <span class="code">${esc(SITE)}/?convite=2MESES&amp;utm_source=tiktok</span>.</p>
         ${f.top.length ? `<div class="card tbl-wrap" style="padding:4px 6px;margin-top:10px"><table class="tbl"><thead><tr><th>Quem mais indica</th><th>E-mail</th><th>Indicados</th><th>Assinaram</th></tr></thead>
           <tbody>${f.top.map(t => `<tr><td>${esc(t.name)}</td><td class="mut">${esc(t.email || '—')}</td><td>${t.indicados}</td><td>${t.pagaram}</td></tr>`).join('')}</tbody></table></div>` : ''}`;
     } catch (err) { if (err.message !== 'auth') $('#funBox').innerHTML = `<div class="card"><div class="empty">Erro: ${esc(err.message)}</div></div>`; }
@@ -1240,14 +1241,16 @@ async function copyText(t) {
   catch { const x = document.createElement('textarea'); x.value = t; document.body.appendChild(x); x.select(); document.execCommand('copy'); x.remove(); }
 }
 
-const refLink = () => S.referral?.code ? `${location.origin}/?indica=${S.referral.code}` : '';
-const refMsg = () => `Oi! Eu e meu amor usamos o Finanças do Casal para organizar as contas: aviso antes de vencer, acerto de quem pagou o quê e metas juntos. Cria a conta de vocês por este link: ${refLink()}`;
+// Links para divulgar sempre no domínio oficial (mesmo se o app foi aberto pelo endereço da Vercel)
+const SITE = /(^|\.)financasdocasal\.sbs$/.test(location.hostname) || /^(localhost|127\.)/.test(location.hostname) ? location.origin : 'https://www.financasdocasal.sbs';
+const refLink = () => S.referral?.code ? `${SITE}/?indica=${S.referral.code}` : '';
+const refMsg = () => `Oi! Uso o Finanças do Casal para organizar minhas contas: aviso no celular antes de vencer, metas, fatura do cartão e gráficos do mês. Dá para usar sozinho ou a dois. Cria a sua conta por este link: ${refLink()}`;
 function refCard() {
   const r = S.referral || {};
   if (!r.code) return '';
   return `<div class="card" id="refCard">
-    <h3>💚 Indique um casal e ganhe 1 mês</h3>
-    <p class="small mut" style="margin:-4px 0 0">Mande o seu link para casais amigos. Quando um deles assinar, vocês ganham <b>30 dias grátis</b>. Sem limite: 5 casais, 5 meses.</p>
+    <h3>💚 Indique e ganhe 1 mês grátis</h3>
+    <p class="small mut" style="margin:-4px 0 0">Mande o seu link para amigos, família ou casais. Cada pessoa que assinar por ele vale <b>30 dias grátis</b> para você. Sem limite: 5 indicações, 5 meses.</p>
     <div class="ref-link"><code id="refLinkTxt">${esc(refLink())}</code>
       <button class="btn" data-act="ref-copy">Copiar</button><button class="btn wa" data-act="ref-wa">📲 WhatsApp</button></div>
     <div class="ref-stats">
@@ -1384,7 +1387,7 @@ function buildNotifs() {
   }
   // Indicação que virou assinatura
   if (S.referral?.paid) list.push({ id: `ref-${S.referral.paid}`, kind: 'ok', ord: 5, tab: 'conta',
-    title: '🎉 Um casal que você indicou assinou', desc: `Você já ganhou ${S.referral.days} dias grátis. Indique mais!` });
+    title: '🎉 Alguém que você indicou assinou', desc: `Você já ganhou ${S.referral.days} dias grátis. Indique mais!` });
   return list.sort((x, y) => x.ord - y.ord);
 }
 
@@ -1664,9 +1667,7 @@ function acertoTxt(k, a) {
     '', '_Finanças do Casal_'].join('\n');
 }
 function acertoCard(k) {
-  if (S.users.length < 2) return `<div class="card"><h3>Acerto do casal</h3>
-    <p class="small mut" style="margin:0 0 10px">Veja quem pagou quanto no mês e quanto um deve ao outro. Para isso, adicione quem divide as contas com você.</p>
-    <button class="btn sm" data-act="tab" data-tab="conta">Adicionar meu parceiro(a)</button></div>`;
+  if (S.users.length < 2) return '';   // quem usa sozinho não precisa de acerto
   const a = acerto(k);
   return `<div class="card">
     <div class="onb-h"><h3>Acerto de ${MESES[+k.slice(5) - 1].toLowerCase()}</h3><div class="spacer"></div>
@@ -1691,7 +1692,7 @@ function onbSteps() {
   return [
     { id: 'tx', ok: S.tx.length > 0, t: 'Lance um gasto ou uma entrada', d: 'Pode ser o mercado de hoje ou o salário.', act: 'new-tx', b: 'Lançar' },
     { id: 'bill', ok: S.bills.length > 0, t: 'Cadastre uma conta a pagar', d: 'Luz, aluguel, internet… o app avisa antes de vencer.', act: 'onb-bill', b: 'Cadastrar' },
-    { id: 'member', ok: S.members.length > 1, t: 'Convide quem divide as contas', d: 'Cada um com seu login, os mesmos números.', act: 'onb-member', b: 'Convidar' },
+    { id: 'member', ok: S.members.length > 1 || !!store.get('fc-solo-' + S.me.id), t: 'Divide as contas com alguém?', d: 'Convide a pessoa: cada um com seu login, os mesmos números. Se usa sozinho(a), é só pular.', act: 'onb-member', b: 'Convidar', skip: 'onb-solo' },
     { id: 'push', ok: S.pushOn === true, t: 'Ative o aviso no celular', d: 'Um lembrete às 8h quando algo vence.', act: 'onb-push', b: 'Ativar' },
   ];
 }
@@ -1704,7 +1705,7 @@ function onbCard() {
       <button class="ghost small" data-act="onb-hide" title="Esconder">Esconder</button></div>
     <div class="hbar" style="margin:0 0 6px"><i style="width:${feitos / st.length * 100}%"></i></div>
     ${st.map(x => `<div class="onb-i ${x.ok ? 'ok' : ''}"><span class="ck">${x.ok ? '✓' : ''}</span>
-      <div class="tx"><b>${x.t}</b><span>${x.d}</span></div>${x.ok ? '' : `<button class="btn sm pri" data-act="${x.act}">${x.b}</button>`}</div>`).join('')}
+      <div class="tx"><b>${x.t}</b><span>${x.d}</span></div>${x.ok ? '' : `${x.skip ? `<button class="btn sm" data-act="${x.skip}">Uso sozinho(a)</button>` : ''}<button class="btn sm pri" data-act="${x.act}">${x.b}</button>`}</div>`).join('')}
   </div>`;
 }
 
@@ -1721,9 +1722,9 @@ function goalCard(g) {
   const pct = Math.min(100, g.saved / g.target * 100), falta = Math.max(0, g.target - g.saved), done = falta <= 0.005;
   const mes = g.deadline ? `${MES_C[+g.deadline.slice(5, 7) - 1]}/${g.deadline.slice(0, 4)}` : '';
   const late = g.deadline && g.deadline < today() && !done;
-  const tip = done ? '🎉 Meta alcançada! Parabéns para vocês.'
+  const tip = done ? '🎉 Meta alcançada! Parabéns!'
     : late ? `O prazo (${mes}) passou. Edite a meta para definir um novo prazo.`
-    : g.deadline ? `Guardem <b>${fm(falta / monthsUntil(g.deadline))}</b> por mês para chegar até ${mes}.` : '';
+    : g.deadline ? `Guarde <b>${fm(falta / monthsUntil(g.deadline))}</b> por mês para chegar até ${mes}.` : '';
   return `<div class="card goal ${done ? 'done' : ''}" data-act="goal-edit" data-id="${g.id}">
     <div class="g-h"><span class="g-ic" aria-hidden="true">${goalIc(g.name)}</span><div><b>${esc(g.name)}</b><small>${g.deadline ? 'até ' + mes : 'sem prazo'}</small></div>
       <span class="g-pct">${Math.floor(pct)}%</span></div>
@@ -1738,15 +1739,15 @@ function renderGoals() {
   const tot = sum(S.goals, g => g.saved), alvo = sum(S.goals, g => g.target);
   const sug = [['✈️', 'Viagem'], ['🛟', 'Reserva de emergência'], ['🏠', 'Entrada da casa'], ['💍', 'Casamento'], ['🚗', 'Carro novo']];
   $('#view').innerHTML = `
-    <div class="bar"><h2>Metas do casal</h2><div class="spacer"></div><button class="btn pri desk" data-act="new">+ Meta</button></div>
+    <div class="bar"><h2>Metas</h2><div class="spacer"></div><button class="btn pri desk" data-act="new">+ Meta</button></div>
     ${S.goals.length ? `<div class="grid kpis">
         <div class="card kpi"><div class="l">Guardado nas metas</div><div class="v in">${fm(tot)}</div><div class="s">${S.goals.length} meta(s)</div></div>
         <div class="card kpi"><div class="l">Objetivo total</div><div class="v">${fm(alvo)}</div><div class="s">${alvo ? Math.floor(tot / alvo * 100) : 0}% do caminho</div></div>
       </div>
       <div class="grid goals">${S.goals.map(goalCard).join('')}</div>`
     : `<div class="card" style="text-align:center;padding:30px 18px">
-        <div style="font-size:42px">🎯</div><h3 style="margin:8px 0 6px">Qual é o próximo sonho de vocês?</h3>
-        <p class="small mut" style="margin:0 auto;max-width:420px">Crie uma meta, defina quanto querem juntar e até quando. O app mostra quanto guardar por mês e o progresso dos dois.</p>
+        <div style="font-size:42px">🎯</div><h3 style="margin:8px 0 6px">Qual é o seu próximo objetivo?</h3>
+        <p class="small mut" style="margin:0 auto;max-width:420px">Crie uma meta, defina quanto juntar e até quando. O app mostra quanto guardar por mês e acompanha o progresso.</p>
         <div class="g-sug">${sug.map(([i, n]) => `<button class="btn" data-act="goal-sug" data-name="${n}">${i} ${n}</button>`).join('')}</div></div>`}`;
 }
 function goalsMini() {
@@ -1844,9 +1845,10 @@ function renderPainel() {
       <div><div class="l">A pagar no mês</div><div class="v ${late.length ? 'out' : ''}">${fm(sum(pend))}</div>
         <div class="s">${pend.length} conta(s)</div></div>
     </div>
-    <div class="grid charts">${acertoCard(k)}${goalsMini() || `<div class="card"><div class="onb-h"><h3>Metas do casal</h3></div>
-      <p class="small mut" style="margin:0 0 10px">Viagem, reserva de emergência, entrada da casa… Criem uma meta e acompanhem juntos.</p>
-      <button class="btn sm" data-act="tab" data-tab="goals">🎯 Criar meta</button></div>`}</div>
+    ${(() => { const cards = [acertoCard(k), goalsMini() || `<div class="card"><div class="onb-h"><h3>Metas</h3></div>
+      <p class="small mut" style="margin:0 0 10px">Viagem, reserva de emergência, carro novo… Crie uma meta e acompanhe o progresso.</p>
+      <button class="btn sm" data-act="tab" data-tab="goals">🎯 Criar meta</button></div>`].filter(Boolean);
+      return `<div class="grid ${cards.length > 1 ? 'charts' : ''}" style="margin-bottom:14px">${cards.join('')}</div>`; })()}
     <div class="grid charts">
       <div class="card"><h3>Entradas × saídas (últimos 6 meses)</h3><div class="chart-wrap"><canvas id="cBar"></canvas></div></div>
       <div class="card upc" style="padding:0">
@@ -2105,7 +2107,7 @@ const FORMS = {
   ],
   goals: [
     { k: 'name', l: 'Nome da meta', req: 1, ph: 'Ex.: Viagem de férias' },
-    { k: 'target', l: 'Quanto vocês querem juntar (R$)', t: 'money', req: 1 },
+    { k: 'target', l: 'Quanto quer juntar (R$)', t: 'money', req: 1 },
     { k: 'deadline', l: 'Até quando (opcional)', t: 'date' },
   ],
   budgets: [
@@ -2607,6 +2609,7 @@ document.addEventListener('click', async e => {
     else if (act === 'acerto-wa') window.open('https://wa.me/?text=' + encodeURIComponent(acertoTxt(mk(), acerto(mk()))), '_blank');
     else if (act === 'ref-copy') { await copyText(refLink()); toast('Link copiado ✓'); }
     else if (act === 'ref-wa') window.open('https://wa.me/?text=' + encodeURIComponent(refMsg()), '_blank');
+    else if (act === 'onb-solo') { store.set('fc-solo-' + S.me.id, '1'); render(); }
     else if (act === 'onb-hide') { store.set('fc-onb-off-' + S.me.id, '1'); render(); }
     else if (act === 'onb-bill') { S.tab = 'bills'; render(); openForm('bills'); }
     else if (act === 'onb-member') { S.tab = 'conta'; render(); setTimeout(() => ($('#memberForm') || $('#refCard'))?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 80); }
@@ -2640,7 +2643,7 @@ document.addEventListener('click', async e => {
     else if (act === 'push-off') { b.disabled = true; await disablePush(); toast('Avisos desativados'); renderDeviceCards(); }
     else if (act === 'push-test') { b.disabled = true; await api('/api/push?action=test', { method: 'POST', body: {} }); toast('Aviso de teste enviado ✓'); b.disabled = false; }
     else if (act === 'install') { const ev = S.installEvt; if (ev) { ev.prompt(); await ev.userChoice.catch(() => {}); S.installEvt = null; renderDeviceCards(); } }
-    else if (act === 'camp-copy') { await copyText(`${location.origin}/?convite=${encodeURIComponent(b.dataset.code)}`); toast('Link copiado ✓'); }
+    else if (act === 'camp-copy') { await copyText(`${SITE}/?convite=${encodeURIComponent(b.dataset.code)}`); toast('Link copiado ✓'); }
     else if (act === 'camp-toggle') { await api('/api/admin?action=campaign-toggle', { method: 'POST', body: { code: b.dataset.code } }); renderAdmin(); }
     else if (act === 'member-pass') {
       const m = S.members.find(x => x.id === id);

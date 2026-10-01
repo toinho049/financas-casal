@@ -8,12 +8,12 @@ Front-end em HTML/JS puro + funções serverless da Vercel + Postgres (Neon).
 
 ## Novidades (setembro/2026)
 
-- **Indique um casal**: cada conta tem um link (`/?indica=CODIGO`, aba Conta). Quando o casal indicado faz o 1º pagamento, quem indicou ganha 30 dias (uma vez por casal indicado) e recebe aviso no celular.
+- **Indique e ganhe**: cada conta tem um link (`/?indica=CODIGO`, aba Conta, sempre no domínio oficial). Quando a pessoa indicada faz o 1º pagamento, quem indicou ganha 30 dias (uma vez por indicado) e recebe aviso no celular.
 - **Primeiros passos** no Painel: lançar, cadastrar conta, convidar o parceiro(a), ativar avisos. Marca sozinho o que já foi feito.
 - **Conversão por canal** no Admin: cadastros, quem usou, em teste, pagaram, conversão e receita por indicação, campanha ou origem (`utm_source`, site de onde veio).
-- **Acerto do casal** no Painel: quem pagou quanto no mês e quem transfere para quem, meio a meio ou pela renda. Gastos marcados "Casal" ficam fora.
+- **Acerto do casal** no Painel (aparece quando a conta tem 2+ pessoas): quem pagou quanto no mês e quem transfere para quem, meio a meio ou pela renda. Gastos marcados "Casal" ficam fora.
 - **Cartões de crédito** (aba Contas a pagar): fechamento, vencimento e limite; cada compra no crédito escolhe o cartão e cai na fatura certa, com parcelas. Aviso no sininho e no celular quando a fatura vence.
-- **Metas do casal** (aba Metas): valor, prazo, quanto guardar por mês, guardar/retirar.
+- **Metas** (aba Metas): valor, prazo, quanto guardar por mês, guardar/retirar.
 - **Resumo do mês no celular** no dia 1 (junto com o aviso das 8h) e no sininho nos dias 1 a 3.
 - **Tema claro, escuro ou automático** (botão no topo e em Mais, no celular); a escolha fica salva no aparelho.
 - **Página de vendas** (visual escuro, com prévia animada do app) para quem não está logado (recursos, planos, dúvidas) e imagem de prévia do link (`og.png`).

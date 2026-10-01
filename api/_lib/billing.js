@@ -154,7 +154,7 @@ export async function rewardReferrer(accountId) {
     [r.referred_by]
   );
   for (const s of subs) {
-    await sendPush(s, { title: '🎉 Você ganhou 1 mês grátis', body: `Um casal que você indicou acabou de assinar. Somamos ${REF_DAYS} dias ao seu acesso.`, url: '/?tab=conta' },
+    await sendPush(s, { title: '🎉 Você ganhou 1 mês grátis', body: `Alguém que você indicou acabou de assinar. Somamos ${REF_DAYS} dias ao seu acesso.`, url: '/?tab=conta' },
       process.env.APP_URL || 'https://www.financasdocasal.sbs').catch(() => {});
   }
   return true;
