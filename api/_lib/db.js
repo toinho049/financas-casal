@@ -124,6 +124,42 @@ const DDL = [
     day DATE NOT NULL,
     PRIMARY KEY (sub_id, day)
   )`,
+  // Indicação, origem do cadastro e forma de dividir as contas (acerto do casal)
+  `ALTER TABLE accounts ADD COLUMN IF NOT EXISTS ref_code TEXT`,
+  `ALTER TABLE accounts ADD COLUMN IF NOT EXISTS referred_by INTEGER`,
+  `ALTER TABLE accounts ADD COLUMN IF NOT EXISTS ref_rewarded BOOLEAN NOT NULL DEFAULT false`,
+  `ALTER TABLE accounts ADD COLUMN IF NOT EXISTS origem TEXT`,
+  `ALTER TABLE accounts ADD COLUMN IF NOT EXISTS split_mode TEXT`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS accounts_ref_code_idx ON accounts(ref_code) WHERE ref_code IS NOT NULL`,
+  `CREATE INDEX IF NOT EXISTS accounts_referred_idx ON accounts(referred_by)`,
+  // Cartões de crédito e faturas
+  `CREATE TABLE IF NOT EXISTS cards (
+    id SERIAL PRIMARY KEY,
+    account_id INTEGER NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    closing_day INTEGER NOT NULL CHECK (closing_day BETWEEN 1 AND 31),
+    due_day INTEGER NOT NULL CHECK (due_day BETWEEN 1 AND 31),
+    credit_limit NUMERIC(12,2),
+    created_at TIMESTAMPTZ DEFAULT now()
+  )`,
+  `ALTER TABLE transactions ADD COLUMN IF NOT EXISTS card_id INTEGER`,
+  `CREATE TABLE IF NOT EXISTS card_paid (
+    account_id INTEGER NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+    card_id INTEGER NOT NULL REFERENCES cards(id) ON DELETE CASCADE,
+    month TEXT NOT NULL,
+    paid_at TIMESTAMPTZ DEFAULT now(),
+    PRIMARY KEY (card_id, month)
+  )`,
+  // Metas do casal
+  `CREATE TABLE IF NOT EXISTS goals (
+    id SERIAL PRIMARY KEY,
+    account_id INTEGER NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    target NUMERIC(14,2) NOT NULL CHECK (target > 0),
+    saved NUMERIC(14,2) NOT NULL DEFAULT 0 CHECK (saved >= 0),
+    deadline DATE,
+    created_at TIMESTAMPTZ DEFAULT now()
+  )`,
 ];
 
 // Usuários antigos da variável USERS ("nome:senha;nome:senha") viram a conta

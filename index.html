@@ -325,6 +325,58 @@ nav.tabs button.on{border-image:linear-gradient(90deg,var(--pri),var(--pri2)) 1}
 .day-h:first-child{border-top:0}
 .list .day-h+.row{border-top:0}
 .mob{display:none}
+/* Primeiros passos */
+.onb{margin-bottom:14px}
+.onb-h{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.onb-h h3{margin:0}.onb-h .n{font-size:13px;color:var(--mut)}
+.onb-i{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--bd)}
+.onb-i .ck{width:26px;height:26px;border-radius:50%;border:2px solid var(--bd);display:grid;place-items:center;flex-shrink:0;font-size:14px;color:#fff}
+.onb-i.ok .ck{background:linear-gradient(135deg,var(--pri),var(--pri2));border-color:transparent}
+.onb-i .tx{flex:1;min-width:0}.onb-i .tx b{display:block;font-weight:600}.onb-i .tx span{font-size:12.5px;color:var(--mut)}
+.onb-i.ok .tx b{color:var(--mut);text-decoration:line-through}
+/* Acerto do casal */
+.ac-row{display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:10px 0;border-top:1px solid var(--bd)}
+.ac-row .nm{font-weight:600}.ac-row .pg{font-weight:700;font-variant-numeric:tabular-nums;text-align:right}
+.ac-row .sb{font-size:12.5px;color:var(--mut)}.ac-row .sb2{font-size:12.5px;text-align:right}
+.ac-res{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:14px;background:var(--pri-soft);margin:12px 0 4px}
+.ac-res .ai{font-size:24px}.ac-res b{display:block;font-size:15.5px}.ac-res span{font-size:12.5px;color:var(--mut)}
+.seg.mini{margin:0;display:inline-flex}.seg.mini span{padding:5px 10px;font-size:13px;white-space:nowrap}
+/* Cartões */
+.cc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-bottom:6px}
+.cc{position:relative;overflow:hidden;border-radius:18px;padding:16px 18px;color:#fff;background:linear-gradient(135deg,#1e293b,#0f172a);box-shadow:0 10px 30px rgba(0,0,0,.18)}
+.cc::after{content:"";position:absolute;right:-60px;top:-60px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.14),transparent 70%)}
+.cc .cc-h{display:flex;align-items:center;gap:8px;position:relative;z-index:1}
+.cc .cc-h b{font-size:16px}.cc .cc-h .ghost{color:rgba(255,255,255,.75)}
+.cc .cc-l{font-size:12.5px;opacity:.75;margin-top:10px}
+.cc .cc-v{font-size:27px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.cc .cc-s{font-size:12.5px;opacity:.85}
+.cc .cc-bar{height:6px;border-radius:9px;background:rgba(255,255,255,.18);overflow:hidden;margin:10px 0 4px}.cc .cc-bar i{display:block;height:100%;background:#fff;border-radius:9px}
+.cc .cc-a{display:flex;gap:8px;margin-top:12px;position:relative;z-index:1;flex-wrap:wrap}
+.cc .cc-a .btn{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.22);color:#fff}
+.cc .pill{background:rgba(255,255,255,.16);color:#fff;border:0}
+.cc details{position:relative;z-index:1;margin-top:10px}.cc summary{cursor:pointer;font-size:13px;opacity:.9}
+.cc .cc-it{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:6px 0;border-top:1px solid rgba(255,255,255,.12)}
+.cc-empty{display:flex;gap:14px;align-items:center}
+/* Metas */
+.goals{grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
+.goal{cursor:pointer}
+.goal .g-h{display:flex;align-items:center;gap:12px}
+.goal .g-ic{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-size:22px;background:var(--pri-soft);flex-shrink:0}
+.goal .g-h b{display:block;font-size:16px}.goal .g-h small{color:var(--mut);font-size:12.5px}
+.goal .g-pct{margin-left:auto;font-size:18px;font-weight:800;color:var(--pri)}
+.goal .g-s{font-size:13.5px;color:var(--mut)}.goal .g-s b{color:var(--tx)}
+.goal .g-tip{font-size:13px;margin-top:6px;padding:8px 10px;border-radius:10px;background:var(--bg)}
+.goal .g-a{display:flex;gap:8px;margin-top:12px}
+.goal.done .g-ic{background:linear-gradient(135deg,var(--pri),var(--pri2))}
+.g-sug{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px}
+.g-mini{display:grid;grid-template-columns:auto 1fr auto;gap:4px 10px;align-items:center;padding:8px 0;border-top:1px solid var(--bd)}
+.g-mini .hbar{grid-column:2/3;margin:0}
+/* Indicação */
+.ref-link{display:flex;gap:8px;align-items:center;margin:12px 0}
+.ref-link code{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:10px 12px;border:1px dashed var(--pri);border-radius:10px;background:var(--pri-soft);color:var(--tx);font-size:13.5px}
+.ref-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}
+.ref-stats div{background:var(--bg);border-radius:12px;padding:10px 12px}.ref-stats b{display:block;font-size:20px}.ref-stats span{font-size:12px;color:var(--mut)}
+@media (max-width:640px){.cc-grid{grid-template-columns:1fr}.ref-link{flex-wrap:wrap}.ref-link code{flex-basis:100%}.ref-link .btn{flex:1}}
 .section-t{margin:22px 0 8px;font-size:13px;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:.04em}
 
 /* Form / dialog */
@@ -474,6 +526,7 @@ dialog.wide{width:min(900px,calc(100vw - 24px))}
   </div>
   <div class="auth-wrap">
     <div class="pitch">
+      <div class="trial-badge hidden" id="refBadge">💚 Você recebeu o convite de um casal amigo</div>
       <div class="trial-badge hidden" id="trialBadge"></div>
       <h1>O dinheiro de vocês dois, <span class="grad">num lugar só.</span></h1>
       <p class="lp-sub">Contas a pagar, gastos do mês, orçamento e investimentos do casal, com aviso no celular antes de vencer. Cada um com seu login, os mesmos números.</p>
@@ -647,6 +700,7 @@ dialog.wide{width:min(900px,calc(100vw - 24px))}
       <button data-act="tab" data-tab="transactions">Entradas e saídas</button>
       <button data-act="tab" data-tab="bills">Contas a pagar</button>
       <button data-act="tab" data-tab="budgets">Orçamento</button>
+      <button data-act="tab" data-tab="goals">Metas</button>
       <button data-act="tab" data-tab="investments">Investimentos</button>
       <button data-act="tab" data-tab="conta">Conta</button>
       <button data-act="tab" data-tab="admin" id="adminTab" class="hidden">Admin</button>
@@ -667,6 +721,7 @@ dialog.wide{width:min(900px,calc(100vw - 24px))}
 <dialog id="moreDlg" class="more-sheet" aria-label="Mais opções">
   <div class="dlg-h"><h3 id="moreWho">Mais</h3><button type="button" class="ghost" data-act="more-close" aria-label="Fechar">✕</button></div>
   <div style="padding-bottom:10px">
+    <button class="ms-item" data-act="tab" data-tab="goals"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg>Metas do casal</button>
     <button class="ms-item" data-act="tab" data-tab="investments"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>Investimentos</button>
     <button class="ms-item" data-act="tab" data-tab="conta"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Conta, plano e avisos</button>
     <button class="ms-item hidden" id="moreAdmin" data-act="tab" data-tab="admin"><svg viewBox="0 0 24 24"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/></svg>Administração</button>
@@ -685,6 +740,21 @@ dialog.wide{width:min(900px,calc(100vw - 24px))}
       <button type="button" class="btn del-btn hidden" id="dlgDel" data-act="del-edit" style="margin-right:auto;color:var(--out)">Excluir</button>
       <button type="button" class="btn" data-act="close">Cancelar</button>
       <button type="submit" class="btn pri" id="dlgSave">Salvar</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="goalDlg">
+  <form id="goalForm" method="dialog">
+    <div class="dlg-h"><h3 id="goalTitle">Guardar</h3><button type="button" class="ghost" data-act="goal-close">✕</button></div>
+    <div class="dlg-b">
+      <div id="goalInfo" class="small mut" style="margin-bottom:10px"></div>
+      <label class="f">Valor (R$)<input name="amount" inputmode="decimal" placeholder="0,00" required></label>
+      <p class="err" id="goalErr"></p>
+    </div>
+    <div class="dlg-f">
+      <button type="button" class="btn" data-act="goal-close">Cancelar</button>
+      <button type="submit" class="btn pri" id="goalSave">Confirmar</button>
     </div>
   </form>
 </dialog>
@@ -778,7 +848,7 @@ const CATS = {
 const KINDS = ['Tesouro Direto','CDB / LCI / LCA','Poupança','Ações','FIIs','Fundos','Cripto','Previdência','Reserva de emergência','Outros'];
 const PALETTE = ['#0f8a5f','#2f6fdb','#e0913a','#9b5de5','#d14343','#1fa2a8','#c9a227','#6c7a89','#e05599','#5aa84a'];
 
-const S = { user: null, users: [], tx: [], bills: [], inv: [], tab: 'painel', charts: {}, f: { type: '', person: '', method: '' } };
+const S = { user: null, users: [], tx: [], bills: [], inv: [], cards: [], cardPaid: [], goals: [], tab: 'painel', charts: {}, f: { type: '', person: '', method: '' } };
 const now = new Date(); S.y = now.getFullYear(); S.m = now.getMonth() + 1;
 const mk = () => `${S.y}-${pad(S.m)}`;
 
@@ -797,10 +867,10 @@ async function api(path, opt = {}) {
   return d;
 }
 async function load(res) {
-  const key = { transactions: 'tx', bills: 'bills', investments: 'inv', budgets: 'budgets' }[res];
+  const key = { transactions: 'tx', bills: 'bills', investments: 'inv', budgets: 'budgets', cards: 'cards', card_paid: 'cardPaid', goals: 'goals' }[res];
   S[key] = await api(`/api/data?r=${res}`);
 }
-const loadAll = () => Promise.all(['transactions', 'bills', 'investments', 'budgets'].map(load));
+const loadAll = () => Promise.all(['transactions', 'bills', 'investments', 'budgets', 'cards', 'card_paid', 'goals'].map(load));
 
 function toast(msg) {
   document.querySelectorAll('.toast').forEach(x => x.remove());
@@ -814,7 +884,7 @@ const show = id => views.forEach(v => $(v).classList.toggle('hidden', v !== id))
 
 function applyMe(d) {
   S.me = d.user; S.account = d.account; S.members = d.members; S.plans = d.plans;
-  S.user = d.user.name; S.users = d.members.map(m => m.name); S.mail = d.mail;
+  S.user = d.user.name; S.users = d.members.map(m => m.name); S.mail = d.mail; S.referral = d.referral || {};
   $('#adminTab').classList.toggle('hidden', !d.user.admin);
   $('#moreAdmin').classList.toggle('hidden', !d.user.admin);
   $('#moreWho').textContent = `Olá, ${cap(d.user.name.split(' ')[0])}`;
@@ -849,6 +919,26 @@ const store = {
 };
 S.convite = (new URLSearchParams(location.search).get('convite') || store.get('fc-convite') || '').trim().toUpperCase();
 if (S.convite) store.set('fc-convite', S.convite);
+// Indique um casal (?indica=CODIGO) e de onde a pessoa veio (primeiro acesso)
+{
+  const qs0 = new URLSearchParams(location.search);
+  S.indica = (qs0.get('indica') || store.get('fc-indica') || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 12);
+  if (S.indica) store.set('fc-indica', S.indica);
+  if (!store.get('fc-origem')) {
+    let o = (qs0.get('utm_source') || qs0.get('origem') || '').toLowerCase();
+    if (o === 'app') o = '';
+    if (!o && document.referrer) {
+      try {
+        const h = new URL(document.referrer).hostname.replace(/^www\./, '');
+        if (h && h !== location.hostname.replace(/^www\./, '')) {
+          o = [['tiktok', 'tiktok'], ['instagram', 'instagram'], ['facebook', 'facebook'], ['fb.', 'facebook'], ['whatsapp', 'whatsapp'], ['wa.me', 'whatsapp'],
+            ['google', 'google'], ['youtube', 'youtube'], ['kwai', 'kwai'], ['t.co', 'twitter'], ['x.com', 'twitter']].find(([k]) => h.includes(k))?.[1] || h;
+        }
+      } catch {}
+    }
+    if (o) store.set('fc-origem', o.replace(/[^a-z0-9._-]/g, '').slice(0, 40));
+  }
+}
 
 const diasTxt = d => d % 30 === 0 && d >= 60 ? `${d / 30} meses` : d === 30 ? '1 mês' : `${d} dias`;
 
@@ -911,7 +1001,8 @@ function showAuth(msg) {
     $('#lpCtaTxt').textContent = o.trial_days ? `${diasTxt(o.trial_days)} grátis, sem cartão. Leva 1 minuto.` : 'Leva 1 minuto para criar a conta.';
     $('#trialBadge').textContent = o.trial_days ? `🎁 Teste grátis por ${diasTxt(o.trial_days)} · sem cartão` : '';
     $('#trialBadge').classList.toggle('hidden', !o.trial_days);
-    if (o.campaign && o.trial_days && !$('#auth').dataset.touched) setAuthMode('signup');
+    $('#refBadge').classList.toggle('hidden', !S.indica);
+    if (((o.campaign && o.trial_days) || S.indica) && !$('#auth').dataset.touched) setAuthMode('signup');
     else setAuthMode(authMode);
   }).catch(() => {});
 }
@@ -975,9 +1066,9 @@ $('#authForm').addEventListener('submit', async e => {
   try {
     if (authMode === 'signup' && !f.get('terms')) throw new Error('Para criar a conta, aceite os Termos de Uso e a Política de Privacidade.');
     const body = authMode === 'reset' ? { token: resetToken, password: f.get('password') }
-      : { name: f.get('name'), email: f.get('email'), password: f.get('password'), terms: !!f.get('terms'), convite: S.convite };
+      : { name: f.get('name'), email: f.get('email'), password: f.get('password'), terms: !!f.get('terms'), convite: S.convite, indica: S.indica, origem: store.get('fc-origem') || '' };
     const d = await api(`/api/auth?action=${authMode}`, { method: 'POST', body });
-    if (authMode === 'signup') store.del('fc-convite');
+    if (authMode === 'signup') { store.del('fc-convite'); store.del('fc-indica'); }
     if (authMode === 'forgot') { $('#authOk').textContent = d.message; $('#authOk').classList.remove('hidden'); return; }
     const wasReset = authMode === 'reset';
     applyMe(d); e.target.reset(); setAuthMode('login'); resetToken = null; route();
@@ -1013,8 +1104,8 @@ paintThemeUI();
   }
   const reset = qs.get('reset');
   const tabQ = qs.get('tab');
-  if (['painel', 'transactions', 'bills', 'budgets', 'investments', 'conta'].includes(tabQ)) S.tab = tabQ;
-  if (pago || reset || tabQ || qs.get('convite') || qs.get('origem')) history.replaceState(null, '', location.pathname);
+  if (['painel', 'transactions', 'bills', 'budgets', 'goals', 'investments', 'conta'].includes(tabQ)) S.tab = tabQ;
+  if (pago || reset || tabQ || qs.get('convite') || qs.get('origem') || qs.get('indica') || qs.get('utm_source')) history.replaceState(null, '', location.pathname);
   if (reset) { resetToken = reset; showAuth(); setAuthMode('reset'); return; }
   try {
     await loadMe();
@@ -1032,11 +1123,11 @@ function render() {
     b.classList.toggle('on', b.dataset.tab === S.tab);
     if (b.closest('.bnav')) b.toggleAttribute('aria-current', b.dataset.tab === S.tab);
   });
-  $('#bnMore').classList.toggle('on', ['investments', 'conta', 'admin'].includes(S.tab));
+  $('#bnMore').classList.toggle('on', ['investments', 'goals', 'conta', 'admin'].includes(S.tab));
   $('#fab').classList.toggle('hidden', ['painel', 'conta', 'admin'].includes(S.tab));
-  $('.month').style.visibility = ['conta', 'admin'].includes(S.tab) ? 'hidden' : '';
+  $('.month').style.visibility = ['conta', 'admin', 'goals'].includes(S.tab) ? 'hidden' : '';
   Object.values(S.charts).forEach(c => c.destroy()); S.charts = {};
-  ({ painel: renderPainel, transactions: renderTx, bills: renderBills, budgets: renderBudgets, investments: renderInv, conta: renderConta, admin: renderAdmin })[S.tab]();
+  ({ painel: renderPainel, transactions: renderTx, bills: renderBills, budgets: renderBudgets, goals: renderGoals, investments: renderInv, conta: renderConta, admin: renderAdmin })[S.tab]();
   refreshAlerts();
 }
 
@@ -1059,6 +1150,10 @@ async function renderAdmin() {
       <div class="card kpi"><div class="l">Cadastraram e não pagaram</div><div class="v">${s.sem_pagamento}</div></div>
       <div class="card kpi"><div class="l">Vencidas</div><div class="v ${s.vencidas ? 'out' : ''}">${s.vencidas}</div><div class="s">inclui testes que acabaram</div></div>
     </div>
+    <div class="section-t" style="display:flex;align-items:center">Conversão por canal<div class="spacer"></div>
+      <select id="funDias" style="border:1px solid var(--bd);background:var(--card);border-radius:10px;padding:5px 8px;text-transform:none;letter-spacing:0;font-weight:500">
+        <option value="7">Últimos 7 dias</option><option value="30" selected>Últimos 30 dias</option><option value="90">Últimos 90 dias</option><option value="0">Desde o início</option></select></div>
+    <div id="funBox"><div class="card"><div class="empty">Carregando…</div></div></div>
     <div class="section-t">Teste grátis e campanhas</div>
     <div class="card" style="display:grid;gap:18px">
       <form id="trialForm" class="feature-row">
@@ -1108,6 +1203,25 @@ async function renderAdmin() {
     }).join('') || '<tr><td colspan="8" class="mut">Nenhuma conta encontrada</td></tr>';
   };
   rows(); $('#admSearch').oninput = rows;
+  const funil = async () => {
+    try {
+      const f = await api('/api/admin?action=funnel&dias=' + $('#funDias').value);
+      const tot = f.rows.reduce((a, r) => ({ cadastros: a.cadastros + r.cadastros, usaram: a.usaram + r.usaram, em_teste: a.em_teste + r.em_teste, pagaram: a.pagaram + r.pagaram, receita: a.receita + r.receita }), { cadastros: 0, usaram: 0, em_teste: 0, pagaram: 0, receita: 0 });
+      const pct = (a, b) => b ? Math.round(a / b * 100) + '%' : '—';
+      const linha = (r, b) => `<tr${b ? ' style="font-weight:700"' : ''}><td>${esc(r.canal)}</td><td>${r.cadastros}</td><td>${r.usaram} <span class="mut">(${pct(r.usaram, r.cadastros)})</span></td>
+        <td>${r.em_teste}</td><td>${r.pagaram}</td><td><b class="${r.pagaram ? 'in' : ''}">${pct(r.pagaram, r.cadastros)}</b></td><td>${fm(r.receita)}</td></tr>`;
+      $('#funBox').innerHTML = `<div class="grid kpis">
+          <div class="card kpi"><div class="l">Cadastros</div><div class="v">${tot.cadastros}</div><div class="s">${tot.usaram} começaram a usar (${pct(tot.usaram, tot.cadastros)})</div></div>
+          <div class="card kpi"><div class="l">Viraram pagantes</div><div class="v in">${tot.pagaram}</div><div class="s">conversão de ${pct(tot.pagaram, tot.cadastros)} · ${tot.em_teste} ainda em teste</div></div>
+          <div class="card kpi"><div class="l">Receita desses cadastros</div><div class="v">${fm(tot.receita)}</div><div class="s">${tot.pagaram ? fm(tot.receita / tot.pagaram) + ' por pagante' : '&nbsp;'}</div></div></div>
+        <div class="card tbl-wrap" style="padding:4px 6px"><table class="tbl"><thead><tr><th>Canal</th><th>Cadastros</th><th>Usaram</th><th>Em teste</th><th>Pagaram</th><th>Conversão</th><th>Receita</th></tr></thead>
+          <tbody>${f.rows.map(r => linha(r)).join('') || '<tr><td colspan="7" class="mut">Nenhum cadastro no período</td></tr>'}${f.rows.length > 1 ? linha({ canal: 'Total', ...tot }, 1) : ''}</tbody></table></div>
+        <p class="small mut" style="margin:8px 0 0">De onde vem cada cadastro: link de indicação, link de campanha (<span class="code">?convite=</span>), ou o site de onde a pessoa chegou (TikTok, Instagram…). Para separar por rede, use links como <span class="code">${esc(location.origin)}/?convite=2MESES&amp;utm_source=tiktok</span>.</p>
+        ${f.top.length ? `<div class="card tbl-wrap" style="padding:4px 6px;margin-top:10px"><table class="tbl"><thead><tr><th>Quem mais indica</th><th>E-mail</th><th>Indicados</th><th>Assinaram</th></tr></thead>
+          <tbody>${f.top.map(t => `<tr><td>${esc(t.name)}</td><td class="mut">${esc(t.email || '—')}</td><td>${t.indicados}</td><td>${t.pagaram}</td></tr>`).join('')}</tbody></table></div>` : ''}`;
+    } catch (err) { if (err.message !== 'auth') $('#funBox').innerHTML = `<div class="card"><div class="empty">Erro: ${esc(err.message)}</div></div>`; }
+  };
+  $('#funDias').onchange = funil; funil();
   $('#trialForm').onsubmit = async e => {
     e.preventDefault();
     try { await api('/api/admin?action=trial', { method: 'POST', body: { days: Number(new FormData(e.target).get('days')) } }); toast('Teste grátis salvo ✓'); renderAdmin(); }
@@ -1126,6 +1240,22 @@ async function copyText(t) {
   catch { const x = document.createElement('textarea'); x.value = t; document.body.appendChild(x); x.select(); document.execCommand('copy'); x.remove(); }
 }
 
+const refLink = () => S.referral?.code ? `${location.origin}/?indica=${S.referral.code}` : '';
+const refMsg = () => `Oi! Eu e meu amor usamos o Finanças do Casal para organizar as contas: aviso antes de vencer, acerto de quem pagou o quê e metas juntos. Cria a conta de vocês por este link: ${refLink()}`;
+function refCard() {
+  const r = S.referral || {};
+  if (!r.code) return '';
+  return `<div class="card" id="refCard">
+    <h3>💚 Indique um casal e ganhe 1 mês</h3>
+    <p class="small mut" style="margin:-4px 0 0">Mande o seu link para casais amigos. Quando um deles assinar, vocês ganham <b>30 dias grátis</b>. Sem limite: 5 casais, 5 meses.</p>
+    <div class="ref-link"><code id="refLinkTxt">${esc(refLink())}</code>
+      <button class="btn" data-act="ref-copy">Copiar</button><button class="btn wa" data-act="ref-wa">📲 WhatsApp</button></div>
+    <div class="ref-stats">
+      <div><b>${r.signups}</b><span>criaram conta</span></div>
+      <div><b>${r.paid}</b><span>assinaram</span></div>
+      <div><b class="in">${r.days}</b><span>dias ganhos</span></div></div>
+  </div>`;
+}
 function renderConta() {
   const a = S.account, owner = S.me.role === 'owner';
   const vital = a.plan === 'vitalicio';
@@ -1141,6 +1271,7 @@ function renderConta() {
         <button class="btn">Salvar</button>
       </div><p class="err" id="profileErr"></p></form>
     </div>
+    ${refCard()}
     <div class="card">
       <h3>Assinatura</h3>
       <div class="kpi"><div class="l">${esc(a.name)}</div>
@@ -1230,6 +1361,30 @@ function buildNotifs() {
       title: `${oq} termina ${dl <= 1 ? 'amanhã' : `em ${dl} dias`}`, desc: `Renove para continuar com acesso. Vence em ${fd(a.paid_until)}.` });
   }
   for (const n of budgetNotifs()) list.push(n);
+  // Faturas de cartão vencendo
+  for (const c of S.cards || []) {
+    const [ty, tm] = t.split('-').map(Number);
+    for (const [y, m] of [[ty, tm], [tm === 12 ? ty + 1 : ty, tm === 12 ? 1 : tm + 1]]) {
+      const f = invoiceOf(c, y, m);
+      if (!f.total || f.paid || f.due < addDays(t, -5) || f.due > addDays(t, 3)) continue;
+      const quando = f.due < t ? `venceu em ${fd(f.due).slice(0, 5)}` : f.due === t ? 'vence hoje' : f.due === addDays(t, 1) ? 'vence amanhã' : `vence em ${fd(f.due).slice(0, 5)}`;
+      list.push({ id: `fat-${c.id}-${f.key}-${f.due <= t ? 'h' : 'p'}`, kind: f.due <= t ? 'late' : 'warn', ord: f.due <= t ? 0 : 2, tab: 'bills',
+        title: `Fatura ${c.name} ${quando}`, desc: fm(f.total) });
+    }
+  }
+  // Resumo do mês que acabou (dias 1 a 3)
+  if (+t.slice(8) <= 3) {
+    const [ty, tm] = t.split('-').map(Number), pk = tm === 1 ? `${ty - 1}-12` : `${ty}-${pad(tm - 1)}`;
+    const txp = (S.tx || []).filter(x => x.date.startsWith(pk));
+    if (txp.length) {
+      const e = sum(txp.filter(x => x.type === 'entrada')), sa = sum(txp.filter(x => x.type === 'saida')), r = e - sa;
+      list.push({ id: `resumo-${pk}`, kind: 'ok', ord: 4, tab: 'painel', title: `Resumo de ${MESES[+pk.slice(5) - 1].toLowerCase()}`,
+        desc: `${r >= 0 ? 'Sobrou' : 'Faltou'} ${fm(Math.abs(r))} · entrou ${fm(e)}, saiu ${fm(sa)}` });
+    }
+  }
+  // Indicação que virou assinatura
+  if (S.referral?.paid) list.push({ id: `ref-${S.referral.paid}`, kind: 'ok', ord: 5, tab: 'conta',
+    title: '🎉 Um casal que você indicou assinou', desc: `Você já ganhou ${S.referral.days} dias grátis. Indique mais!` });
   return list.sort((x, y) => x.ord - y.ord);
 }
 
@@ -1449,6 +1604,192 @@ function dayLabel(s) {
 }
 const dateBox = s => `<div class="date"><b>${s.slice(8,10)}</b><small>${MES_C[+s.slice(5,7)-1]}</small></div>`;
 
+/* ---------- Cartão de crédito: em qual fatura cada compra cai ---------- */
+const dim = (y, m) => new Date(y, m, 0).getDate();
+const ymdN = (y, m, d) => { while (m < 1) { m += 12; y--; } while (m > 12) { m -= 12; y++; } return `${y}-${pad(m)}-${pad(Math.min(d, dim(y, m)))}`; };
+// Fatura que VENCE no mês (y, m): compras de (from, to]
+function invoiceRange(c, y, m) {
+  const cm = c.due_day > c.closing_day ? m : m - 1;
+  return { from: ymdN(y, cm - 1, c.closing_day), to: ymdN(y, cm, c.closing_day), due: ymdN(y, m, c.due_day), key: ymdN(y, m, 1).slice(0, 7) };
+}
+// Mês de vencimento (AAAA-MM) da fatura em que cai uma compra
+function invoiceKeyOf(c, date) {
+  let [y, m, d] = date.split('-').map(Number);
+  if (d > Math.min(c.closing_day, dim(y, m))) m++;          // passou do fechamento: vai para a próxima
+  if (c.due_day <= c.closing_day) m++;                         // vence no mês seguinte ao fechamento
+  return ymdN(y, m, 1).slice(0, 7);
+}
+const cardTx = c => S.tx.filter(t => t.card_id === c.id && t.type === 'saida');
+const invPaid = (c, key) => S.cardPaid.some(p => p.card_id === c.id && p.month === key);
+function invoiceOf(c, y, m) {
+  const r = invoiceRange(c, y, m);
+  const items = cardTx(c).filter(t => t.date > r.from && t.date <= r.to).sort((a, b) => a.date.localeCompare(b.date));
+  return { ...r, items, total: sum(items), paid: invPaid(c, r.key) };
+}
+// Limite usado: compras das faturas que ainda não venceram e não foram pagas
+const cardUsed = c => sum(cardTx(c).filter(t => { const k = invoiceKeyOf(c, t.date); return !invPaid(c, k) && k >= today().slice(0, 7); }));
+
+/* ---------- Acerto do casal ---------- */
+function acerto(k) {
+  const people = S.users;
+  const txm = S.tx.filter(t => t.date.startsWith(k));
+  const pago = Object.fromEntries(people.map(p => [p, 0])), renda = Object.fromEntries(people.map(p => [p, 0]));
+  let comum = 0;
+  for (const t of txm) {
+    if (t.type === 'saida') { if (t.person in pago) pago[t.person] += t.amount; else comum += t.amount; }
+    else if (t.person in renda) renda[t.person] += t.amount;
+  }
+  const add = o => Object.values(o).reduce((x, y) => x + y, 0);
+  const total = add(pago), totRenda = add(renda);
+  const modo = S.account.split_mode === 'renda' && totRenda > 0 ? 'renda' : 'igual';
+  const rows = people.map(p => {
+    const parte = modo === 'renda' ? renda[p] / totRenda : 1 / people.length;
+    return { p, pago: pago[p], parte, justo: total * parte, saldo: pago[p] - total * parte };
+  });
+  // Quem deve transfere para quem pagou a mais
+  const dev = rows.filter(r => r.saldo < -0.005).map(r => ({ ...r, v: -r.saldo })).sort((a, b) => b.v - a.v);
+  const cre = rows.filter(r => r.saldo > 0.005).map(r => ({ ...r, v: r.saldo })).sort((a, b) => b.v - a.v);
+  const transf = [];
+  for (const d of dev) for (const c of cre) {
+    const v = Math.min(d.v, c.v); if (v < 0.01) continue;
+    transf.push({ de: d.p, para: c.p, v }); d.v -= v; c.v -= v;
+  }
+  return { rows, transf, total, comum, modo, pediuRenda: S.account.split_mode === 'renda', semRenda: totRenda <= 0 };
+}
+function acertoTxt(k, a) {
+  const mes = `${MESES[+k.slice(5) - 1].toLowerCase()}`;
+  return [`💚 *Acerto de ${mes}* (${a.modo === 'renda' ? 'pela renda' : 'meio a meio'})`, '',
+    ...a.rows.map(r => `• ${cap(r.p)} pagou ${fm(r.pago)} (parte justa ${fm(r.justo)})`), '',
+    ...(a.transf.length ? a.transf.map(t => `👉 ${cap(t.de)} transfere *${fm(t.v)}* para ${cap(t.para)}`) : ['✅ Tudo certo, ninguém deve nada.']),
+    '', '_Finanças do Casal_'].join('\n');
+}
+function acertoCard(k) {
+  if (S.users.length < 2) return `<div class="card"><h3>Acerto do casal</h3>
+    <p class="small mut" style="margin:0 0 10px">Veja quem pagou quanto no mês e quanto um deve ao outro. Para isso, adicione quem divide as contas com você.</p>
+    <button class="btn sm" data-act="tab" data-tab="conta">Adicionar meu parceiro(a)</button></div>`;
+  const a = acerto(k);
+  return `<div class="card">
+    <div class="onb-h"><h3>Acerto de ${MESES[+k.slice(5) - 1].toLowerCase()}</h3><div class="spacer"></div>
+      <div class="seg mini" role="radiogroup" aria-label="Como dividir">
+        <label><input type="radio" name="split" value="igual" ${a.pediuRenda ? '' : 'checked'} data-act="split"><span>Meio a meio</span></label>
+        <label><input type="radio" name="split" value="renda" ${a.pediuRenda ? 'checked' : ''} data-act="split"><span>Pela renda</span></label></div></div>
+    ${a.total ? `${a.rows.map(r => `<div class="ac-row"><span class="nm">${esc(cap(r.p))}</span><span class="pg">${fm(r.pago)}</span>
+        <span class="sb">pagou · parte justa ${fm(r.justo)} (${Math.round(r.parte * 100)}%)</span>
+        <span class="sb2 ${r.saldo > 0.005 ? 'in' : r.saldo < -0.005 ? 'out' : 'mut'}">${r.saldo > 0.005 ? '+' + fm(r.saldo) : r.saldo < -0.005 ? '−' + fm(-r.saldo) : 'em dia'}</span></div>`).join('')}
+      <div class="ac-res">${a.transf.length
+        ? `<span class="ai">👉</span><div>${a.transf.map(t => `<b>${esc(cap(t.de))} transfere ${fm(t.v)} para ${esc(cap(t.para))}</b>`).join('')}<span>Assim cada um fica com a sua parte de ${fm(a.total)}</span></div>`
+        : `<span class="ai">✅</span><div><b>Tudo certo, ninguém deve nada</b><span>Cada um pagou exatamente a sua parte</span></div>`}</div>
+      ${a.pediuRenda && a.semRenda ? '<p class="small mut" style="margin:6px 0 0">Ainda não há entradas com nome neste mês, então a divisão ficou meio a meio. Lance o salário de cada um para dividir pela renda.</p>' : ''}
+      ${a.comum ? `<p class="small mut" style="margin:6px 0 0">${fm(a.comum)} em gastos marcados como "Casal" não entram no acerto.</p>` : ''}
+      <button class="btn sm wa" style="margin-top:10px" data-act="acerto-wa">📲 Mandar o acerto no WhatsApp</button>`
+    : `<p class="small mut" style="margin:0">Quando vocês lançarem os gastos com o nome de quem pagou, o acerto aparece aqui.</p>`}
+  </div>`;
+}
+
+/* ---------- Primeiros passos ---------- */
+function onbSteps() {
+  return [
+    { id: 'tx', ok: S.tx.length > 0, t: 'Lance um gasto ou uma entrada', d: 'Pode ser o mercado de hoje ou o salário.', act: 'new-tx', b: 'Lançar' },
+    { id: 'bill', ok: S.bills.length > 0, t: 'Cadastre uma conta a pagar', d: 'Luz, aluguel, internet… o app avisa antes de vencer.', act: 'onb-bill', b: 'Cadastrar' },
+    { id: 'member', ok: S.members.length > 1, t: 'Convide quem divide as contas', d: 'Cada um com seu login, os mesmos números.', act: 'onb-member', b: 'Convidar' },
+    { id: 'push', ok: S.pushOn === true, t: 'Ative o aviso no celular', d: 'Um lembrete às 8h quando algo vence.', act: 'onb-push', b: 'Ativar' },
+  ];
+}
+function onbCard() {
+  if (store.get('fc-onb-off-' + S.me.id)) return '';
+  const st = onbSteps(), feitos = st.filter(x => x.ok).length;
+  if (feitos === st.length) return '';
+  return `<div class="card onb" id="onbCard">
+    <div class="onb-h"><h3>🚀 Primeiros passos</h3><span class="n">${feitos} de ${st.length}</span><div class="spacer"></div>
+      <button class="ghost small" data-act="onb-hide" title="Esconder">Esconder</button></div>
+    <div class="hbar" style="margin:0 0 6px"><i style="width:${feitos / st.length * 100}%"></i></div>
+    ${st.map(x => `<div class="onb-i ${x.ok ? 'ok' : ''}"><span class="ck">${x.ok ? '✓' : ''}</span>
+      <div class="tx"><b>${x.t}</b><span>${x.d}</span></div>${x.ok ? '' : `<button class="btn sm pri" data-act="${x.act}">${x.b}</button>`}</div>`).join('')}
+  </div>`;
+}
+
+/* ---------- Metas ---------- */
+const GOAL_IC = [[/viag|f[eé]rias|passeio|praia/, '✈️'], [/casa|apart|im[oó]vel|entrada|reforma/, '🏠'], [/carro|moto|ve[ií]culo/, '🚗'],
+  [/reserva|emerg|seguran/, '🛟'], [/casament|noivado|lua de mel|anel|alian/, '💍'], [/beb[eê]|filho|enxoval|gravidez/, '🍼'],
+  [/estud|curso|faculdade|interc/, '🎓'], [/celular|notebook|computador|tv|eletr/, '📱'], [/d[ií]vida|quitar|empr[eé]st/, '🧾'], [/pet|cachorro|gato/, '🐾']];
+const goalIc = n => GOAL_IC.find(([re]) => re.test(String(n).toLowerCase()))?.[1] || '🎯';
+function monthsUntil(d) {
+  const [y, m] = d.split('-').map(Number), t = new Date();
+  return Math.max(1, (y - t.getFullYear()) * 12 + (m - (t.getMonth() + 1)) + (Number(d.slice(8)) >= t.getDate() ? 1 : 0));
+}
+function goalCard(g) {
+  const pct = Math.min(100, g.saved / g.target * 100), falta = Math.max(0, g.target - g.saved), done = falta <= 0.005;
+  const mes = g.deadline ? `${MES_C[+g.deadline.slice(5, 7) - 1]}/${g.deadline.slice(0, 4)}` : '';
+  const late = g.deadline && g.deadline < today() && !done;
+  const tip = done ? '🎉 Meta alcançada! Parabéns para vocês.'
+    : late ? `O prazo (${mes}) passou. Edite a meta para definir um novo prazo.`
+    : g.deadline ? `Guardem <b>${fm(falta / monthsUntil(g.deadline))}</b> por mês para chegar até ${mes}.` : '';
+  return `<div class="card goal ${done ? 'done' : ''}" data-act="goal-edit" data-id="${g.id}">
+    <div class="g-h"><span class="g-ic" aria-hidden="true">${goalIc(g.name)}</span><div><b>${esc(g.name)}</b><small>${g.deadline ? 'até ' + mes : 'sem prazo'}</small></div>
+      <span class="g-pct">${Math.floor(pct)}%</span></div>
+    <div class="hbar" role="progressbar" aria-label="${esc(g.name)}: ${Math.floor(pct)}%" aria-valuenow="${Math.floor(pct)}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct}%"></i></div>
+    <div class="g-s"><b>${fm(g.saved)}</b> de ${fm(g.target)}${done ? '' : ` · faltam ${fm(falta)}`}</div>
+    ${tip ? `<div class="g-tip">${tip}</div>` : ''}
+    <div class="g-a"><button class="btn sm pri" data-act="goal-add" data-id="${g.id}">+ Guardar</button>
+      ${g.saved > 0 ? `<button class="btn sm" data-act="goal-sub" data-id="${g.id}">Retirar</button>` : ''}</div>
+  </div>`;
+}
+function renderGoals() {
+  const tot = sum(S.goals, g => g.saved), alvo = sum(S.goals, g => g.target);
+  const sug = [['✈️', 'Viagem'], ['🛟', 'Reserva de emergência'], ['🏠', 'Entrada da casa'], ['💍', 'Casamento'], ['🚗', 'Carro novo']];
+  $('#view').innerHTML = `
+    <div class="bar"><h2>Metas do casal</h2><div class="spacer"></div><button class="btn pri desk" data-act="new">+ Meta</button></div>
+    ${S.goals.length ? `<div class="grid kpis">
+        <div class="card kpi"><div class="l">Guardado nas metas</div><div class="v in">${fm(tot)}</div><div class="s">${S.goals.length} meta(s)</div></div>
+        <div class="card kpi"><div class="l">Objetivo total</div><div class="v">${fm(alvo)}</div><div class="s">${alvo ? Math.floor(tot / alvo * 100) : 0}% do caminho</div></div>
+      </div>
+      <div class="grid goals">${S.goals.map(goalCard).join('')}</div>`
+    : `<div class="card" style="text-align:center;padding:30px 18px">
+        <div style="font-size:42px">🎯</div><h3 style="margin:8px 0 6px">Qual é o próximo sonho de vocês?</h3>
+        <p class="small mut" style="margin:0 auto;max-width:420px">Crie uma meta, defina quanto querem juntar e até quando. O app mostra quanto guardar por mês e o progresso dos dois.</p>
+        <div class="g-sug">${sug.map(([i, n]) => `<button class="btn" data-act="goal-sug" data-name="${n}">${i} ${n}</button>`).join('')}</div></div>`}`;
+}
+function goalsMini() {
+  if (!S.goals.length) return '';
+  return `<div class="card"><div class="onb-h"><h3>Metas</h3><div class="spacer"></div><button class="linkbtn small" data-act="tab" data-tab="goals">Ver todas</button></div>
+    ${S.goals.slice(0, 3).map(g => { const pct = Math.min(100, g.saved / g.target * 100); return `<div class="g-mini"><span>${goalIc(g.name)}</span>
+      <div><div style="display:flex;justify-content:space-between;font-size:13.5px"><b>${esc(g.name)}</b><span class="mut">${fm(g.saved)} de ${fm(g.target)}</span></div>
+      <div class="hbar" style="margin:6px 0 0"><i style="width:${pct}%"></i></div></div><b style="color:var(--pri)">${Math.floor(pct)}%</b></div>`; }).join('')}</div>`;
+}
+
+/* ---------- Cartões (na aba Contas a pagar) ---------- */
+function cardsSection() {
+  const k = mk();
+  const semCartao = S.tx.filter(t => t.type === 'saida' && t.method === 'Cartão de crédito' && !t.card_id && t.date.startsWith(k));
+  const tiles = S.cards.map(c => {
+    const f = invoiceOf(c, S.y, S.m), t = today();
+    const st = f.paid ? '<span class="pill">Paga ✓</span>'
+      : t <= f.to ? `<span class="pill">Aberta · fecha ${fd(f.to).slice(0, 5)}</span>`
+      : t > f.due ? '<span class="pill" style="background:rgba(248,113,113,.35)">Vencida</span>'
+      : `<span class="pill">Fechada · vence ${fd(f.due).slice(0, 5)}</span>`;
+    const used = c.credit_limit ? cardUsed(c) : 0;
+    return `<div class="cc">
+      <div class="cc-h"><b>💳 ${esc(c.name)}</b><div class="spacer"></div>${st}<button class="ghost" data-act="card-edit" data-id="${c.id}" title="Editar cartão" aria-label="Editar cartão">✎</button></div>
+      <div class="cc-l">Fatura de ${MESES[S.m - 1].toLowerCase()} · vence ${fd(f.due)}</div>
+      <div class="cc-v">${fm(f.total)}</div>
+      <div class="cc-s">${f.items.length} compra(s) de ${fd(addDays(f.from, 1)).slice(0, 5)} a ${fd(f.to).slice(0, 5)}</div>
+      ${c.credit_limit ? `<div class="cc-bar"><i style="width:${Math.min(100, used / c.credit_limit * 100)}%"></i></div>
+        <div class="cc-s">Limite: ${fm(used)} usado de ${fm(c.credit_limit)} · livre ${fm(Math.max(0, c.credit_limit - used))}</div>` : ''}
+      ${f.items.length ? `<details><summary>Ver compras</summary>${f.items.map(x => `<div class="cc-it"><span>${fd(x.date).slice(0, 5)} · ${esc(x.description)}</span><b>${fm(x.amount)}</b></div>`).join('')}</details>` : ''}
+      ${f.total ? `<div class="cc-a"><button class="btn sm" data-act="card-pay" data-id="${c.id}" data-month="${f.key}" data-paid="${f.paid ? 0 : 1}">${f.paid ? 'Desmarcar pagamento' : 'Marcar fatura como paga'}</button></div>` : ''}
+    </div>`;
+  }).join('');
+  return `<div class="section-t" style="display:flex;align-items:center">Cartões de crédito<div class="spacer"></div><button class="btn sm" data-act="card-new">+ Cartão</button></div>
+    ${S.cards.length ? `<div class="cc-grid">${tiles}</div>
+      <p class="small mut" style="margin:4px 0 0">As compras já contam nas saídas do mês em que foram feitas. A fatura mostra quanto vai sair de uma vez no vencimento.</p>`
+    : `<div class="card cc-empty"><div style="font-size:30px">💳</div><div style="flex:1"><b>Veja a fatura de cada cartão</b>
+        <div class="small mut">Cadastre o cartão com o dia de fechamento e de vencimento. As compras no crédito, inclusive as parcelas, entram sozinhas na fatura certa.</div></div>
+        <button class="btn pri" data-act="card-new">Cadastrar cartão</button></div>`}
+    ${S.cards.length && semCartao.length ? `<div class="warn-box" style="margin-top:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span style="flex:1">${semCartao.length} compra(s) no crédito em ${MESES[S.m - 1].toLowerCase()} sem cartão definido (${fm(sum(semCartao))}).</span>
+        ${S.cards.length === 1 ? `<button class="btn sm" data-act="card-assign">Colocar no ${esc(S.cards[0].name)}</button>` : '<span class="small">Toque na compra e escolha o cartão.</span>'}</div>` : ''}`;
+}
+
 function renderPainel() {
   const k = mk();
   const txm = S.tx.filter(t => t.date.startsWith(k));
@@ -1462,6 +1803,7 @@ function renderPainel() {
 
   const proximas = S.bills.filter(b => !b.paid).slice(0, 6);
 
+  if (S.pushOn === undefined) pushState().then(st => { const was = S.pushOn; S.pushOn = st === 'on'; if (was !== S.pushOn && S.tab === 'painel' && $('#onbCard')) { const el = document.createElement('div'); el.innerHTML = onbCard(); $('#onbCard').replaceWith(el.firstElementChild || document.createTextNode('')); } }).catch(() => {});
   // Destaque: quanto sobrou e o que precisa de atenção
   const res = ent - sai, mes = MESES[S.m - 1].toLowerCase();
   const pctG = ent > 0 ? sai / ent : (sai > 0 ? 1 : 0);
@@ -1480,6 +1822,7 @@ function renderPainel() {
   const vazio = !ent && !sai;
 
   $('#view').innerHTML = `
+    ${onbCard()}
     <div class="bar"><h2>Resumo do mês</h2><div class="spacer"></div>
       <button class="btn wa" data-act="wa" data-kind="resumo">📲 Enviar no WhatsApp</button></div>
     <div class="card hero">
@@ -1501,6 +1844,9 @@ function renderPainel() {
       <div><div class="l">A pagar no mês</div><div class="v ${late.length ? 'out' : ''}">${fm(sum(pend))}</div>
         <div class="s">${pend.length} conta(s)</div></div>
     </div>
+    <div class="grid charts">${acertoCard(k)}${goalsMini() || `<div class="card"><div class="onb-h"><h3>Metas do casal</h3></div>
+      <p class="small mut" style="margin:0 0 10px">Viagem, reserva de emergência, entrada da casa… Criem uma meta e acompanhem juntos.</p>
+      <button class="btn sm" data-act="tab" data-tab="goals">🎯 Criar meta</button></div>`}</div>
     <div class="grid charts">
       <div class="card"><h3>Entradas × saídas (últimos 6 meses)</h3><div class="chart-wrap"><canvas id="cBar"></canvas></div></div>
       <div class="card upc" style="padding:0">
@@ -1636,6 +1982,7 @@ function renderBills() {
       <div class="card kpi"><div class="l">Pendentes em ${MESES[S.m - 1].toLowerCase()}</div><div class="v">${fm(sum(doMes))}</div><div class="s">${doMes.length} conta(s)</div></div>
       <div class="card kpi"><div class="l">Pagas em ${MESES[S.m - 1].toLowerCase()}</div><div class="v in">${fm(sum(pagas))}</div><div class="s">${pagas.length} conta(s)</div></div>
     </div>
+    ${cardsSection()}
     ${late.length ? `<div class="section-t">Vencidas</div><div class="list">${late.map(billRow).join('')}</div>` : ''}
     <div class="section-t">Pendentes em ${MESES[S.m - 1]}</div>
     <div class="list">${doMes.filter(b => !late.includes(b)).map(billRow).join('') || '<div class="empty">Nada pendente neste mês.</div>'}</div>
@@ -1737,17 +2084,29 @@ function renderInv() {
 }
 
 /* ---------- Formulários ---------- */
-const LABEL = { transactions: 'lançamento', bills: 'conta a pagar', investments: 'investimento', budgets: 'limite de orçamento' };
+const LABEL = { transactions: 'lançamento', bills: 'conta a pagar', investments: 'investimento', budgets: 'limite de orçamento', cards: 'cartão de crédito', goals: 'meta' };
 const FORMS = {
   transactions: [
     { k: 'type', t: 'seg' },
     { k: 'description', l: 'Descrição', req: 1 },
     { k: 'amount', l: 'Valor (R$)', t: 'money', req: 1 },
     { k: 'method', l: 'Forma de pagamento', t: 'method' },
+    { k: 'card_id', l: 'Qual cartão', t: 'card' },
     { k: 'installments', l: 'Parcelas', t: 'parc', newOnly: 1 },
     { k: 'category', l: 'Categoria', t: 'cat' },
     { k: 'date', l: 'Data', t: 'date', req: 1 },
     { k: 'person', l: 'Quem', t: 'person' },
+  ],
+  cards: [
+    { k: 'name', l: 'Nome do cartão', req: 1, ph: 'Ex.: Nubank, Itaú Visa' },
+    { k: 'closing_day', l: 'Dia em que a fatura fecha', t: 'int', req: 1, ph: 'Ex.: 5' },
+    { k: 'due_day', l: 'Dia do vencimento', t: 'int', req: 1, ph: 'Ex.: 12' },
+    { k: 'credit_limit', l: 'Limite (opcional)', t: 'money' },
+  ],
+  goals: [
+    { k: 'name', l: 'Nome da meta', req: 1, ph: 'Ex.: Viagem de férias' },
+    { k: 'target', l: 'Quanto vocês querem juntar (R$)', t: 'money', req: 1 },
+    { k: 'deadline', l: 'Até quando (opcional)', t: 'date' },
   ],
   budgets: [
     { k: 'category', l: 'Categoria', t: 'cat', req: 1, ph: 'Ex.: Mercado' },
@@ -1770,13 +2129,16 @@ const FORMS = {
   ],
 };
 const DEFAULTS = {
-  transactions: () => ({ type: 'saida', date: today(), person: S.user, method: lastMethod() }),
+  transactions: () => ({ type: 'saida', date: today(), person: S.user, method: lastMethod(), card_id: lastCard() }),
   bills: () => ({ due_date: today(), recurring: false }),
   investments: () => ({ date: today(), kind: KINDS[0] }),
   budgets: () => ({ category: S.budgetCat || '' }),
+  cards: () => ({}),
+  goals: () => ({ name: S.goalName || '' }),
 };
 const METHODS = [['Pix', '⚡'], ['Cartão de crédito', '💳'], ['Cartão de débito', '💳'], ['Dinheiro', '💵'], ['Boleto', '🧾']];
 const METHOD_SHORT = { 'Cartão de crédito': 'Crédito', 'Cartão de débito': 'Débito' };
+const lastCard = () => { const id = Number(store.get('fc-card')); return S.cards.some(c => c.id === id) ? id : S.cards[0]?.id || null; };
 const lastMethod = () => { try { return localStorage.getItem('fc-method') || 'Pix'; } catch { return 'Pix'; } };
 const methodChips = (v, name = 'method') => `<div class="pm" role="radiogroup">${METHODS.map(([m, ic]) =>
   `<label><input type="radio" name="${name}" value="${esc(m)}" ${m === v ? 'checked' : ''}><span>${ic} ${esc(m)}</span></label>`).join('')}</div>`;
@@ -1795,6 +2157,10 @@ function fieldHtml(f, v) {
     case 'parc': return `<label class="f" id="parcField">${f.l}<select name="${f.k}">${PARC.map(n =>
       `<option value="${n}">${n === 1 ? 'À vista (1x)' : `Parcelado em ${n}x`}</option>`).join('')}</select>
       <span class="small mut hidden" id="parcHint" style="display:block;margin-top:6px"></span></label>`;
+    case 'int': return `<label class="f">${f.l}<input name="${f.k}" type="number" inputmode="numeric" min="1" max="31" value="${esc(v ?? '')}"${ph}${req}></label>`;
+    case 'card': return S.cards.length
+      ? `<label class="f" id="cardField">${f.l}<select name="${f.k}">${S.cards.map(c => `<option value="${c.id}" ${c.id === v ? 'selected' : ''}>💳 ${esc(c.name)}</option>`).join('')}<option value="" ${v ? '' : 'selected'}>Sem cartão definido</option></select></label>`
+      : `<p class="small mut hidden" id="cardField" style="margin:-4px 0 12px">💳 Cadastre seus cartões em <b>Contas → Cartões de crédito</b> para ver a fatura de cada mês.</p>`;
     case 'method': return `<div class="f" id="methodField"><span id="methodLbl">${f.l}</span>${methodChips(v)}</div>`;
     case 'check': return `<label class="chk"><input type="checkbox" name="${f.k}" ${v ? 'checked' : ''}> ${f.l}</label>`;
     case 'person': return `<label class="f">${f.l}<select name="${f.k}"><option value="">Casal</option>${S.users.map(u =>
@@ -1818,10 +2184,15 @@ function openForm(res, item) {
   $('#dlgErr').textContent = '';
   setCats(res === 'transactions' ? it.type : res === 'bills' || res === 'budgets' ? 'saida' : null);
   const parc = () => {
-    const sel = $('#dlgBody [name=installments]'); if (!sel) return;
+    const sel = $('#dlgBody [name=installments]');
+    if (!sel) {   // editando: só mostra/esconde o cartão
+      const cr = $('#dlgBody input[name=method]:checked')?.value === 'Cartão de crédito' && $('#dlgBody input[name=type]:checked')?.value !== 'entrada';
+      $('#cardField')?.classList.toggle('hidden', !cr); return;
+    }
     const saida = $('#dlgBody input[name=type]:checked')?.value !== 'entrada';
     const credito = $('#dlgBody input[name=method]:checked')?.value === 'Cartão de crédito';
     $('#parcField').classList.toggle('hidden', !(saida && credito));
+    $('#cardField')?.classList.toggle('hidden', !(saida && credito));
     if (!(saida && credito)) sel.value = '1';
     const n = Number(sel.value), amt = $('#dlgBody [name=amount]');
     amt.parentElement.firstChild.textContent = n > 1 ? 'Valor total da compra (R$)' : 'Valor (R$)';
@@ -1847,6 +2218,8 @@ $('#dlgForm').addEventListener('submit', async e => {
     const el = form.elements[f.k];
     if (!el) continue;
     if (f.t === 'parc') { body[f.k] = Number(el.value) || 1; continue; }
+    if (f.t === 'card') { body[f.k] = el.tagName === 'SELECT' && form.elements.method?.value === 'Cartão de crédito' ? (Number(el.value) || null) : null; continue; }
+    if (f.t === 'int') { body[f.k] = Number(el.value) || null; continue; }
     if (f.t === 'check') body[f.k] = el.checked;
     else if (f.t === 'money') {
       if (el.value.trim() === '') { body[f.k] = null; if (f.req) return ($('#dlgErr').textContent = `Informe ${f.l.toLowerCase()}`); continue; }
@@ -1859,10 +2232,23 @@ $('#dlgForm').addEventListener('submit', async e => {
   try {
     const out = await api(`/api/data?r=${res}${id ? '&id=' + id : ''}`, { method: id ? 'PUT' : 'POST', body });
     if (res === 'transactions' && body.method) { try { localStorage.setItem('fc-method', body.method); } catch {} }
+    if (res === 'transactions' && body.card_id) store.set('fc-card', body.card_id);
     await load(res); $('#dlg').close(); render();
     toast(Array.isArray(out) ? `${out.length} parcelas lançadas ✓` : 'Salvo!');
   } catch (err) { if (err.message !== 'auth') $('#dlgErr').textContent = err.message; }
   finally { $('#dlgSave').disabled = false; }
+});
+$('#goalForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const v = parseMoney(e.target.elements.amount.value);
+  if (!(v > 0)) return ($('#goalErr').textContent = 'Informe um valor maior que zero');
+  $('#goalSave').disabled = true;
+  try {
+    const g = await api(`/api/data?r=goals&action=deposit&id=${S.goalOp.id}`, { method: 'POST', body: { amount: S.goalOp.sign * v } });
+    $('#goalDlg').close(); await load('goals'); render();
+    toast(S.goalOp.sign > 0 ? (g.saved >= g.target ? '🎉 Meta alcançada!' : `${fm(v)} guardado ✓`) : `${fm(v)} retirado`);
+  } catch (err) { if (err.message !== 'auth') $('#goalErr').textContent = err.message; }
+  finally { $('#goalSave').disabled = false; }
 });
 $('#payForm').addEventListener('submit', async e => {
   e.preventDefault();
@@ -2141,7 +2527,7 @@ async function showAdmMembers() {
 
 /* ---------- Ações ---------- */
 const resOfTab = () => (S.tab === 'painel' ? 'transactions' : S.tab);
-const findItem = (res, id) => ({ transactions: S.tx, bills: S.bills, investments: S.inv, budgets: S.budgets }[res]).find(x => x.id === id);
+const findItem = (res, id) => ({ transactions: S.tx, bills: S.bills, investments: S.inv, budgets: S.budgets, cards: S.cards, goals: S.goals }[res]).find(x => x.id === id);
 
 document.addEventListener('click', async e => {
   const b = e.target.closest('[data-act]'); if (!b) return;
@@ -2191,6 +2577,40 @@ document.addEventListener('click', async e => {
       $('#payDlg').showModal();
     }
     else if (act === 'pay-close') $('#payDlg').close();
+    else if (act === 'goal-close') $('#goalDlg').close();
+    else if (act === 'goal-add' || act === 'goal-sub') {
+      const g = findItem('goals', id); S.goalOp = { id, sign: act === 'goal-add' ? 1 : -1 };
+      $('#goalTitle').textContent = act === 'goal-add' ? `Guardar em "${g.name}"` : `Retirar de "${g.name}"`;
+      $('#goalInfo').textContent = `Guardado até agora: ${fm(g.saved)} de ${fm(g.target)}`;
+      $('#goalForm').reset(); $('#goalErr').textContent = ''; $('#goalDlg').showModal();
+      setTimeout(() => $('#goalForm').elements.amount.focus(), 50);
+    }
+    else if (act === 'goal-edit') openForm('goals', findItem('goals', id));
+    else if (act === 'goal-sug') { S.goalName = b.dataset.name; openForm('goals'); S.goalName = ''; }
+    else if (act === 'card-new') openForm('cards');
+    else if (act === 'card-edit') openForm('cards', findItem('cards', id));
+    else if (act === 'card-pay') {
+      await api('/api/data?r=cards&action=invoice', { method: 'POST', body: { card_id: id, month: b.dataset.month, paid: b.dataset.paid === '1' } });
+      await load('card_paid'); render(); toast(b.dataset.paid === '1' ? 'Fatura marcada como paga ✓' : 'Pagamento desmarcado');
+    }
+    else if (act === 'card-assign') {
+      const c = S.cards[0], k = mk();
+      const list = S.tx.filter(t => t.type === 'saida' && t.method === 'Cartão de crédito' && !t.card_id && t.date.startsWith(k));
+      b.disabled = true;
+      for (const t of list) await api(`/api/data?r=transactions&id=${t.id}`, { method: 'PUT', body: { card_id: c.id } });
+      await load('transactions'); render(); toast(`${list.length} compra(s) colocadas no ${c.name} ✓`);
+    }
+    else if (act === 'split') {
+      if (b.value === (S.account.split_mode || 'igual')) return;
+      applyMe(await api('/api/auth?action=split', { method: 'POST', body: { mode: b.value } })); render();
+    }
+    else if (act === 'acerto-wa') window.open('https://wa.me/?text=' + encodeURIComponent(acertoTxt(mk(), acerto(mk()))), '_blank');
+    else if (act === 'ref-copy') { await copyText(refLink()); toast('Link copiado ✓'); }
+    else if (act === 'ref-wa') window.open('https://wa.me/?text=' + encodeURIComponent(refMsg()), '_blank');
+    else if (act === 'onb-hide') { store.set('fc-onb-off-' + S.me.id, '1'); render(); }
+    else if (act === 'onb-bill') { S.tab = 'bills'; render(); openForm('bills'); }
+    else if (act === 'onb-member') { S.tab = 'conta'; render(); setTimeout(() => ($('#memberForm') || $('#refCard'))?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 80); }
+    else if (act === 'onb-push') { S.tab = 'conta'; render(); setTimeout(() => $('#deviceCards')?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 150); }
     else if (act === 'theme') { const nx = { auto: 'dark', dark: 'light', light: 'auto' }[getTheme()]; setTheme(nx); toast(`Tema ${THEME_TXT[nx]}`); }
     else if (act === 'filters') { S.fOpen = !S.fOpen; renderTx(); }
     else if (act === 'new-tx') { S.tab = 'transactions'; render(); openForm('transactions'); }
@@ -2216,7 +2636,7 @@ document.addEventListener('click', async e => {
     else if (act === 'export-pdf') exportPDF();
     else if (act === 'notif-read') { seen.add((S.notifs || []).map(n => n.id)); toggleNotifs(false); }
     else if (act === 'notif-go') { toggleNotifs(false); S.tab = b.dataset.tab; render(); window.scrollTo(0, 0); }
-    else if (act === 'push-on') { b.disabled = true; await enablePush(); toast('Avisos ativados ✓'); renderDeviceCards(); }
+    else if (act === 'push-on') { b.disabled = true; await enablePush(); S.pushOn = true; toast('Avisos ativados ✓'); renderDeviceCards(); }
     else if (act === 'push-off') { b.disabled = true; await disablePush(); toast('Avisos desativados'); renderDeviceCards(); }
     else if (act === 'push-test') { b.disabled = true; await api('/api/push?action=test', { method: 'POST', body: {} }); toast('Aviso de teste enviado ✓'); b.disabled = false; }
     else if (act === 'install') { const ev = S.installEvt; if (ev) { ev.prompt(); await ev.userChoice.catch(() => {}); S.installEvt = null; renderDeviceCards(); } }

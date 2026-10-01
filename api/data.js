@@ -4,10 +4,25 @@ import { getSession } from './_lib/auth.js';
 
 const R = {
   transactions: {
-    fields: ['type', 'description', 'amount', 'category', 'date', 'person', 'method'],
-    select: `id, type, description, amount::float8 AS amount, category, date::text AS date, person, method, bill_id,
+    fields: ['type', 'description', 'amount', 'category', 'date', 'person', 'method', 'card_id'],
+    select: `id, type, description, amount::float8 AS amount, category, date::text AS date, person, method, card_id, bill_id,
              installment_group, installment_no, installment_total`,
     order: 'date DESC, id DESC',
+  },
+  cards: {
+    fields: ['name', 'closing_day', 'due_day', 'credit_limit'],
+    select: `id, name, closing_day, due_day, credit_limit::float8 AS credit_limit`,
+    order: 'lower(name), id',
+  },
+  card_paid: {
+    fields: [],
+    select: `card_id, month`,
+    order: 'month',
+  },
+  goals: {
+    fields: ['name', 'target', 'deadline'],
+    select: `id, name, target::float8 AS target, saved::float8 AS saved, deadline::text AS deadline`,
+    order: 'deadline NULLS LAST, id',
   },
   budgets: {
     fields: ['category', 'amount'],
@@ -31,6 +46,16 @@ const clean = (v) => (v === '' || v === undefined ? null : v);
 // Formas de pagamento aceitas (qualquer outro valor vira "não informado")
 const METHODS = ['Pix', 'Cartão de crédito', 'Cartão de débito', 'Dinheiro', 'Boleto'];
 const method = (v) => (METHODS.includes(v) ? v : null);
+const bad = (msg) => Object.assign(new Error(msg), { status: 400 });
+const day = (v) => { const n = Math.trunc(Number(v)); return n >= 1 && n <= 31 ? n : null; };
+
+// Cartão informado no lançamento precisa ser desta conta
+async function ownCard(v, acc) {
+  const id = Math.trunc(Number(v));
+  if (!id) return null;
+  const [c] = await q(`SELECT id FROM cards WHERE id = $1 AND account_id = $2`, [id, acc]);
+  return c ? c.id : null;
+}
 
 export default async function handler(req, res) {
   try {
@@ -54,6 +79,42 @@ export default async function handler(req, res) {
     }
 
     if ('method' in body) body.method = method(body.method);
+    if (table === 'transactions' && 'card_id' in body) body.card_id = await ownCard(body.card_id, acc);
+    if (table === 'card_paid' && req.method !== 'GET') return res.status(405).json({ error: 'Método não permitido' });
+
+    // Cartões: validação
+    if (table === 'cards' && (req.method === 'POST' || req.method === 'PUT') && !req.query.action) {
+      body.name = String(body.name || '').trim().slice(0, 40);
+      if (!body.name) throw bad('Informe o nome do cartão');
+      body.closing_day = day(body.closing_day); body.due_day = day(body.due_day);
+      if (!body.closing_day || !body.due_day) throw bad('Informe os dias de fechamento e de vencimento (1 a 31)');
+      if (body.credit_limit != null && body.credit_limit !== '' && !(Number(body.credit_limit) >= 0)) throw bad('Limite inválido');
+    }
+    // Fatura paga / não paga
+    if (table === 'cards' && req.method === 'POST' && req.query.action === 'invoice') {
+      const card = await ownCard(body.card_id, acc), month = String(body.month || '');
+      if (!card || !/^\d{4}-\d{2}$/.test(month)) throw bad('Fatura inválida');
+      if (body.paid) await q(`INSERT INTO card_paid (account_id, card_id, month) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING`, [acc, card, month]);
+      else await q(`DELETE FROM card_paid WHERE card_id = $1 AND month = $2 AND account_id = $3`, [card, month, acc]);
+      return res.json({ ok: true });
+    }
+    // Metas: validação e "guardar / retirar"
+    if (table === 'goals' && (req.method === 'POST' || req.method === 'PUT') && !req.query.action) {
+      body.name = String(body.name || '').trim().slice(0, 60);
+      if (!body.name) throw bad('Dê um nome para a meta');
+      if (!(Number(body.target) > 0)) throw bad('Informe quanto vocês querem juntar');
+      if (body.deadline && !/^\d{4}-\d{2}-\d{2}$/.test(String(body.deadline))) body.deadline = null;
+    }
+    if (table === 'goals' && req.method === 'POST' && req.query.action === 'deposit') {
+      const v = Number(body.amount);
+      if (!v || !isFinite(v) || Math.abs(v) > 1e9) throw bad('Valor inválido');
+      const rows = await q(
+        `UPDATE goals SET saved = GREATEST(0, saved + $1) WHERE id = $2 AND account_id = $3 RETURNING ${R.goals.select}`,
+        [Math.round(v * 100) / 100, id, acc]
+      );
+      if (!rows.length) return res.status(404).json({ error: 'Meta não encontrada' });
+      return res.json(rows[0]);
+    }
     const keys = r.fields.filter((k) => k in body);
 
     if (req.method === 'POST' && table === 'transactions' && req.query.action === 'import') {
@@ -118,6 +179,7 @@ export default async function handler(req, res) {
         );
         if (rows.length) return res.json({ ok: true, deleted: rows.length });
       }
+      if (table === 'cards') await q(`UPDATE transactions SET card_id = NULL WHERE card_id = $1 AND account_id = $2`, [id, acc]);
       await q(`DELETE FROM ${table} WHERE id = $1 AND account_id = $2`, [id, acc]);
       return res.json({ ok: true, deleted: 1 });
     }
@@ -145,11 +207,11 @@ async function createInstallments(body, acc) {
   const values = [], params = [];
   for (let i = 0; i < n; i++) {
     const p = params.length;
-    values.push(`('saida', $${p + 1}, $${p + 2}, $${p + 3}, ($${p + 4}::date + make_interval(months => ${i}))::date, $${p + 5}, $${p + 6}, $${p + 7}, ${i + 1}, ${n}, $${p + 8})`);
-    params.push(`${desc} (${i + 1}/${n})`, (i === 0 ? first : base) / 100, clean(body.category), body.date, clean(body.person), acc, group, method(body.method) || 'Cartão de crédito');
+    values.push(`('saida', $${p + 1}, $${p + 2}, $${p + 3}, ($${p + 4}::date + make_interval(months => ${i}))::date, $${p + 5}, $${p + 6}, $${p + 7}, ${i + 1}, ${n}, $${p + 8}, $${p + 9})`);
+    params.push(`${desc} (${i + 1}/${n})`, (i === 0 ? first : base) / 100, clean(body.category), body.date, clean(body.person), acc, group, method(body.method) || 'Cartão de crédito', body.card_id || null);
   }
   return q(
-    `INSERT INTO transactions (type, description, amount, category, date, person, account_id, installment_group, installment_no, installment_total, method)
+    `INSERT INTO transactions (type, description, amount, category, date, person, account_id, installment_group, installment_no, installment_total, method, card_id)
      VALUES ${values.join(',')} RETURNING ${R.transactions.select}`,
     params
   );

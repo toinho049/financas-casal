@@ -2,7 +2,7 @@ import crypto from 'node:crypto';
 import { q, getSetting } from './_lib/db.js';
 import { getSession, makeToken, setCookie, requireSecret, SESSION_SELECT } from './_lib/auth.js';
 import { hashPassword, verifyPassword } from './_lib/password.js';
-import { publicPlans, baseUrl } from './_lib/billing.js';
+import { publicPlans, baseUrl, REF_DAYS } from './_lib/billing.js';
 import { clientIp, tooMany, record, clear, isAdmin } from './_lib/security.js';
 import { sendMail, resetEmail, mailEnabled } from './_lib/mail.js';
 
@@ -10,12 +10,32 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MAX_MEMBERS = 5;
 const sha256 = (s) => crypto.createHash('sha256').update(s).digest('hex');
 
+// Código de indicação da conta (criado na primeira vez que é pedido)
+const REF_ABC = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+async function refCode(accountId) {
+  const [a] = await q(`SELECT ref_code FROM accounts WHERE id = $1`, [accountId]);
+  if (a?.ref_code) return a.ref_code;
+  for (let i = 0; i < 6; i++) {
+    const code = Array.from(crypto.randomBytes(6), (b) => REF_ABC[b % REF_ABC.length]).join('');
+    try {
+      const [r] = await q(`UPDATE accounts SET ref_code = COALESCE(ref_code, $1) WHERE id = $2 RETURNING ref_code`, [code, accountId]);
+      if (r) return r.ref_code;
+    } catch (e) { if (e.code !== '23505') throw e; }
+  }
+  return null;
+}
+
 async function mePayload(u) {
   const members = await q(`SELECT id, name, email, role FROM users WHERE account_id = $1 ORDER BY id`, [u.account_id]);
+  const [ref] = await q(
+    `SELECT count(*)::int AS signups, count(*) FILTER (WHERE ref_rewarded)::int AS paid FROM accounts WHERE referred_by = $1`,
+    [u.account_id]
+  );
   return {
     user: { id: u.id, name: u.name, email: u.email, role: u.role, admin: isAdmin(u) },
-    account: { name: u.account_name, plan: u.plan, paid_until: u.paid_until, active: u.active, days_left: u.days_left,
-      sub_status: u.subscription_status, sub_plan: u.subscription_plan },
+    account: { id: u.account_id, name: u.account_name, plan: u.plan, paid_until: u.paid_until, active: u.active, days_left: u.days_left,
+      sub_status: u.subscription_status, sub_plan: u.subscription_plan, split_mode: u.split_mode || 'igual' },
+    referral: { code: await refCode(u.account_id), signups: ref.signups, paid: ref.paid, days: ref.paid * REF_DAYS },
     members,
     plans: publicPlans(),
     mail: mailEnabled(),
@@ -117,17 +137,21 @@ export default async function handler(req, res) {
       const code = String(body.convite || '').trim().toUpperCase().slice(0, 40);
       const [camp] = code ? await q(`SELECT code, days FROM campaigns WHERE code = $1 AND active`, [code]) : [];
       const trialDays = camp ? camp.days : Math.max(0, Math.trunc(Number(await getSetting('trial_days', 0)) || 0));
+      // Indicação (?indica=CODIGO) e de onde a pessoa veio (TikTok, Instagram…)
+      const refc = String(body.indica || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 12);
+      const [refAcc] = refc ? await q(`SELECT id FROM accounts WHERE ref_code = $1`, [refc]) : [];
+      const origem = String(body.origem || '').trim().toLowerCase().replace(/[^a-z0-9._-]/g, '').slice(0, 40) || null;
 
       try {
         await q(
           `WITH a AS (
-             INSERT INTO accounts (name, plan, paid_until, campaign)
+             INSERT INTO accounts (name, plan, paid_until, campaign, referred_by, origem)
              VALUES ($1, CASE WHEN $5::int > 0 THEN 'teste' END,
-                     CASE WHEN $5::int > 0 THEN now() + make_interval(days => $5::int) END, $6)
+                     CASE WHEN $5::int > 0 THEN now() + make_interval(days => $5::int) END, $6, $7, $8)
              RETURNING id)
            INSERT INTO users (account_id, email, name, pass_hash, role, terms_at)
            SELECT id, $2, $3, $4, 'owner', now() FROM a`,
-          [String(body.account_name || `Casa de ${name.split(' ')[0]}`).slice(0, 80), email, name.slice(0, 60), hashPassword(password), trialDays, camp ? camp.code : null]
+          [String(body.account_name || `Casa de ${name.split(' ')[0]}`).slice(0, 80), email, name.slice(0, 60), hashPassword(password), trialDays, camp ? camp.code : null, refAcc ? refAcc.id : null, origem]
         );
       } catch (e) {
         if (e.code === '23505') return res.status(400).json({ error: 'Este e-mail já tem cadastro. Use "Entrar".' });
@@ -142,6 +166,11 @@ export default async function handler(req, res) {
 
     // Daqui para baixo precisa estar logado
     const me = await getSession(req);
+    if (me && action === 'split') {
+      const mode = ['igual', 'renda'].includes(body.mode) ? body.mode : 'igual';
+      await q(`UPDATE accounts SET split_mode = $1 WHERE id = $2`, [mode, me.account_id]);
+      return res.json(await mePayload(await loadUser('u.id = $1', [me.id])));
+    }
     if (!me) return res.status(401).json({ error: 'Não autenticado' });
 
     if (action === 'password') {

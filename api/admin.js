@@ -43,6 +43,39 @@ export default async function handler(req, res) {
       return res.json({ stats, revenue: rev, accounts, payments, campaigns, trial_days });
     }
 
+    // Conversão por canal: de onde vieram os cadastros e quantos viraram pagantes
+    if (req.method === 'GET' && action === 'funnel') {
+      const dias = Math.max(0, Math.min(3650, Math.trunc(Number(req.query.dias)) || 0));   // 0 = desde o início
+      const rows = await q(
+        `WITH a AS (
+           SELECT a.*,
+             CASE WHEN a.referred_by IS NOT NULL THEN 'Indicação'
+                  WHEN a.campaign IS NOT NULL THEN 'Campanha ' || a.campaign
+                  WHEN a.origem IS NOT NULL THEN initcap(a.origem)
+                  ELSE 'Direto' END AS canal,
+             (SELECT COALESCE(sum(amount), 0) FROM payments p WHERE p.account_id = a.id AND p.credited) AS receita,
+             EXISTS (SELECT 1 FROM transactions t WHERE t.account_id = a.id) AS usou
+           FROM accounts a
+           WHERE a.plan IS DISTINCT FROM 'vitalicio'
+             AND ($1::int = 0 OR a.created_at > now() - make_interval(days => $1::int)))
+         SELECT canal,
+                count(*)::int AS cadastros,
+                count(*) FILTER (WHERE usou)::int AS usaram,
+                count(*) FILTER (WHERE plan = 'teste' AND paid_until > now())::int AS em_teste,
+                count(*) FILTER (WHERE receita > 0)::int AS pagaram,
+                COALESCE(sum(receita), 0)::float8 AS receita
+         FROM a GROUP BY canal ORDER BY cadastros DESC, canal`,
+        [dias]
+      );
+      const top = await q(
+        `SELECT r.id, r.name, (SELECT email FROM users WHERE account_id = r.id AND role = 'owner' ORDER BY id LIMIT 1) AS email,
+                count(*)::int AS indicados, count(*) FILTER (WHERE a.ref_rewarded)::int AS pagaram
+         FROM accounts a JOIN accounts r ON r.id = a.referred_by
+         GROUP BY r.id, r.name ORDER BY pagaram DESC, indicados DESC LIMIT 10`
+      );
+      return res.json({ dias, rows, top });
+    }
+
     // Teste grátis padrão para qualquer cadastro novo (0 = sem teste)
     if (req.method === 'POST' && action === 'trial') {
       const days = Math.trunc(Number(req.body?.days));

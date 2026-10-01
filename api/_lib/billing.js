@@ -1,5 +1,8 @@
 import crypto from 'node:crypto';
 import { q } from './db.js';
+import { sendPush } from './push.js';
+
+export const REF_DAYS = 30;   // dias que quem indicou ganha quando o casal indicado paga
 
 const num = (v, d) => (Number.isFinite(Number(v)) && Number(v) > 0 ? Number(v) : d);
 
@@ -124,8 +127,37 @@ export async function processPayment(paymentId) {
       [String(pay.id), p.interval]
     );
     credited = rows.length > 0;
+    if (credited) await rewardReferrer(accountId).catch((e) => console.error('indicação', e));
   }
   return { accountId, status: pay.status, credited };
+}
+
+// Indique um casal: no 1º pagamento do casal indicado, quem indicou ganha REF_DAYS dias (uma única vez)
+export async function rewardReferrer(accountId) {
+  const [r] = await q(
+    `UPDATE accounts SET ref_rewarded = true
+     WHERE id = $1 AND referred_by IS NOT NULL AND referred_by <> id AND NOT ref_rewarded
+     RETURNING referred_by, name`,
+    [accountId]
+  );
+  if (!r) return false;
+  await q(
+    `UPDATE accounts
+        SET paid_until = GREATEST(COALESCE(paid_until, now()), now()) + make_interval(days => $2),
+            plan = COALESCE(plan, 'teste')
+      WHERE id = $1 AND plan IS DISTINCT FROM 'vitalicio'`,
+    [r.referred_by, REF_DAYS]
+  );
+  // Avisa no celular de quem indicou
+  const subs = await q(
+    `SELECT s.id, s.endpoint, s.p256dh, s.auth FROM push_subscriptions s JOIN users u ON u.id = s.user_id WHERE u.account_id = $1`,
+    [r.referred_by]
+  );
+  for (const s of subs) {
+    await sendPush(s, { title: '🎉 Você ganhou 1 mês grátis', body: `Um casal que você indicou acabou de assinar. Somamos ${REF_DAYS} dias ao seu acesso.`, url: '/?tab=conta' },
+      process.env.APP_URL || 'https://www.financasdocasal.sbs').catch(() => {});
+  }
+  return true;
 }
 
 /* ---------- Assinatura automática (Mercado Pago "preapproval") ---------- */
