@@ -34,6 +34,8 @@ export default async function handler(req, res) {
       try { if (await sendPush(s, d, baseUrl(req))) sent++; } catch (e) { failed++; console.error('push', s.id, e.statusCode || e.message); }
     }
     await q(`DELETE FROM push_log WHERE day < (now() AT TIME ZONE 'America/Sao_Paulo')::date - 30`);
+    await q(`DELETE FROM bot_seen WHERE at < now() - interval '3 days'`);
+    await q(`DELETE FROM bot_codes WHERE expires_at < now()`);
     res.json({ subs: subs.length, sent, skipped, failed });
   } catch (e) {
     console.error(e);

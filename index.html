@@ -1175,6 +1175,8 @@ async function renderAdmin() {
       <select id="funDias" style="border:1px solid var(--bd);background:var(--card);border-radius:10px;padding:5px 8px;text-transform:none;letter-spacing:0;font-weight:500">
         <option value="7">Últimos 7 dias</option><option value="30" selected>Últimos 30 dias</option><option value="90">Últimos 90 dias</option><option value="0">Desde o início</option></select></div>
     <div id="funBox"><div class="card"><div class="empty">Carregando…</div></div></div>
+    <div class="section-t">Robô de mensagens</div>
+    <div class="card" id="botAdm"><div class="empty">Carregando…</div></div>
     <div class="section-t">Teste grátis e campanhas</div>
     <div class="card" style="display:grid;gap:18px">
       <form id="trialForm" class="feature-row">
@@ -1245,6 +1247,7 @@ async function renderAdmin() {
     } catch (err) { if (err.message !== 'auth') $('#funBox').innerHTML = `<div class="card"><div class="empty">Erro: ${esc(err.message)}</div></div>`; }
   };
   $('#funDias').onchange = funil; funil();
+  api('/api/bot?action=admin').then(renderBotAdmin).catch(() => {});
   $('#trialForm').onsubmit = async e => {
     e.preventDefault();
     try { await api('/api/admin?action=trial', { method: 'POST', body: { days: Number(new FormData(e.target).get('days')) } }); toast('Teste grátis salvo ✓'); renderAdmin(); }
@@ -1257,6 +1260,23 @@ async function renderAdmin() {
       toast('Link de campanha criado ✓'); renderAdmin();
     } catch (err) { if (err.message !== 'auth') $('#campErr').textContent = err.message; }
   };
+}
+function renderBotAdmin(r) {
+  const box = $('#botAdm'); if (!box) return;
+  const cp = t => `<button class="btn sm" data-act="copy-txt" data-txt="${esc(t)}">Copiar</button>`;
+  box.innerHTML = `
+    <div style="display:grid;gap:16px">
+      <div><div style="font-weight:600;margin-bottom:4px">Telegram ${r.telegram_ready ? `<span class="badge b-ok">Ligado · @${esc(r.telegram)}</span>` : r.telegram_token ? '<span class="badge b-today">Token ok, falta ativar</span>' : '<span class="badge b-rec">Desligado</span>'}</div>
+        <p class="small mut" style="margin:0 0 8px">${r.telegram_token ? 'Toque em <b>Ativar / atualizar</b> sempre que trocar o token ou o domínio.' : 'No Telegram, fale com <b>@BotFather</b> → /newbot, copie o token e salve na Vercel como <span class="code">TELEGRAM_BOT_TOKEN</span>. Depois faça Redeploy e volte aqui.'}</p></div>
+      <div><div style="font-weight:600;margin-bottom:4px">WhatsApp oficial ${r.whatsapp ? `<span class="badge b-ok">Ligado · +${esc(r.whatsapp)}</span>` : r.whatsapp_on ? '<span class="badge b-today">Token ok, falta ativar</span>' : '<span class="badge b-rec">Desligado</span>'}${r.whatsapp_on && !r.wa_secret ? ' <span class="badge b-late">Falta WHATSAPP_APP_SECRET</span>' : ''}</div>
+        <p class="small mut" style="margin:0 0 8px">Na Meta (developers.facebook.com → seu app → WhatsApp → Configuração), em <b>Webhook</b> cole:</p>
+        <div class="feature-row" style="margin-bottom:6px"><span class="small">URL de retorno:</span><span class="code">${esc(r.wa_webhook)}</span>${cp(r.wa_webhook)}</div>
+        <div class="feature-row"><span class="small">Token de verificação:</span><span class="code">${esc(r.wa_verify)}</span>${cp(r.wa_verify)}</div>
+        <p class="small mut" style="margin:8px 0 0">e assine o campo <b>messages</b>. Variáveis na Vercel: <span class="code">WHATSAPP_TOKEN</span>, <span class="code">WHATSAPP_PHONE_ID</span> e <span class="code">WHATSAPP_APP_SECRET</span>.</p></div>
+      <div class="feature-row"><button class="btn pri" data-act="bot-setup">Ativar / atualizar robô</button>
+        <span class="small mut">${r.linked ? `${r.linked.tg} chat(s) no Telegram · ${r.linked.wa} no WhatsApp` : ''}</span></div>
+      ${r.errors?.length ? `<div class="warn-box" style="margin:0">${r.errors.map(esc).join('<br>')}</div>` : ''}
+    </div>`;
 }
 // Coloca o nome da coluna em cada célula (no celular a tabela vira lista "rótulo: valor")
 function stackTables(root = $('#view')) {
@@ -1289,6 +1309,42 @@ function refCard() {
       <div><b class="in">${r.days}</b><span>dias ganhos</span></div></div>
   </div>`;
 }
+/* ---------- Robô: lançar por mensagem (Telegram / WhatsApp) ---------- */
+const BOT_EX = ['gastei 100 em alimentação', 'mercado 250,90 no débito', 'uber 23,50 pix', 'tv 1.200 em 10x nubank', 'recebi 5000 salário', 'paguei a luz'];
+const CH_NAME = { tg: 'Telegram', wa: 'WhatsApp' };
+async function renderBotCard() {
+  const box = $('#botCard'); if (!box) return;
+  let st;
+  try { st = S.bot = await api('/api/bot?action=status'); } catch (e) { if (e.message !== 'auth') box.remove(); return; }
+  if (!st.telegram && !st.whatsapp) {
+    if (S.me.admin) box.innerHTML = `<h3>📲 Lançar por mensagem</h3><p class="small mut" style="margin:0">O robô ainda não está ligado. Configure em <b>Admin → Robô de mensagens</b>.</p>`;
+    else box.remove();
+    return;
+  }
+  box.innerHTML = `<h3>📲 Lançar por mensagem</h3>
+    <p class="small mut" style="margin:-4px 0 10px">Mande uma mensagem como <b>"gastei 100 em alimentação"</b> e o robô lança na hora, com categoria, forma de pagamento e data.${st.telegram ? ' No Telegram funciona também no grupo da família.' : ''}</p>
+    <div class="feature-row" style="flex-wrap:wrap">
+      ${st.whatsapp ? `<button class="btn wa" data-act="bot-connect" data-ch="wa">Conectar WhatsApp</button>` : ''}
+      ${st.telegram ? `<button class="btn" data-act="bot-connect" data-ch="tg" style="background:#229ed9;border-color:#229ed9;color:#fff">Conectar Telegram</button>` : ''}
+    </div>
+    <div id="botCode"></div>
+    ${st.links.length ? `<div class="list" style="box-shadow:none;margin-top:12px">${st.links.map(l => `<div class="row"><div class="main">
+        <div class="t">${CH_NAME[l.channel] || l.channel} ${l.label ? '· ' + esc(l.label) : ''}<span class="badge b-ok">Conectado</span></div>
+        <div class="m">desde ${fd(l.since)}</div></div><button class="ghost" data-act="bot-unlink" data-id="${l.id}" title="Desconectar">✕</button></div>`).join('')}</div>` : ''}
+    <details style="margin-top:12px"><summary class="small" style="cursor:pointer;font-weight:600">Exemplos do que mandar</summary>
+      <ul class="small mut" style="margin:8px 0 0;padding-left:18px;line-height:1.7">${BOT_EX.map(x => `<li>${esc(x)}</li>`).join('')}
+        <li><b>resumo</b> · <b>contas</b> · <b>desfazer</b> · <b>ajuda</b></li></ul></details>`;
+}
+async function botConnect(ch) {
+  const d = await api('/api/bot?action=code', { method: 'POST', body: {} });
+  const url = ch === 'tg' ? `https://t.me/${d.telegram}?start=${d.code}` : `https://wa.me/${d.whatsapp}?text=${encodeURIComponent('conectar ' + d.code)}`;
+  $('#botCode').innerHTML = `<div class="ok-msg" style="margin-top:12px">
+    ${ch === 'tg' ? `Abrimos o Telegram: toque em <b>Iniciar</b>.` : `Abrimos o WhatsApp com a mensagem pronta: é só <b>enviar</b>.`}
+    Se não abriu, ${ch === 'tg' ? `procure <b>@${esc(d.telegram)}</b>` : `mande para <b>+${esc(d.whatsapp)}</b>`}: <b>conectar ${d.code}</b>
+    <span class="small" style="display:block;margin-top:4px">O código vale 15 minutos.${ch === 'tg' ? ' Para usar no grupo: adicione o robô ao grupo da família; cada pessoa conecta o próprio Telegram uma vez.' : ''}</span>
+    <button class="btn sm" style="margin-top:8px" data-act="bot-refresh">Já conectei</button></div>`;
+  window.open(url, '_blank');
+}
 function renderConta() {
   const a = S.account, owner = S.me.role === 'owner';
   const vital = a.plan === 'vitalicio';
@@ -1304,6 +1360,7 @@ function renderConta() {
         <button class="btn">Salvar</button>
       </div><p class="err" id="profileErr"></p></form>
     </div>
+    <div class="card" id="botCard"><h3>📲 Lançar por mensagem</h3><div class="small mut">Carregando…</div></div>
     ${refCard()}
     <div class="card">
       <h3>Assinatura</h3>
@@ -1345,6 +1402,7 @@ function renderConta() {
     <p class="small mut" style="text-align:center"><a href="/termos.html" style="color:inherit">Termos de Uso</a> · <a href="/privacidade.html" style="color:inherit">Política de Privacidade</a></p>
   </div>`;
   renderDeviceCards();
+  renderBotCard();
 
   $('#memberForm')?.addEventListener('submit', async e => {
     e.preventDefault(); const f = new FormData(e.target);
@@ -2657,6 +2715,11 @@ document.addEventListener('click', async e => {
     else if (act === 'acerto-wa') window.open('https://wa.me/?text=' + encodeURIComponent(acertoTxt(mk(), acerto(mk()))), '_blank');
     else if (act === 'ref-copy') { await copyText(refLink()); toast('Link copiado ✓'); }
     else if (act === 'ref-wa') window.open('https://wa.me/?text=' + encodeURIComponent(refMsg()), '_blank');
+    else if (act === 'bot-connect') await botConnect(b.dataset.ch);
+    else if (act === 'bot-refresh') { await renderBotCard(); toast(S.bot?.links?.length ? 'Conectado ✓' : 'Ainda não recebi a mensagem. Tente de novo.'); }
+    else if (act === 'bot-unlink') { if (!confirm('Desconectar este chat? Ele para de lançar na sua conta.')) return; await api('/api/bot?action=unlink', { method: 'POST', body: { id } }); renderBotCard(); toast('Desconectado'); }
+    else if (act === 'bot-setup') { b.disabled = true; const r = await api('/api/bot?action=setup', { method: 'POST', body: {} }); renderBotAdmin(r); toast(r.errors.length ? 'Veja os avisos' : 'Robô atualizado ✓'); }
+    else if (act === 'copy-txt') { await copyText(b.dataset.txt); toast('Copiado ✓'); }
     else if (act === 'onb-solo') { store.set('fc-solo-' + S.me.id, '1'); render(); }
     else if (act === 'onb-hide') { store.set('fc-onb-off-' + S.me.id, '1'); render(); }
     else if (act === 'onb-bill') { S.tab = 'bills'; render(); openForm('bills'); }

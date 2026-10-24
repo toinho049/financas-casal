@@ -15,6 +15,7 @@ Front-end em HTML/JS puro + funções serverless da Vercel + Postgres (Neon).
 - **Cartões de crédito** (aba Contas a pagar): fechamento, vencimento e limite; cada compra no crédito escolhe o cartão e cai na fatura certa, com parcelas. Aviso no sininho e no celular quando a fatura vence.
 - **Metas** (aba Metas): valor, prazo, quanto guardar por mês, guardar/retirar.
 - **Resumo do mês no celular** no dia 1 (junto com o aviso das 8h) e no sininho nos dias 1 a 3.
+- **Lançar por mensagem** (`api/bot.js`): Telegram (privado ou grupo) e WhatsApp oficial da Meta. "gastei 100 em alimentação", "tv 1.200 em 10x nubank", "paguei a luz", "resumo", "desfazer". Cada pessoa conecta o chat na aba Conta com um código. Configuração em **Admin → Robô de mensagens**.
 - **Tema claro, escuro ou automático** (botão no topo e em Mais, no celular); a escolha fica salva no aparelho.
 - **Página de vendas** (visual escuro, com prévia animada do app) para quem não está logado (recursos, planos, dúvidas) e imagem de prévia do link (`og.png`).
 - **Teste grátis**: padrão para todo cadastro (Admin → Teste grátis) e **links de campanha** `/?convite=CODIGO` com dias próprios.
@@ -57,6 +58,10 @@ api/_lib/billing.js     # integração Mercado Pago e regra de liberação do ac
 | `ADMIN_EMAILS` | não | E-mails com acesso à aba **Admin**, separados por vírgula |
 | `RESEND_API_KEY` | não | Chave do resend.com para o "Esqueci minha senha" por e-mail |
 | `MAIL_FROM` | não | Remetente, ex. `Finanças do Casal <nao-responda@seudominio.com.br>` |
+| `TELEGRAM_BOT_TOKEN` | não | Token do robô criado no @BotFather. Depois: Admin → Robô → Ativar |
+| `WHATSAPP_TOKEN` | não | Token permanente do app na Meta (WhatsApp Cloud API) |
+| `WHATSAPP_PHONE_ID` | não | "Phone number ID" do número do robô na Meta |
+| `WHATSAPP_APP_SECRET` | com WhatsApp | "App secret" do app na Meta: confere que a mensagem veio mesmo da Meta |
 | `USERS` | não | Só para a migração da conta antiga (`nome:senha;nome:senha`) |
 
 Depois de mudar variáveis, faça **Redeploy**.

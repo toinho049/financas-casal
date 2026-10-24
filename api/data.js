@@ -194,7 +194,7 @@ export default async function handler(req, res) {
 }
 
 // Divide o total em N parcelas mensais (centavos que sobram vão na 1ª)
-async function createInstallments(body, acc) {
+export async function createInstallments(body, acc) {
   const n = Math.trunc(Number(body.installments));
   const total = Number(body.amount);
   if (!(n >= 2 && n <= 48)) throw Object.assign(new Error('Parcelas: de 2 a 48'), { status: 400 });
@@ -246,7 +246,7 @@ async function importRows(rows, me) {
 }
 
 // Marca a conta como paga, lança a saída e, se for recorrente, cria a do mês seguinte
-async function payBill(id, { date, person, method: how }, me) {
+export async function payBill(id, { date, person, method: how }, me) {
   const acc = me.account_id;
   const [b] = await q(
     `SELECT id, description, amount, category, recurring, paid, due_date::text AS due_date

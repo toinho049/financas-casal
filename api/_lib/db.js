@@ -150,6 +150,27 @@ const DDL = [
     paid_at TIMESTAMPTZ DEFAULT now(),
     PRIMARY KEY (card_id, month)
   )`,
+  // Robô de mensagens (Telegram / WhatsApp)
+  `CREATE TABLE IF NOT EXISTS bot_links (
+    id SERIAL PRIMARY KEY,
+    channel TEXT NOT NULL,
+    ext_id TEXT NOT NULL,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    label TEXT,
+    created_at TIMESTAMPTZ DEFAULT now(),
+    UNIQUE (channel, ext_id)
+  )`,
+  `CREATE TABLE IF NOT EXISTS bot_codes (
+    code TEXT PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    expires_at TIMESTAMPTZ NOT NULL
+  )`,
+  `CREATE TABLE IF NOT EXISTS bot_seen (
+    key TEXT PRIMARY KEY,
+    at TIMESTAMPTZ NOT NULL DEFAULT now()
+  )`,
+  `ALTER TABLE transactions ADD COLUMN IF NOT EXISTS bot_user INTEGER`,
+  `ALTER TABLE transactions ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT now()`,
   // Metas do casal
   `CREATE TABLE IF NOT EXISTS goals (
     id SERIAL PRIMARY KEY,
